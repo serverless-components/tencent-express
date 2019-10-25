@@ -1,6 +1,6 @@
 # Tencent Express
 
-Instantly deploy Express applications to Tencent Cloud using Serverless Components
+Deploy Express applications to Tencent Cloud using Serverless Components
 
 &nbsp;
 
@@ -23,8 +23,9 @@ $ npm install -g serverless
 Just create `serverless.yml` and `.env` files
 
 ```console
-$ touch serverless.yml
 $ touch .env # your Tencent API Keys
+$ touch app.js
+$ touch serverless.yml
 ```
 
 Set Tencent credentials in the `.env` file.
@@ -36,42 +37,39 @@ TENCENT_SECRET_KEY=123
 TENCENT_APP_ID=123
 ```
 
+Initialize a new NPM package and install express:
+
+```
+npm init              # then keep hitting enter
+npm i --save express  # install express
+```
+
+create your express app in `app.js`:
+
+```js
+const express = require('express')
+const app = express()
+
+app.get('/', function(req, res) {
+  res.send('Hello from Express')
+})
+
+// don't forget to export!
+module.exports = app
+```
+
 ### 3. Configure
 
 ```yml
 # serverless.yml
 
 myBucket:
-  component: '@serverless/tencent-cos'
+  component: '@serverless/tencent-express'
   inputs:
-    # Required
-    bucket: myBucket-1300418942 # if you don't add the AppId suffix, it will be added automatically for you
-    region: ap-guangzhou
-
-    # acl (Optional)
-    acl:
-      permissions: private
-      grantRead: STRING_VALUE
-      grantWrite: STRING_VALUE
-      grantFullControl: STRING_VALUE
-
-    # cors (Optional)
-    cors:
-      - id: abc
-        maxAgeSeconds: '10'
-        allowedMethods:
-          - GET
-        allowedOrigins:
-          - https://tencent.com
-        allowedHeaders:
-          - FIRST_ALLOWED_HEADER
-        exposeHeaders:
-          - FIRST_EXPOSED_HEADER
-
-    # tags (Optional)
-    tags:
-      - key: abc
-        value: xyz
+    functionName: eslam-function # SCF name
+    serviceName: mytest # APIGW service name
+    serviceId: service-np1uloxw # APIGW service id
+    code: ./code
 ```
 
 ### 4. Deploy
@@ -79,30 +77,16 @@ myBucket:
 ```
 myApp (master)$ serverless --debug
 
-  DEBUG ─ "myBucket-1300418942" bucket was successfully deployed to the "eu-frankfurt" region.
-  DEBUG ─ Setting ACL for "myBucket-1300418942" bucket in the "eu-frankfurt" region.
-  DEBUG ─ Setting CORS rules for "myBucket-1300418942" bucket in the "eu-frankfurt" region.
-  DEBUG ─ Setting Tags for "myBucket-1300418942" bucket in the "undefined" region.
+  DEBUG ─ Endpoint ANY / already exists with id api-3n1p7a86.
+  DEBUG ─ Updating api with api id api-3n1p7a86.
+  DEBUG ─ Service with id api-3n1p7a86 updated.
+  DEBUG ─ Deploying service with id service-np1uloxw.
+  DEBUG ─ Deployment successful for the api named express.TencentApiGateway in the ap-guangzhou region.
 
-  bucket:
-    bucket: myBucket-1300418942
-    region: eu-frankfurt
-    acl:
-      permissions: private
-    cors:
-      -
-        id:             abc
-        maxAgeSeconds:  10
-        allowedMethods: (max depth reached)
-        allowedOrigins: (max depth reached)
-        allowedHeaders: (max depth reached)
-        exposeHeaders:  (max depth reached)
-    tags:
-      -
-        key:   abc
-        value: xyz
+  express:
+    url: http://service-np1uloxw-1300415943.gz.apigw.tencentcs.com/release
 
-  3s › bucket › done
+  84s › express › done
 
 myApp (master)$
 ```
@@ -113,10 +97,9 @@ myApp (master)$
 myApp (master)$ serverless remove --debug
 
   DEBUG ─ Flushing template state and removing all components.
-  DEBUG ─ Removing "myBucket-1300418942" bucket from the "eu-frankfurt" region.
-  DEBUG ─ "myBucket-1300418942" bucket was successfully removed from the "eu-frankfurt" region.
+  DEBUG ─ Removed function eslam-function successful
 
-  7s › bucket › done
+  17s › express › done
 
 myApp (master)$
 ```

@@ -14,6 +14,8 @@
   "license": "Apache",
   "dependencies": {
     "@serverless/core": "^1.0.0",
+    "@serverless/tencent-apigateway": "^1.2.0",
+    "@serverless/tencent-cloudfunction": "^1.1.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
