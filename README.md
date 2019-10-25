@@ -63,7 +63,7 @@ module.exports = app
 ```yml
 # serverless.yml
 
-myBucket:
+express:
   component: '@serverless/tencent-express'
   inputs:
     functionName: eslam-function # SCF name
