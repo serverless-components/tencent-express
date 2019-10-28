@@ -3,7 +3,22 @@ const { Component, utils } = require('@serverless/core')
 
 class TencentExpress extends Component {
   async default(inputs = {}) {
-    inputs.include = [path.join(__dirname, 'shim', 'dist')]
+    // there are some dependencies that require the express him to work
+    // I've included them all here. A better approach would be to use
+    // browserify to build all of these files into one.
+    // but browserify throws an error because the required app.js is not found
+    // which the user will be adding later on after the build
+    const shimsDir = path.join(__dirname, 'shims')
+    inputs.include = [
+      path.join(shimsDir, 'binary-case.js'),
+      path.join(shimsDir, 'index.js'),
+      path.join(shimsDir, 'media-typer.js'),
+      path.join(shimsDir, 'middleware.js'),
+      path.join(shimsDir, 'mime-db.json'),
+      path.join(shimsDir, 'mime-types.js'),
+      path.join(shimsDir, 'type-is.js')
+    ]
+    inputs.exclude = ['.git/**', '.gitignore', '.serverless', '.DS_Store']
     inputs.handler = 'index.handler'
     inputs.runtime = 'Nodejs8.9'
     inputs.name = inputs.functionName
@@ -15,7 +30,7 @@ class TencentExpress extends Component {
       throw new Error(`app.js not found in ${inputs.codeUri}`)
     }
 
-    const tencentCloudFunction = await this.load('@serverless/tencent-cloudfunction')
+    const tencentCloudFunction = await this.load('@serverless/tencent-scf')
     const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
     const tencentCloudFunctionOutputs = await tencentCloudFunction(inputs)
@@ -44,7 +59,7 @@ class TencentExpress extends Component {
   }
 
   async remove() {
-    const tencentCloudFunction = await this.load('@serverless/tencent-cloudfunction')
+    const tencentCloudFunction = await this.load('@serverless/tencent-scf')
     const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
     await tencentCloudFunction.remove()

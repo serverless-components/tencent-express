@@ -51,7 +51,7 @@ const express = require('express')
 const app = express()
 
 app.get('/', function(req, res) {
-  res.send('Hello from Express')
+  res.send('Hello Express')
 })
 
 // don't forget to export!
@@ -69,7 +69,7 @@ express:
     functionName: eslam-function # SCF name
     serviceName: mytest # APIGW service name
     serviceId: service-np1uloxw # APIGW service id
-    code: ./code
+    # code: ./code Optional - default is current working directory
 ```
 
 ### 4. Deploy
@@ -90,6 +90,8 @@ myApp (master)$ serverless --debug
 
 myApp (master)$
 ```
+
+You can now visit the output URL in the browser, and you should see the express response.
 
 ### 5. Remove
 
