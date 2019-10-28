@@ -45,10 +45,6 @@ function mapApiGatewayEventToHttpRequest(event, context, socketPath) {
     path: getPathWithQueryStringParams(event),
     headers,
     socketPath
-    // protocol: `${headers['X-Forwarded-Proto']}:`,
-    // host: headers.Host,
-    // hostname: headers.Host, // Alias for host
-    // port: headers['X-Forwarded-Port']
   }
 }
 
@@ -118,7 +114,6 @@ function forwardLibraryErrorResponseToApiGateway(error, resolve) {
 }
 
 function getSocketPath(socketPathSuffix) {
-  /* istanbul ignore if */ /* only running tests on Linux; Window support is for local dev only */
   if (/^win/.test(process.platform)) {
     const path = require('path')
     return path.join('\\\\?\\pipe', process.cwd(), `server-${socketPathSuffix}`)
@@ -176,7 +171,6 @@ function createServer(requestListener, serverListenCallback, binaryTypes) {
       server._isListening = false
     })
     .on('error', (error) => {
-      /* istanbul ignore else */
       if (error.code === 'EADDRINUSE') {
         // eslint-disable-next-line
         console.warn(
