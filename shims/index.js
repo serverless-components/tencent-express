@@ -210,12 +210,6 @@ function proxy(server, event, context) {
 
 function handler(event, context) {
   const app = require('./app')
-  // return {
-  //   isBase64: false,
-  //   statusCode: 200,
-  //   headers: { 'Content-Type': 'text', 'Access-Control-Allow-Origin': '*' },
-  //   body: 'body'
-  // }
   const server = createServer(app)
   return proxy(server, event, context)
 }
