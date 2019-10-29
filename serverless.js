@@ -45,6 +45,7 @@ class TencentExpress extends Component {
           path: '/',
           method: 'ANY',
           function: {
+            isIntegratedResponse: true,
             functionName: tencentCloudFunctionOutputs.Name
           }
         }
