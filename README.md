@@ -30,6 +30,10 @@ $ touch serverless.yml
 
 Set Tencent credentials in the `.env` file.
 
+If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first.  
+
+If you already [login in](https://intl.cloud.tencent.com/login), find  `TENCENT_SECRET_ID` and `TENCENT_SECRET_KEY`  in [Tencent Console](https://console.cloud.tencent.com/cam/capi).
+
 ```
 # .env
 TENCENT_SECRET_ID=123
@@ -67,9 +71,9 @@ express:
   component: '@serverless/tencent-express'
   inputs:
     functionName: eslam-function # SCF name
-    serviceName: mytest # APIGW service name
-    serviceId: service-np1uloxw # APIGW service id
-    # code: ./code Optional - default is current working directory
+    # serviceName: mytest   Optional - APIGW service name, default to create a new serivce
+    # serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
+    # code: ./code   Optional - default is current working directory
 ```
 
 ### 4. Deploy
