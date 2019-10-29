@@ -42,15 +42,23 @@ class TencentExpress extends Component {
     const tencentCloudFunction = await this.load('@serverless/tencent-scf')
     const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
-    inputs.timeout = inputs.functionConf.timeout || 3
-    inputs.memorySize = inputs.functionConf.memorySize || 128
+    inputs.timeout =
+      inputs.functionConf && inputs.functionConf.timeout ? inputs.functionConf.timeout : 3
+    inputs.memorySize =
+      inputs.functionConf && inputs.functionConf.memorySize ? inputs.functionConf.memorySize : 128
     const tencentCloudFunctionOutputs = await tencentCloudFunction(inputs)
     const tencentApiGatewayOutputs = await tencentApiGateway({
       serviceName: inputs.serviceName,
       serviceId: inputs.serviceId,
       region: inputs.region,
-      protocol: inputs.apigatewayConf.protocol,
-      environment: inputs.apigatewayConf.environment,
+      protocol:
+        inputs.apigatewayConf && inputs.apigatewayConf.protocol
+          ? inputs.apigatewayConf.protocol
+          : 'http',
+      environment:
+        inputs.apigatewayConf && inputs.apigatewayConf.environment
+          ? inputs.apigatewayConf.environment
+          : 'release',
       endpoints: [
         {
           path: '/',
