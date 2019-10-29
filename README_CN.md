@@ -76,12 +76,20 @@ module.exports = app
 # serverless.yml
 
 express:
-  component: '@serverless/tencent-express'
+  region: ap-shanghai
+  component: '/Users/dfounderliu/Desktop/temp/tencent-express'
   inputs:
+    region: ap-shanghai
     functionName: eslam-function # SCF函数名
     # serviceName: mytest   可选，API网关的服务名，默认会创建一个新的服务
     # serviceId: service-np1uloxw   可选，API网关的服务Id，默认会创建一个新的服务
     # code: ./code   可选，默认是当前的工作目录
+    functionConf:
+      timeout: 10
+      memorySize: 128
+    apigatewayConf:
+      protocol: https
+      environment: test
 ```
 
 ### 4. 部署
