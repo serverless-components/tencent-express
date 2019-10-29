@@ -64,12 +64,21 @@ module.exports = app
 # serverless.yml
 
 express:
-  component: '@serverless/tencent-express'
+  region: ap-shanghai
+  component: '/Users/dfounderliu/Desktop/temp/tencent-express'
   inputs:
-    functionName: eslam-function # SCF name
-    serviceName: mytest # APIGW service name
-    serviceId: service-np1uloxw # APIGW service id
-    # code: ./code Optional - default is current working directory
+    region: ap-shanghai
+#    functionName: eslam-function # SCF name
+#    serviceName: mytest # APIGW service name
+#    serviceId: service-np1uloxw # APIGW service id
+#     code: ./code Optional - default is current working directory
+    functionConf:
+      timeout: 10
+      memorySize: 128
+    apigatewayConf:
+      protocol: https
+      environment: test
+
 ```
 
 ### 4. Deploy
