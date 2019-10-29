@@ -8,7 +8,7 @@ Deploy Express applications to Tencent Cloud using Serverless Components
 
 ## 简介
 
-Express 组件通过使用 serverless-tencent 的基础组件如API网关组件，SCF组件等，快速，方便的创建，配置和管理一个Express框架。
+Express 组件通过使用 serverless-tencent 的基础组件如API网关组件，SCF组件等，快速，方便的在腾讯云创建，配置和管理一个Express框架。
 
 ## 快速开始
 
