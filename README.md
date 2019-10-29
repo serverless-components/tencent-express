@@ -68,10 +68,10 @@ express:
   component: '/Users/dfounderliu/Desktop/temp/tencent-express'
   inputs:
     region: ap-shanghai
-#    functionName: eslam-function # SCF name
-#    serviceName: mytest # APIGW service name
-#    serviceId: service-np1uloxw # APIGW service id
-#     code: ./code Optional - default is current working directory
+#   functionName: eslam-function # SCF name
+#   serviceName: mytest   Optional - APIGW service name, default to create a new serivce
+#   serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
+#   code: ./code   Optional - default is current working directory
     functionConf:
       timeout: 10
       memorySize: 128
