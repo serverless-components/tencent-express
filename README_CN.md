@@ -1,7 +1,5 @@
 [![Serverless Express Tencent Cloud](https://s3.amazonaws.com/assets.github.serverless/github_readme_serverless_express_tencent.png)](http://serverless.com)
 
-Deploy Express applications to Tencent Cloud using Serverless Components
-
 &nbsp;
 
 # 腾讯云Express组件
