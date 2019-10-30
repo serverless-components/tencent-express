@@ -67,7 +67,7 @@ module.exports = app
 
 express:
   region: ap-shanghai
-  component: '/Users/dfounderliu/Desktop/temp/tencent-express'
+  component: '@serverless/tencent-express'
   inputs:
     region: ap-shanghai
 #   functionName: eslam-function # SCF name
