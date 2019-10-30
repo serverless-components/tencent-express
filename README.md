@@ -28,7 +28,7 @@ $ touch app.js
 $ touch serverless.yml
 ```
 
-Set Tencent credentials in the `.env` file.
+Add the access keys of a [Tencent CAM Role](https://console.cloud.tencent.com/cam/capi) with `AdministratorAccess` in the `.env` file, using this format: 
 
 ```
 # .env
@@ -36,6 +36,8 @@ TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 TENCENT_APP_ID=123
 ```
+
+* If you don't have a Tencent Cloud account, you could [sign up](https://intl.cloud.tencent.com/register) first. 
 
 Initialize a new NPM package and install express:
 
