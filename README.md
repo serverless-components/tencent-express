@@ -99,6 +99,47 @@ express:
 #          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
 ```
 
+* Main param description
+
+| Param        | Required/Optional    |  Default    |  Description |
+| --------     | :-----:              | :----:      |  :----:      |
+| region       | Optional             |ap-guangzhou |  |
+| functionName | Optional             |             | ServerlessCloudFunction Name |
+| serviceName  | Optional             |             | API-Gateway service name, default to create a new serivce |
+| serviceId    | Optional             |             | API-Gateway service id, if it has will use this APII-Gateway service |
+| code         | Optional             |             | Default is current working directory |
+| functionConf | Optional             |             | Function configure |
+| apigatewayConf| Optional            |             | API-Gateway configure |
+
+
+* funtionConf param description
+
+| Param        | Required/Optional    |  Default    |  Description |
+| --------     | :-----:              | :----:      |  :----:      |
+| timeout      | Optional             | 3s          | The duration a function allowed to execute. Choose a value between 1 and 300 seconds; The default is 3 seconds. |
+| memorySize   | Optional             |128M         | The size of memory size available to the function during execution. Specify a value between 128 MB (default) and 1,536 MB in 128 MB increments. |
+| environment  | Optional             |             | Environment variable of the function |
+| -- variables |                      |             | Environment variable array |
+| vpcConfig    | Optional             |             | VPC configuration of the function |
+| -- subnetId  |                      |             | ID of the VPC |
+| -- vpcId     |                      |             | ID of the subnet |
+
+* apigatewayConf param description
+
+| Param        | Required/Optional    |  Default    |  Description |
+| --------     | :-----:              | :----:      |  :----:      |
+| protocol      | Optional             |          | Frontend request type of the service, such as HTTP, HTTPS, HTTP and HTTPS. |
+| environment   | Optional             |         | The name of the environment to be published. Three environments are supported: test, prepub and release. |
+| usagePlan  | Optional             |             |  |
+| -- usagePlanId |                      |             | User-defined usage plan id |
+| -- usagePlanName |                      |             | User-defined usage plan name |
+| -- usagePlanDesc |                      |             | User-defined usage plan description |
+| -- maxRequestNum |                      |             | Total number of requests allowed. If this is left empty, -1 will be used by default, indicating it’s disabled |
+| auth    | Optional            |             |  |
+| -- serviceTimeout  |                      |             |  |
+| -- secretName     |                      |             |  |
+| -- secretIds     |                      |             |  |
+
 ### 4. Deploy
 
 ```
