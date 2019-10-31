@@ -42,13 +42,21 @@ class TencentExpress extends Component {
     const tencentCloudFunction = await this.load('@serverless/tencent-scf')
     const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
-    inputs.timeout =
-      inputs.functionConf && inputs.functionConf.timeout ? inputs.functionConf.timeout : 3
-    inputs.memorySize =
-      inputs.functionConf && inputs.functionConf.memorySize ? inputs.functionConf.memorySize : 128
+    if (inputs.functionConf) {
+      inputs.timeout = inputs.functionConf.timeout ? inputs.functionConf.timeout : 3
+      inputs.memorySize = inputs.functionConf.memorySize ? inputs.functionConf.memorySize : 128
+      if (inputs.functionConf.environment) {
+        inputs.environment = inputs.functionConf.environment
+      }
+      if (inputs.functionConf.vpcConfig) {
+        inputs.vpcConfig = inputs.functionConf.vpcConfig
+      }
+    }
+
     const tencentCloudFunctionOutputs = await tencentCloudFunction(inputs)
-    const tencentApiGatewayOutputs = await tencentApiGateway({
+    const apigwParam = {
       serviceName: inputs.serviceName,
+      description: 'Serverless Framework tencent-express Component',
       serviceId: inputs.serviceId,
       region: inputs.region,
       protocol:
@@ -69,9 +77,19 @@ class TencentExpress extends Component {
           }
         }
       ]
-    })
+    }
+    if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
+      apigwParam.endpoints[0].usagePlan = inputs.apigatewayConf.usagePlan
+    }
+    if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
+      apigwParam.endpoints[0].auth = inputs.apigatewayConf.auth
+    }
 
+    const tencentApiGatewayOutputs = await tencentApiGateway(apigwParam)
     const outputs = {
+      region: inputs.region,
+      functionName: inputs.name,
+      apiGatewayServiceId: tencentApiGatewayOutputs.serviceId,
       url: `${tencentApiGatewayOutputs.protocol}://${tencentApiGatewayOutputs.subDomain}/${tencentApiGatewayOutputs.environment}/`
     }
 

@@ -70,17 +70,33 @@ express:
   component: '@serverless/tencent-express'
   inputs:
     region: ap-shanghai
-#   functionName: eslam-function # SCF name
-#   serviceName: mytest   Optional - APIGW service name, default to create a new serivce
-#   serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
-#   code: ./code   Optional - default is current working directory
-    functionConf:
-      timeout: 10
-      memorySize: 128
-    apigatewayConf:
-      protocol: https
-      environment: test
-
+#    functionName: eslam-function # SCF name
+#    serviceName: mytest   Optional - APIGW service name, default to create a new serivce
+#    serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
+#    code: ./code   Optional - default is current working directory
+#    functionConf:
+#      timeout: 10
+#      memorySize: 128
+#      environment:
+#        variables:
+#          TEST: vale
+#      vpcConfig:
+#        subnetId: ''
+#        vpcId: ''
+#    apigatewayConf:
+#      protocol: https
+#      environment: test
+#      usagePlan:
+#        # if dont't exists create a new 
+#        usagePlanId: 1111
+#        usagePlanName: slscmp # required
+#        usagePlanDesc: sls create
+#        maxRequestNum: 1000
+#      auth:
+#        serviceTimeout: 15
+#        secretName: secret  # required
+#        secretIds:
+#          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
 ```
 
 ### 4. Deploy
