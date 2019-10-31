@@ -129,26 +129,26 @@ express:
 | timeout      | 可选             | 3s          | 函数最长执行时间，单位为秒，可选值范围 1-300 秒，默认为 3 秒 |
 | memorySize   | 可选             |128M         | 函数运行时内存大小，默认为 128M，可选范围 128MB-1536MB，并且以 128MB 为阶梯 |
 | environment  | 可选             |             | 函数的环境变量 |
-| -- variables |                      |             | 环境变量数组 |
+| -variables |                      |             | 环境变量数组 |
 | vpcConfig    | 可选             |             | 函数的私有网络配置 |
-| -- subnetId  |                      |             | 私有网络 的 id |
-| -- vpcId     |                      |             | 子网的 id |
+| -subnetId  |                      |             | 私有网络 的 id |
+| -vpcId     |                      |             | 子网的 id |
 
 * apigatewayConf 参数说明
 
-| Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----      |
-| protocol      | 可选             |          | 服务的前端请求类型。如 HTTP、HTTPS、HTTP 和 HTTPS。 |
-| environment   | 可选             |         | 待发布的环境名称，当前支持三个环境，测试：test，预发：prepub，线上：release |
-| usagePlan  | 可选             |             |  |
-| -- usagePlanId |                      |             | 用户自定义的使用计划ID |
-| -- usagePlanName |                      |             | 用户自定义的使用计划名称 |
-| -- usagePlanDesc |                      |             | 用户自定义的使用计划描述 |
-| -- maxRequestNum |                      |             | 请求配额总数，不传为-1表示不开启 |
-| auth    | 可选            |             |  |
-| -- serviceTimeout  |                      |             |  |
-| -- secretName     |                      |             |  |
-| -- secretIds     |                      |             |  |
+| Param        | Required/Optional    |   Description |
+| --------     | :-----:              |  :----      |
+| protocol      | 可选             |           服务的前端请求类型。如 HTTP、HTTPS、HTTP 和 HTTPS。 |
+| environment   | 可选             |          待发布的环境名称，当前支持三个环境，测试：test，预发：prepub，线上：release |
+| usagePlan  | 可选             |               |
+| -usagePlanId |                      |              用户自定义的使用计划ID |
+| -usagePlanName |                                  | 用户自定义的使用计划名称 |
+| -usagePlanDesc |                                   | 用户自定义的使用计划描述 |
+| -maxRequestNum |                                   | 请求配额总数，不传为-1表示不开启 |
+| auth    | 可选            |               |
+| -serviceTimeout  |                                   |  |
+| -secretName     |                                   |  |
+| -secretIds     |                                   |  |
 
 ### 4. 部署
 
