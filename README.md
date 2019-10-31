@@ -99,87 +99,42 @@ express:
 #          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
 ```
 
-* Main param description
-
-| Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----      |
-| region       | Optional             |ap-guangzhou |  |
-| functionName | Optional             |             | ServerlessCloudFunction Name |
-| serviceName  | Optional             |             | API-Gateway service name, default to create a new serivce |
-| serviceId    | Optional             |             | API-Gateway service id, if it has will use this APII-Gateway service |
-| code         | Optional             |             | Default is current working directory |
-| functionConf | Optional             |             | Function configure |
-| apigatewayConf| Optional            |             | API-Gateway configure |
-
-
-* funtionConf param description
-
-| Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----      |
-| timeout      | Optional             | 3s          | The duration a function allowed to execute. Choose a value between 1 and 300 seconds; The default is 3 seconds. |
-| memorySize   | Optional             |128M         | The size of memory size available to the function during execution. Specify a value between 128 MB (default) and 1,536 MB in 128 MB increments. |
-| environment  | Optional             |             | Environment variable of the function |
-| vpcConfig    | Optional             |             | VPC configuration of the function |
-
-
-environment param description
-
-| Param        |   Description |
-| --------     |   :----      |
-| variables    |   Environment variable array |
-
-
-vpcConfig param description
-
-| Param        |  Description |
-| --------     |   :----      |
-| subnetId     |  ID of the VPC |
-| vpcId        | ID of the subnet |
-
-* apigatewayConf param description
-
-| Param        | Required/Optional    |  Description |
-| --------     | :-----:              |   :----      |
-| protocol      | Optional             | Frontend request type of the service, such as HTTP, HTTPS, HTTP and HTTPS. |
-| environment   | Optional             |  The name of the environment to be published. Three environments are supported: test, prepub and release. |
-| usagePlan  | Optional             |             |
-| auth    | Optional            |           |
-
-usagePlan param description
-
-| Param        |  Description |
-| --------     |   :----      |
-| usagePlanId | User-defined usage plan id |
-| usagePlanName | User-defined usage plan name |
-| usagePlanDesc | User-defined usage plan description |
-| maxRequestNum | Total number of requests allowed. If this is left empty, -1 will be used by default, indicating it’s disabled |
-
-
-auth param description
-
-| Param        |  Description |
-| --------     |   :----      |
-| serviceTimeout  |   Service timeout    |
-| secretName     |    Secret name    |
-| secretIds     |    Secret Id (Array)     |
+* [Click here to view the configuration document](https://github.com/serverless-tencent/tencent-express/docs/configure.md)
 
 ### 4. Deploy
 
 ```
-myApp (master)$ serverless --debug
+$ sls --debug
 
-  DEBUG ─ Endpoint ANY / already exists with id api-3n1p7a86.
-  DEBUG ─ Updating api with api id api-3n1p7a86.
-  DEBUG ─ Service with id api-3n1p7a86 updated.
-  DEBUG ─ Deploying service with id service-np1uloxw.
-  DEBUG ─ Deployment successful for the api named express.TencentApiGateway in the ap-guangzhou region.
+  DEBUG ─ Resolving the template's static variables.
+  DEBUG ─ Collecting components from the template.
+  DEBUG ─ Downloading any NPM components found in the template.
+  DEBUG ─ Analyzing the template's components dependencies.
+  DEBUG ─ Creating the template's components graph.
+  DEBUG ─ Syncing template state.
+  DEBUG ─ Executing the template's components graph.
+  DEBUG ─ Compressing function ExpressComponent_7xRrrd file to /Users/dfounderliu/Desktop/temp/code/.serverless/ExpressComponent_7xRrrd.zip.
+  DEBUG ─ Compressed function ExpressComponent_7xRrrd file successful
+  DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-shanghai-code]. sls-cloudfunction-default-ExpressComponent_7xRrrd-1572512568.zip
+  DEBUG ─ Uploaded package successful /Users/dfounderliu/Desktop/temp/code/.serverless/ExpressComponent_7xRrrd.zip
+  DEBUG ─ Creating function ExpressComponent_7xRrrd
+  DEBUG ─ Created function ExpressComponent_7xRrrd successful
+  DEBUG ─ Starting API-Gateway deployment with name express.TencentApiGateway in the ap-shanghai region
+  DEBUG ─ Using last time deploy service id service-n0vs2ohb
+  DEBUG ─ Updating service with serviceId service-n0vs2ohb.
+  DEBUG ─ Endpoint ANY / already exists with id api-9z60urs4.
+  DEBUG ─ Updating api with api id api-9z60urs4.
+  DEBUG ─ Service with id api-9z60urs4 updated.
+  DEBUG ─ Deploying service with id service-n0vs2ohb.
+  DEBUG ─ Deployment successful for the api named express.TencentApiGateway in the ap-shanghai region.
 
-  express:
-    url: http://service-np1uloxw-1300415943.gz.apigw.tencentcs.com/release
+  express: 
+    region:              ap-shanghai
+    functionName:        ExpressComponent_7xRrrd
+    apiGatewayServiceId: service-n0vs2ohb
+    url:                 http://service-n0vs2ohb-1300415943.ap-shanghai.apigateway.myqcloud.com/release/
 
-  84s › express › done
-
-myApp (master)$
+  36s › express › done
 ```
 
 You can now visit the output URL in the browser, and you should see the express response.
@@ -187,14 +142,14 @@ You can now visit the output URL in the browser, and you should see the express 
 ### 5. Remove
 
 ```
-myApp (master)$ serverless remove --debug
+$ sls remove --debug
 
   DEBUG ─ Flushing template state and removing all components.
-  DEBUG ─ Removed function eslam-function successful
+  DEBUG ─ Removed function ExpressComponent_MHrAzr successful
+  DEBUG ─ Removing any previously deployed API. api-kf2hxrhc
+  DEBUG ─ Removing any previously deployed service. service-4ndfl6pz
 
-  17s › express › done
-
-myApp (master)$
+  13s › express › done
 ```
 
 ### New to Components?

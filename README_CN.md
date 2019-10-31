@@ -39,8 +39,7 @@ $ touch .env # 腾讯云的配置信息
 
 如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
 
-如果已有腾讯云账号，可以在[API密钥管理
-](https://console.cloud.tencent.com/cam/capi)中获取`APPID`, `SecretId` 和`SecretKey`.
+如果已有腾讯云账号，可以在[API密钥管理](https://console.cloud.tencent.com/cam/capi)中获取`APPID`, `SecretId` 和`SecretKey`.
 
 ```
 # .env
@@ -78,99 +77,10 @@ module.exports = app
 express:
   component: '@serverless/tencent-express'
   inputs:
-    region: ap-shanghai # 
-#    functionName: eslam-function # SCF name
-#    serviceName: mytest   Optional - APIGW service name, default to create a new serivce
-#    serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
-#    code: ./code   Optional - default is current working directory
-#    functionConf:
-#      timeout: 10
-#      memorySize: 128
-#      environment:
-#        variables:
-#          TEST: vale
-#      vpcConfig:
-#        subnetId: ''
-#        vpcId: ''
-#    apigatewayConf:
-#      protocol: https
-#      environment: test
-#      usagePlan:
-#        # if dont't exists create a new 
-#        usagePlanId: 1111
-#        usagePlanName: slscmp # required
-#        usagePlanDesc: sls create
-#        maxRequestNum: 1000
-#      auth:
-#        serviceTimeout: 15
-#        secretName: secret  # required
-#        secretIds:
-#          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
+    region: ap-shanghai
 
 ```
-
-* 主要参数说明
-
-| Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----      |
-| region       | 可选             |ap-guangzhou |  |
-| functionName | 可选             |             | SCF函数名 |
-| serviceName  | 可选             |             | API网关服务名 |
-| serviceId    | 可选             |             | API网关ID名 |
-| code         | 可选             |             | 代码目录 |
-| functionConf | 可选             |             | 函数配置 |
-| apigatewayConf| 可选            |             | API网关配置 |
-
-
-* funtionConf 参数说明
-
-| Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----      |
-| timeout      | 可选             | 3s          | 函数最长执行时间，单位为秒，可选值范围 1-300 秒，默认为 3 秒 |
-| memorySize   | 可选             |128M         | 函数运行时内存大小，默认为 128M，可选范围 128MB-1536MB，并且以 128MB 为阶梯 |
-| environment  | 可选             |             | 函数的环境变量 |
-| vpcConfig    | 可选             |             | 函数的私有网络配置 |
-
-environment 参数说明
-
-| Param        |  Description |
-| --------     |:----      |
-| variables |   环境变量数组 |
-
-vpcConfig 参数说明
-
-| Param        |  Description |
-| --------     |:----      |
-| subnetId  | 私有网络 的 id |
-| vpcId     | 子网的 id |
-
-* apigatewayConf 参数说明
-
-| Param        | Required/Optional    |   Description |
-| --------     | :-----:              |  :----      |
-| protocol      | 可选             |           服务的前端请求类型。如 HTTP、HTTPS、HTTP 和 HTTPS。 |
-| environment   | 可选             |          待发布的环境名称，当前支持三个环境，测试：test，预发：prepub，线上：release |
-| usagePlan  | 可选             |               |
-| auth    | 可选            |               |
-
-
-usagePlan 参数说明
-
-| Param        |  Description |
-| --------     |:----      |
-| usagePlanId |    用户自定义的使用计划ID |
-| usagePlanName | 用户自定义的使用计划名称 |
-| usagePlanDesc | 用户自定义的使用计划描述 |
-| maxRequestNum | 请求配额总数，不传为-1表示不开启 |
-
-
-auth 参数说明
-
-| Param        |  Description |
-| --------     |:----      |
-| serviceTimeout  | 服务超时时间 |
-| secretName     | 密钥名字  |
-| secretIds     |  密钥ID数组 |
+* [点击此处查看配置文档](https://github.com/serverless-tencent/tencent-express/docs/configure.md)
 
 
 ### 4. 部署
@@ -178,20 +88,38 @@ auth 参数说明
 通过如下命令进行部署，并查看部署过程中的信息
 
 ```
-myApp (master)$ serverless --debug
+$ sls --debug
 
-  DEBUG ─ Endpoint ANY / already exists with id api-3n1p7a86.
-  DEBUG ─ Updating api with api id api-3n1p7a86.
-  DEBUG ─ Service with id api-3n1p7a86 updated.
-  DEBUG ─ Deploying service with id service-np1uloxw.
-  DEBUG ─ Deployment successful for the api named express.TencentApiGateway in the ap-guangzhou region.
+  DEBUG ─ Resolving the template's static variables.
+  DEBUG ─ Collecting components from the template.
+  DEBUG ─ Downloading any NPM components found in the template.
+  DEBUG ─ Analyzing the template's components dependencies.
+  DEBUG ─ Creating the template's components graph.
+  DEBUG ─ Syncing template state.
+  DEBUG ─ Executing the template's components graph.
+  DEBUG ─ Compressing function ExpressComponent_7xRrrd file to /Users/dfounderliu/Desktop/temp/code/.serverless/ExpressComponent_7xRrrd.zip.
+  DEBUG ─ Compressed function ExpressComponent_7xRrrd file successful
+  DEBUG ─ Uploading service package to cos[sls-cloudfunction-ap-shanghai-code]. sls-cloudfunction-default-ExpressComponent_7xRrrd-1572512568.zip
+  DEBUG ─ Uploaded package successful /Users/dfounderliu/Desktop/temp/code/.serverless/ExpressComponent_7xRrrd.zip
+  DEBUG ─ Creating function ExpressComponent_7xRrrd
+  DEBUG ─ Created function ExpressComponent_7xRrrd successful
+  DEBUG ─ Starting API-Gateway deployment with name express.TencentApiGateway in the ap-shanghai region
+  DEBUG ─ Using last time deploy service id service-n0vs2ohb
+  DEBUG ─ Updating service with serviceId service-n0vs2ohb.
+  DEBUG ─ Endpoint ANY / already exists with id api-9z60urs4.
+  DEBUG ─ Updating api with api id api-9z60urs4.
+  DEBUG ─ Service with id api-9z60urs4 updated.
+  DEBUG ─ Deploying service with id service-n0vs2ohb.
+  DEBUG ─ Deployment successful for the api named express.TencentApiGateway in the ap-shanghai region.
 
-  express:
-    url: http://service-np1uloxw-1300415943.gz.apigw.tencentcs.com/release
+  express: 
+    region:              ap-shanghai
+    functionName:        ExpressComponent_7xRrrd
+    apiGatewayServiceId: service-n0vs2ohb
+    url:                 http://service-n0vs2ohb-1300415943.ap-shanghai.apigateway.myqcloud.com/release/
 
-  84s › express › done
+  36s › express › done
 
-myApp (master)$
 ```
 部署完毕后，可以在浏览器中访问返回的链接，看到对应的express返回值。
 
@@ -200,14 +128,14 @@ myApp (master)$
 通过以下命令移除部署的存储桶
 
 ```
-myApp (master)$ serverless remove --debug
+$ sls remove --debug
 
   DEBUG ─ Flushing template state and removing all components.
-  DEBUG ─ Removed function eslam-function successful
+  DEBUG ─ Removed function ExpressComponent_MHrAzr successful
+  DEBUG ─ Removing any previously deployed API. api-kf2hxrhc
+  DEBUG ─ Removing any previously deployed service. service-4ndfl6pz
 
-  17s › express › done
-
-myApp (master)$
+  13s › express › done
 ```
 
 ### 还支持哪些组件？
