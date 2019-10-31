@@ -99,7 +99,7 @@ express:
 #          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
 ```
 
-* [Click here to view the configuration document](https://github.com/serverless-tencent/tencent-express/docs/configure.md)
+* [Click here to view the configuration document](https://github.com/serverless-tencent/tencent-express/blob/master/docs/configure.md)
 
 ### 4. Deploy
 

@@ -80,7 +80,7 @@ express:
     region: ap-shanghai
 
 ```
-* [点击此处查看配置文档](https://github.com/serverless-tencent/tencent-express/docs/configure.md)
+* [点击此处查看配置文档](https://github.com/serverless-tencent/tencent-express/blob/master/docs/configure.md)
 
 
 ### 4. 部署
