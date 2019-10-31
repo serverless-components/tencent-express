@@ -112,7 +112,7 @@ express:
 * 主要参数说明
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | region       | 可选             |ap-guangzhou |  |
 | functionName | 可选             |             | SCF函数名 |
 | serviceName  | 可选             |             | API网关服务名 |
@@ -125,7 +125,7 @@ express:
 * funtionConf 参数说明
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | timeout      | 可选             | 3s          | 函数最长执行时间，单位为秒，可选值范围 1-300 秒，默认为 3 秒 |
 | memorySize   | 可选             |128M         | 函数运行时内存大小，默认为 128M，可选范围 128MB-1536MB，并且以 128MB 为阶梯 |
 | environment  | 可选             |             | 函数的环境变量 |
@@ -137,7 +137,7 @@ express:
 * apigatewayConf 参数说明
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | protocol      | 可选             |          | 服务的前端请求类型。如 HTTP、HTTPS、HTTP 和 HTTPS。 |
 | environment   | 可选             |         | 待发布的环境名称，当前支持三个环境，测试：test，预发：prepub，线上：release |
 | usagePlan  | 可选             |             |  |

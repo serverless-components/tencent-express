@@ -102,7 +102,7 @@ express:
 * Main param description
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | region       | Optional             |ap-guangzhou |  |
 | functionName | Optional             |             | ServerlessCloudFunction Name |
 | serviceName  | Optional             |             | API-Gateway service name, default to create a new serivce |
@@ -115,7 +115,7 @@ express:
 * funtionConf param description
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | timeout      | Optional             | 3s          | The duration a function allowed to execute. Choose a value between 1 and 300 seconds; The default is 3 seconds. |
 | memorySize   | Optional             |128M         | The size of memory size available to the function during execution. Specify a value between 128 MB (default) and 1,536 MB in 128 MB increments. |
 | environment  | Optional             |             | Environment variable of the function |
@@ -127,7 +127,7 @@ express:
 * apigatewayConf param description
 
 | Param        | Required/Optional    |  Default    |  Description |
-| --------     | :-----:              | :----:      |  :----:      |
+| --------     | :-----:              | :----:      |  :----      |
 | protocol      | Optional             |          | Frontend request type of the service, such as HTTP, HTTPS, HTTP and HTTPS. |
 | environment   | Optional             |         | The name of the environment to be published. Three environments are supported: test, prepub and release. |
 | usagePlan  | Optional             |             |  |
