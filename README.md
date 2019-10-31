@@ -149,19 +149,19 @@ usagePlan param description
 
 | Param        |  Description |
 | --------     |   :----      |
-| -usagePlanId | User-defined usage plan id |
-| -usagePlanName | User-defined usage plan name |
-| -usagePlanDesc | User-defined usage plan description |
-| -maxRequestNum | Total number of requests allowed. If this is left empty, -1 will be used by default, indicating it’s disabled |
+| usagePlanId | User-defined usage plan id |
+| usagePlanName | User-defined usage plan name |
+| usagePlanDesc | User-defined usage plan description |
+| maxRequestNum | Total number of requests allowed. If this is left empty, -1 will be used by default, indicating it’s disabled |
 
 
 auth param description
 
 | Param        |  Description |
 | --------     |   :----      |
-| -serviceTimeout  |   Service timeout    |
-| -secretName     |    Secret name    |
-| -secretIds     |    Secret Id (Array)     |
+| serviceTimeout  |   Service timeout    |
+| secretName     |    Secret name    |
+| secretIds     |    Secret Id (Array)     |
 
 ### 4. Deploy
 
