@@ -51,7 +51,7 @@ Main param description
 | serviceId    | Optional             |             | API-Gateway service id, if it has will use this APII-Gateway service |
 | code         | Optional             |             | Default is current working directory |
 | [functionConf](#funtionConf-param-description) | Optional             |             | Function configure |
-| [apigatewayConf](apigatewayConf-param-description)| Optional            |             | API-Gateway configure |
+| [apigatewayConf](#apigatewayConf-param-description)| Optional            |             | API-Gateway configure |
 
 
 ### funtionConf param description

@@ -66,37 +66,9 @@ module.exports = app
 # serverless.yml
 
 express:
-  region: ap-shanghai
   component: '@serverless/tencent-express'
   inputs:
     region: ap-shanghai
-#    functionName: eslam-function # SCF name
-#    serviceName: mytest   Optional - APIGW service name, default to create a new serivce
-#    serviceId: service-np1uloxw  Optional - APIGW service id, default to create a new serivce
-#    code: ./code   Optional - default is current working directory
-#    functionConf:
-#      timeout: 10
-#      memorySize: 128
-#      environment:
-#        variables:
-#          TEST: vale
-#      vpcConfig:
-#        subnetId: ''
-#        vpcId: ''
-#    apigatewayConf:
-#      protocol: https
-#      environment: test
-#      usagePlan:
-#        # if dont't exists create a new 
-#        usagePlanId: 1111
-#        usagePlanName: slscmp # required
-#        usagePlanDesc: sls create
-#        maxRequestNum: 1000
-#      auth:
-#        serviceTimeout: 15
-#        secretName: secret  # required
-#        secretIds:
-#          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
 ```
 
 * [Click here to view the configuration document](https://github.com/serverless-tencent/tencent-express/blob/master/docs/configure.md)
