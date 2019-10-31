@@ -41,7 +41,7 @@ express:
 
 ## Configuration description
 
-* Main param description
+Main param description
 
 | Param        | Required/Optional    |  Default    |  Description |
 | --------     | :-----:              | :----:      |  :----      |
@@ -50,11 +50,11 @@ express:
 | serviceName  | Optional             |             | API-Gateway service name, default to create a new serivce |
 | serviceId    | Optional             |             | API-Gateway service id, if it has will use this APII-Gateway service |
 | code         | Optional             |             | Default is current working directory |
-| functionConf | Optional             |             | Function configure |
-| apigatewayConf| Optional            |             | API-Gateway configure |
+| [functionConf](#funtionConf-param-description) | Optional             |             | Function configure |
+| [apigatewayConf](apigatewayConf-param-description)| Optional            |             | API-Gateway configure |
 
 
-* funtionConf param description
+### funtionConf param description
 
 | Param        | Required/Optional    |  Default    |  Description |
 | --------     | :-----:              | :----:      |  :----      |
@@ -64,21 +64,21 @@ express:
 | vpcConfig    | Optional             |             | VPC configuration of the function |
 
 
-environment param description
+* environment param description
 
 | Param        |   Description |
 | --------     |   :----      |
 | variables    |   Environment variable array |
 
 
-vpcConfig param description
+* vpcConfig param description
 
 | Param        |  Description |
 | --------     |   :----      |
 | subnetId     |  ID of the VPC |
 | vpcId        | ID of the subnet |
 
-* apigatewayConf param description
+### apigatewayConf param description
 
 | Param        | Required/Optional    |  Description |
 | --------     | :-----:              |   :----      |
@@ -87,7 +87,7 @@ vpcConfig param description
 | usagePlan  | Optional             |             |
 | auth    | Optional            |           |
 
-usagePlan param description
+* usagePlan param description
 
 | Param        |  Description |
 | --------     |   :----      |
@@ -97,7 +97,7 @@ usagePlan param description
 | maxRequestNum | Total number of requests allowed. If this is left empty, -1 will be used by default, indicating it’s disabled |
 
 
-auth param description
+* auth param description
 
 | Param        |  Description |
 | --------     |   :----      |
