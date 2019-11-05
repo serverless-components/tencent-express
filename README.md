@@ -1,4 +1,4 @@
-[![Serverless Express Tencent Cloud](https://serverless-framework-1256773370.cos-website.ap-chengdu.myqcloud.com/component_pic/express.png)](http://serverless.com)
+[![Serverless Express Tencent Cloud](https://s3.amazonaws.com/assets.general.serverless.com/component_express_tencent/readme-express-tencent-serverless.png)](http://serverless.com)
 
 Deploy Express applications to Tencent Cloud using Serverless Components
 
