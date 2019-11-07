@@ -78,7 +78,7 @@ class TencentExpress extends Component {
         }
       ]
     }
-    if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
+    if (inputs.apigatewayConf && inputs.apigatewayConf.usagePlan) {
       apigwParam.endpoints[0].usagePlan = inputs.apigatewayConf.usagePlan
     }
     if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
