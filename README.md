@@ -4,6 +4,8 @@ Easily deploy Express.js applications to Tencent Cloud's serverless infrastructu
 
 &nbsp;
 
+<img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm.gif" />
+
 * [请点击这里查看中文版部署文档](./README_CN.md)
 
 &nbsp;
