@@ -7,6 +7,7 @@
 ## 简介
 
 Express 组件通过使用 serverless-tencent 的基础组件如API网关组件，SCF组件等，快速，方便的在腾讯云创建，配置和管理一个Express框架。
+<img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm_resize.gif" />
 
 ## 快速开始
 
