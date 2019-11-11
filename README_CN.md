@@ -46,7 +46,6 @@ $ touch .env # 腾讯云的配置信息
 # .env
 TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
-TENCENT_APP_ID=123
 ```
 
 初始化一个新的NPM包，并且安装express:
