@@ -3,7 +3,7 @@
 Easily deploy Express.js applications to Tencent Cloud's serverless infrastructure using this Serverless Framework Component.  Your application will auto-scale, never charge you for idle time, and require little-to-zero administration.
 
 &nbsp;
-<img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm_resize.gif" />
+<img align="right" width="400" src="https://s3.amazonaws.com/assets.general.serverless.com/component_express_tencent/express_demo_logo_light.gif" />
 
 * [请点击这里查看中文版部署文档](./README_CN.md)
 
