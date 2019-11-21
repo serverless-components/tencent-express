@@ -15,7 +15,7 @@
   "dependencies": {
     "@serverless/core": "^1.0.0",
     "@serverless/tencent-apigateway": "^1.2.0",
-    "@serverless/tencent-scf": "^1.1.0"
+    "@serverless/tencent-scf": "^1.1.11c"
   },
   "devDependencies": {
     "babel-eslint": "9.0.0",
