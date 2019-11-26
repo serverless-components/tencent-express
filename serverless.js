@@ -87,7 +87,7 @@ class TencentExpress extends Component {
 
     const tencentApiGatewayOutputs = await tencentApiGateway(apigwParam)
     const outputs = {
-      region: inputs.region,
+      region: inputs.region || 'ap-guangzhou',
       functionName: inputs.name,
       apiGatewayServiceId: tencentApiGatewayOutputs.serviceId,
       url: `${tencentApiGatewayOutputs.protocol}://${tencentApiGatewayOutputs.subDomain}/${tencentApiGatewayOutputs.environment}/`
