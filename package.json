@@ -7,7 +7,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tape *.test.js",
     "lint": "eslint . --fix --cache"
   },
   "author": "Serverless, Inc.",
@@ -23,6 +23,7 @@
     "eslint-config-prettier": "^3.6.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "tape": "^4.11.0"
   }
 }
