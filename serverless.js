@@ -2,6 +2,13 @@ const path = require('path')
 const { Component, utils } = require('@serverless/core')
 
 class TencentExpress extends Component {
+  getDefaultProtocol(protocols) {
+    if (protocols.map((i) => i.toLowerCase()).includes('https')) {
+      return 'https'
+    }
+    return 'http'
+  }
+
   async default(inputs = {}) {
     // there are some dependencies that require the express him to work
     // I've included them all here. A better approach would be to use
@@ -59,10 +66,10 @@ class TencentExpress extends Component {
       description: 'Serverless Framework tencent-express Component',
       serviceId: inputs.serviceId,
       region: inputs.region,
-      protocol:
-        inputs.apigatewayConf && inputs.apigatewayConf.protocol
-          ? inputs.apigatewayConf.protocol
-          : 'http',
+      protocols:
+        inputs.apigatewayConf && inputs.apigatewayConf.protocols
+          ? inputs.apigatewayConf.protocols
+          : ['http'],
       environment:
         inputs.apigatewayConf && inputs.apigatewayConf.environment
           ? inputs.apigatewayConf.environment
@@ -90,7 +97,9 @@ class TencentExpress extends Component {
       region: inputs.region || 'ap-guangzhou',
       functionName: inputs.name,
       apiGatewayServiceId: tencentApiGatewayOutputs.serviceId,
-      url: `${tencentApiGatewayOutputs.protocol}://${tencentApiGatewayOutputs.subDomain}/${tencentApiGatewayOutputs.environment}/`
+      url: `${this.getDefaultProtocol(tencentApiGatewayOutputs.protocols)}://${
+        tencentApiGatewayOutputs.subDomain
+      }/${tencentApiGatewayOutputs.environment}/`
     }
 
     return outputs

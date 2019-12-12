@@ -1,20 +1,20 @@
 {
   "name": "@serverless/tencent-express",
   "description": "Tencent Express Component",
-  "version": "1.2.3",
+  "version": "2.0.0",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tape *.test.js",
     "lint": "eslint . --fix --cache"
   },
   "author": "Serverless, Inc.",
   "license": "Apache",
   "dependencies": {
     "@serverless/core": "^1.0.0",
-    "@serverless/tencent-apigateway": "^1.2.0",
+    "@serverless/tencent-apigateway": "^2.0.0",
     "@serverless/tencent-scf": "^1.1.11c"
   },
   "devDependencies": {
@@ -23,6 +23,7 @@
     "eslint-config-prettier": "^3.6.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "tape": "^4.11.0"
   }
 }
