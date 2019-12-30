@@ -1,7 +1,7 @@
 {
   "name": "@serverless/tencent-express",
   "description": "Tencent Express Component",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -15,7 +15,7 @@
   "dependencies": {
     "@serverless/core": "^1.0.0",
     "@serverless/tencent-apigateway": "^2.0.0",
-    "@serverless/tencent-scf": "^1.1.11c"
+    "@serverless/tencent-scf": "^2.0.2"
   },
   "devDependencies": {
     "babel-eslint": "9.0.0",
