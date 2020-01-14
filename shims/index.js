@@ -66,12 +66,8 @@ function forwardResponseToApiGateway(server, response, resolve) {
       // eslint-disable-next-line
       Object.keys(headers).forEach((h) => {
         if (Array.isArray(headers[h])) {
-          if (h.toLowerCase() === 'set-cookie') {
-            headers[h].forEach((value, i) => {
-              headers[binarycase(h, i + 1)] = value
-            })
-            delete headers[h]
-          } else {
+          // remove for for tecnent api gateway
+          if (h.toLowerCase() !== 'set-cookie') {
             headers[h] = headers[h].join(',')
           }
         }
