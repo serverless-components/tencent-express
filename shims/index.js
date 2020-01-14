@@ -66,7 +66,7 @@ function forwardResponseToApiGateway(server, response, resolve) {
       // eslint-disable-next-line
       Object.keys(headers).forEach((h) => {
         if (Array.isArray(headers[h])) {
-          // remove for for tecnent api gateway
+          // remove for for tencent api gateway
           if (h.toLowerCase() !== 'set-cookie') {
             headers[h] = headers[h].join(',')
           }
