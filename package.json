@@ -15,7 +15,13 @@
   "dependencies": {
     "@serverless/core": "^1.0.0",
     "@serverless/tencent-apigateway": "^2.0.0",
-    "@serverless/tencent-scf": "^2.0.2"
+    "@serverless/tencent-scf": "^2.0.2",
+    "ext": "^1.4.0",
+    "fs-extra": "^8.1.0",
+    "tencent-serverless-nodejs": "^1.0.1",
+    "terser": "^4.6.3",
+    "type": "^2.0.0",
+    "webmake": "^1.1.0"
   },
   "devDependencies": {
     "babel-eslint": "9.0.0",
