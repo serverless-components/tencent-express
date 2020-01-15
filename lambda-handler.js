@@ -1,4 +1,4 @@
-const { createServer, proxy } = require('tencent-serverless-nodejs')
+const { createServer, proxy } = require('tencent-serverless-http')
 
 module.exports.handler = (event, context) => {
   const app = require.fromParentEnvironment('./app')
