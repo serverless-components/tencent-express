@@ -24,7 +24,6 @@ class TencentExpress extends Component {
     inputs.region = ensureString(inputs.region, { default: 'ap-guangzhou' })
     inputs.include = ensureIterable(inputs.include, { default: [], ensureItem: ensureString })
     inputs.exclude = ensureIterable(inputs.exclude, { default: [], ensureItem: ensureString })
-    const apigatewayConf = ensurePlainObject(inputs.apigatewayConf, { default: {} })
 
     const appFile = path.resolve(inputs.codeUri, 'app.js')
     if (!(await utils.fileExists(appFile))) {
@@ -39,7 +38,6 @@ class TencentExpress extends Component {
     inputs.runtime = 'Nodejs8.9'
 
     const tencentCloudFunction = await this.load('@serverless/tencent-scf')
-    const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
     if (inputs.functionConf) {
       inputs.timeout = inputs.functionConf.timeout ? inputs.functionConf.timeout : 3
@@ -53,37 +51,49 @@ class TencentExpress extends Component {
     }
 
     const tencentCloudFunctionOutputs = await tencentCloudFunction(inputs)
-    const apigwParam = {
-      serviceName: inputs.serviceName,
-      description: 'Serverless Framework tencent-express Component',
-      serviceId: inputs.serviceId,
-      region: inputs.region,
-      protocols: apigatewayConf.protocols || ['http'],
-      environment: apigatewayConf.environment || 'release',
-      endpoints: [
-        {
-          path: '/',
-          method: 'ANY',
-          function: {
-            isIntegratedResponse: true,
-            functionName: tencentCloudFunctionOutputs.Name
-          }
-        }
-      ]
-    }
-    if (inputs.apigatewayConf && inputs.apigatewayConf.usagePlan) {
-      apigwParam.endpoints[0].usagePlan = inputs.apigatewayConf.usagePlan
-    }
-    if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
-      apigwParam.endpoints[0].auth = inputs.apigatewayConf.auth
-    }
 
-    const tencentApiGatewayOutputs = await tencentApiGateway(apigwParam)
     const outputs = {
       region: inputs.region,
-      functionName: inputs.name,
-      apiGatewayServiceId: tencentApiGatewayOutputs.serviceId,
-      url: `${this.getDefaultProtocol(tencentApiGatewayOutputs.protocols)}://${
+      functionName: inputs.name
+    }
+
+    if (inputs.apigatewayConf.disable !== true) {
+      const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
+      const apigwParam = {
+        serviceName: inputs.serviceName,
+        description: 'Serverless Framework tencent-express Component',
+        serviceId: inputs.serviceId,
+        region: inputs.region,
+        protocols:
+          inputs.apigatewayConf && inputs.apigatewayConf.protocols
+            ? inputs.apigatewayConf.protocols
+            : ['http'],
+        environment:
+          inputs.apigatewayConf && inputs.apigatewayConf.environment
+            ? inputs.apigatewayConf.environment
+            : 'release',
+        endpoints: [
+          {
+            path: '/',
+            method: 'ANY',
+            function: {
+              isIntegratedResponse: true,
+              functionName: tencentCloudFunctionOutputs.Name
+            }
+          }
+        ]
+      }
+      if (inputs.apigatewayConf && inputs.apigatewayConf.usagePlan) {
+        apigwParam.endpoints[0].usagePlan = inputs.apigatewayConf.usagePlan
+      }
+      if (inputs.apigatewayConf && inputs.apigatewayConf.auth) {
+        apigwParam.endpoints[0].auth = inputs.apigatewayConf.auth
+      }
+
+      const tencentApiGatewayOutputs = await tencentApiGateway(apigwParam)
+
+      outputs.apiGatewayServiceId = tencentApiGatewayOutputs.serviceId
+      outputs.url = `${this.getDefaultProtocol(tencentApiGatewayOutputs.protocols)}://${
         tencentApiGatewayOutputs.subDomain
       }/${tencentApiGatewayOutputs.environment}/`
     }
