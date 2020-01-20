@@ -10,7 +10,7 @@ express:
   component: '@serverless/tencent-express'
   inputs:
     region: ap-shanghai
-    functionName: eslam-function
+    functionName: my-function
     serviceName: mytest
     serviceId: service-np1uloxw
     code: ./code
@@ -80,7 +80,7 @@ Main param description
 
 | Param       | Required/Optional | Description                                                                                              |
 | ----------- | :---------------: | :------------------------------------------------------------------------------------------------------- |
-| disable     |     Optional      | Whether disable auto creating api gateway, if you don't want to create it, set to `true`                 |
+| isDisabled  |     Optional      | Whether disable auto creating api gateway, if you don't want to create it, set to `true`                 |
 | protocols   |     Optional      | Frontend request type of the service, such as `http` or `https`.                                         |
 | environment |     Optional      | The name of the environment to be published. Three environments are supported: test, prepub and release. |
 | usagePlan   |     Optional      |                                                                                                          |

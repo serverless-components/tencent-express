@@ -57,7 +57,7 @@ class TencentExpress extends Component {
       functionName: inputs.name
     }
 
-    if (inputs.apigatewayConf.disable !== true) {
+    if (!inputs.apigatewayConf.isDisabled) {
       const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
       const apigwParam = {
         serviceName: inputs.serviceName,
