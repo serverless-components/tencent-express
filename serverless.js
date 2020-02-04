@@ -50,6 +50,7 @@ class TencentExpress extends Component {
       }
     }
 
+    inputs.fromClientRemark = inputs.fromClientRemark || 'tencent-express'
     const tencentCloudFunctionOutputs = await tencentCloudFunction(inputs)
 
     const outputs = {
@@ -90,6 +91,7 @@ class TencentExpress extends Component {
         apigwParam.endpoints[0].auth = inputs.apigatewayConf.auth
       }
 
+      apigwParam.fromClientRemark = inputs.fromClientRemark || 'tencent-express'
       const tencentApiGatewayOutputs = await tencentApiGateway(apigwParam)
 
       outputs.apiGatewayServiceId = tencentApiGatewayOutputs.serviceId
@@ -101,12 +103,15 @@ class TencentExpress extends Component {
     return outputs
   }
 
-  async remove() {
+  async remove(inputs = {}) {
+    const removeInput = {
+      fromClientRemark: inputs.fromClientRemark || 'tencent-express'
+    }
     const tencentCloudFunction = await this.load('@serverless/tencent-scf')
     const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
 
-    await tencentCloudFunction.remove()
-    await tencentApiGateway.remove()
+    await tencentCloudFunction.remove(removeInput)
+    await tencentApiGateway.remove(removeInput)
 
     return {}
   }
