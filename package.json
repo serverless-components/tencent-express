@@ -1,7 +1,7 @@
 {
   "name": "@serverless/tencent-express",
   "description": "Tencent Express Component",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
