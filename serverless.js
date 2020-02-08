@@ -24,6 +24,10 @@ class TencentExpress extends Component {
     inputs.region = ensureString(inputs.region, { default: 'ap-guangzhou' })
     inputs.include = ensureIterable(inputs.include, { default: [], ensureItem: ensureString })
     inputs.exclude = ensureIterable(inputs.exclude, { default: [], ensureItem: ensureString })
+    inputs.apigatewayConf = ensureIterable(inputs.apigatewayConf, {
+      default: {},
+      ensureItem: ensurePlainObject
+    })
 
     const appFile = path.resolve(inputs.codeUri, 'app.js')
     if (!(await utils.fileExists(appFile))) {
@@ -58,6 +62,7 @@ class TencentExpress extends Component {
       functionName: inputs.name
     }
 
+    // only user set apigatewayConf.isDisabled to `true`, do not create api
     if (!inputs.apigatewayConf.isDisabled) {
       const tencentApiGateway = await this.load('@serverless/tencent-apigateway')
       const apigwParam = {
