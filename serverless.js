@@ -24,9 +24,8 @@ class TencentExpress extends Component {
     inputs.region = ensureString(inputs.region, { default: 'ap-guangzhou' })
     inputs.include = ensureIterable(inputs.include, { default: [], ensureItem: ensureString })
     inputs.exclude = ensureIterable(inputs.exclude, { default: [], ensureItem: ensureString })
-    inputs.apigatewayConf = ensureIterable(inputs.apigatewayConf, {
-      default: {},
-      ensureItem: ensurePlainObject
+    inputs.apigatewayConf = ensurePlainObject(inputs.apigatewayConf, {
+      default: {}
     })
 
     const appFile = path.resolve(inputs.codeUri, 'app.js')
