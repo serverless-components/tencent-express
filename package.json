@@ -1,7 +1,7 @@
 {
   "name": "@serverless/tencent-express",
   "description": "Tencent Express Component",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -18,7 +18,7 @@
     "@serverless/tencent-scf": "^2.0.2",
     "ext": "^1.4.0",
     "fs-extra": "^8.1.0",
-    "tencent-serverless-http": "^1.0.2",
+    "tencent-serverless-http": "^1.0.5",
     "terser": "^4.6.3",
     "type": "^2.0.0",
     "webmake": "^1.1.0"
