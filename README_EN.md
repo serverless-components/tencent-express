@@ -1,4 +1,4 @@
-[![Serverless Express Tencent Cloud](https://s3.amazonaws.com/assets.general.serverless.com/component_express_tencent/readme-express-tencent-serverless.png)](http://serverless.com)
+[![Serverless Express Tencent Cloud](https://img.serverlesscloud.cn/2020210/1581352135771-express.png)](http://serverless.com)
 
 Easily deploy Express.js applications to Tencent Cloud's serverless infrastructure using this Serverless Framework Component.  Your application will auto-scale, never charge you for idle time, and require little-to-zero administration.
 
