@@ -1,4 +1,4 @@
-[![Serverless Express Tencent Cloud](https://s3.amazonaws.com/assets.general.serverless.com/component_express_tencent/readme-express-tencent-serverless.png)](http://serverless.com)
+[![Serverless Express Tencent Cloud](https://img.serverlesscloud.cn/2020210/1581352135771-express.png)](http://serverless.com)
 
 * [请点击这里查看英文版部署文档](./README_EN.md)
 
