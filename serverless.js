@@ -86,7 +86,8 @@ class TencentExpress extends Component {
               functionName: tencentCloudFunctionOutputs.Name
             }
           }
-        ]
+        ],
+        customDomain: inputs.apigatewayConf.customDomain
       }
       if (inputs.apigatewayConf && inputs.apigatewayConf.usagePlan) {
         apigwParam.endpoints[0].usagePlan = inputs.apigatewayConf.usagePlan
@@ -102,6 +103,10 @@ class TencentExpress extends Component {
       outputs.url = `${this.getDefaultProtocol(tencentApiGatewayOutputs.protocols)}://${
         tencentApiGatewayOutputs.subDomain
       }/${tencentApiGatewayOutputs.environment}/`
+
+      if (tencentApiGatewayOutputs.customDomains) {
+        outputs.customDomains = tencentApiGatewayOutputs.customDomains
+      }
     }
 
     return outputs
