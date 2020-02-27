@@ -8,14 +8,20 @@
   },
   "scripts": {
     "test": "tape *.test.js",
-    "lint": "eslint . --fix --cache"
+    "lint": "eslint . --fix --cache",
+    "release": "standard-version"
+  },
+  "standard-version": {
+    "skip": {
+      "tag": false
+    }
   },
   "author": "Serverless, Inc.",
   "license": "Apache",
   "dependencies": {
     "@serverless/core": "^1.0.0",
     "@serverless/tencent-apigateway": "^2.1.2",
-    "@serverless/tencent-scf": "^2.0.12",
+    "@serverless/tencent-scf": "^2.1.0",
     "ext": "^1.4.0",
     "fs-extra": "^8.1.0",
     "tencent-serverless-http": "^1.0.5",
@@ -30,6 +36,7 @@
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-prettier": "^3.0.1",
     "prettier": "^1.18.2",
+    "standard-version": "^7.1.0",
     "tape": "^4.11.0"
   }
 }
