@@ -35,7 +35,7 @@ class TencentExpress extends Component {
 
     const cachedHandlerPath = await resolveCachedHandlerPath(inputs)
     inputs.include.push(cachedHandlerPath)
-    inputs.exclude = ['.git/**', '.gitignore', '.serverless', '.DS_Store']
+    inputs.exclude.push('.git/**', '.gitignore', '.serverless', '.DS_Store')
 
     inputs.handler = `${path.basename(cachedHandlerPath, '.js')}.handler`
     inputs.runtime = 'Nodejs8.9'
