@@ -22,6 +22,7 @@ class TencentExpress extends Component {
 
     inputs.codeUri = ensureString(inputs.code, { isOptional: true }) || process.cwd()
     inputs.region = ensureString(inputs.region, { default: 'ap-guangzhou' })
+    inputs.namespace = ensureString(inputs.namespace, { default: 'default' })
     inputs.include = ensureIterable(inputs.include, { default: [], ensureItem: ensureString })
     inputs.exclude = ensureIterable(inputs.exclude, { default: [], ensureItem: ensureString })
     inputs.apigatewayConf = ensurePlainObject(inputs.apigatewayConf, {
@@ -83,7 +84,8 @@ class TencentExpress extends Component {
             method: 'ANY',
             function: {
               isIntegratedResponse: true,
-              functionName: tencentCloudFunctionOutputs.Name
+              functionName: tencentCloudFunctionOutputs.Name,
+              functionNamespace: inputs.namespace
             }
           }
         ],
