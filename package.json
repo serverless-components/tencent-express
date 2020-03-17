@@ -7,36 +7,55 @@
     "access": "public"
   },
   "scripts": {
+    "commitlint": "commitlint -f HEAD@{15}",
     "test": "tape *.test.js",
-    "lint": "eslint . --fix --cache",
+    "lint": "eslint --ext .js,.ts,.tsx .",
+    "lint:fix": "eslint --fix --ext .js,.ts,.tsx .",
+    "prettier": "prettier --check **/*.{css,html,js,json,md,yaml,yml}",
+    "prettier:fix": "prettier --write **/*.{css,html,js,json,md,yaml,yml}",
     "release": "standard-version"
+  },
+  "author": "Tencent Cloud, Inc.",
+  "license": "Apache-2.0",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix --ext .js,.ts,.tsx .",
+      "git add ."
+    ],
+    "**/*.{css,html,js,json,md,yaml,yml}": [
+      "npm run prettier:fix",
+      "git add ."
+    ]
   },
   "standard-version": {
     "skip": {
       "tag": false
     }
   },
-  "author": "Serverless, Inc.",
-  "license": "Apache",
   "dependencies": {
-    "@serverless/core": "^1.0.0",
-    "@serverless/tencent-apigateway": "^2.1.4",
-    "@serverless/tencent-scf": "^3.0.0",
-    "ext": "^1.4.0",
-    "fs-extra": "^8.1.0",
+    "@serverless/core": "^1.1.2",
+    "@serverless/tencent-framework": "^0.0.4",
+    "@ygkit/bundler": "^0.0.4",
     "tencent-serverless-http": "^1.0.5",
-    "terser": "^4.6.3",
-    "type": "^2.0.0",
-    "webmake": "^1.1.0"
+    "type": "^2.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "babel-eslint": "9.0.0",
     "eslint": "5.6.0",
     "eslint-config-prettier": "^3.6.0",
-    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.18.2",
-    "standard-version": "^7.1.0",
-    "tape": "^4.11.0"
+    "husky": "^3.1.0",
+    "lint-staged": "^9.5.0",
+    "prettier": "^1.15.3",
+    "standard-version": "^7.0.1"
   }
 }

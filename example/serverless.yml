@@ -1,0 +1,14 @@
+ExpressFunc:
+  # component: '@serverless/tencent-express'
+  component: ../
+  inputs:
+    functionName: express-function
+    region: ap-guangzhou
+    code: ./
+    exclude:
+      - .env
+    apigatewayConf:
+      protocols:
+        - http
+        - https
+      environment: test

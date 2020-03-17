@@ -8,7 +8,7 @@ jest/*
 coverage
 .serverlessUnzipped
 node_modules
-.vscode/
+.vscode
 .eslintcache
 dist
 .idea
