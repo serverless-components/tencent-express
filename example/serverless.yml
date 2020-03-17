@@ -1,6 +1,5 @@
 ExpressFunc:
-  # component: '@serverless/tencent-express'
-  component: ../
+  component: '@serverless/tencent-express'
   inputs:
     functionName: express-function
     region: ap-guangzhou
