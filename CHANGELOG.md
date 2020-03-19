@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/serverless-components/tencent-express/compare/v3.0.0...v3.0.1) (2020-03-19)
+
+### Bug Fixes
+
+- support customize runtime ([aa1dce7](https://github.com/serverless-components/tencent-express/commit/aa1dce76abddbed2179ed0cf0b87e70b4e713bfb))
+
 ## [3.0.0](https://github.com/serverless-components/tencent-express/compare/v2.3.3...v3.0.0) (2020-03-17)
 
 ### Features
