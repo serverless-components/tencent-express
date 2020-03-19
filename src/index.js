@@ -8,19 +8,18 @@ const { bundler } = require('@ygkit/bundler')
 const pkg = require('../package.json')
 
 const DEFAULTS = {
-  runtime: 'Nodejs8.9'
+  runtime: 'Nodejs8.9',
+  framework: 'express'
 }
-
-const framework = 'express'
 
 class TencentComponent extends Component {
   async default(inputs = {}) {
     inputs.include = ensureIterable(inputs.include, { default: [], ensureItem: ensureString })
-    inputs.runtime = DEFAULTS.runtime
+    inputs.runtime = ensureString(inputs.runtime, { default: DEFAULTS.runtime })
 
     const cachePath = path.join(
       os.homedir(),
-      `.serverless/cache/tencent-${framework}`,
+      `.serverless/cache/tencent-${DEFAULTS.framework}`,
       pkg.version,
       'serverless-handler.js'
     )
@@ -42,7 +41,7 @@ class TencentComponent extends Component {
     const framworkOutpus = await Framework({
       ...inputs,
       ...{
-        framework
+        framework: DEFAULTS.framework
       }
     })
 

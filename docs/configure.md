@@ -6,12 +6,13 @@
 # serverless.yml
 
 express:
-  region: ap-shanghai
+  region: ap-guangzhou
   component: '@serverless/tencent-express'
   inputs:
-    region: ap-shanghai
+    region: ap-guangzhou
     functionName: my-function
     serviceName: mytest
+    runtime: Nodejs8.9
     serviceId: service-np1uloxw
     code: ./code
     functionConf:
@@ -47,7 +48,7 @@ express:
         serviceTimeout: 15
         secretName: secret
         secretIds:
-          - AKIDNSdvdFcJ8GJ9th6qeZH0ll8r7dE6HHaSuchJ
+          - xxx
 ```
 
 ## Configuration description
@@ -57,6 +58,7 @@ Main param description
 | Param                                               | Required/Optional |   Default    | Description                                                          |
 | --------------------------------------------------- | :---------------: | :----------: | :------------------------------------------------------------------- |
 | region                                              |     Optional      | ap-guangzhou |                                                                      |
+| runtime                                             |     Optional      |  Nodejs8.9   | Nodejs Runtime, support: Nodejs6.10, Nodejs8.9, Nodejs10.15          |
 | functionName                                        |     Optional      |              | ServerlessCloudFunction Name                                         |
 | serviceName                                         |     Optional      |              | API-Gateway service name, default to create a new serivce            |
 | serviceId                                           |     Optional      |              | API-Gateway service id, if it has will use this APII-Gateway service |
