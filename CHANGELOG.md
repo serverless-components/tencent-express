@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.3](https://github.com/serverless-components/tencent-express/compare/v3.0.2...v3.0.3) (2020-03-26)
+
+### Features
+
+- support binary types config ([0ea9485](https://github.com/serverless-components/tencent-express/commit/0ea9485c563b2b5f07803879f8ecf5ed98df40da))
+
 ### [3.0.2](https://github.com/serverless-components/tencent-express/compare/v3.0.1...v3.0.2) (2020-03-26)
 
 ### Bug Fixes
