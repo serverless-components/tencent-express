@@ -64,6 +64,9 @@ app.get('/', function(req, res) {
   res.send('Hello Express')
 })
 
+// set binary types
+// app.binaryTypes = [*/*];
+
 // don't forget to export!
 module.exports = app
 ```
