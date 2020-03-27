@@ -79,7 +79,8 @@ module.exports = app
 express:
   component: '@serverless/tencent-express'
   inputs:
-    region: ap-shanghai
+    region: ap-guangzhou
+    runtime: Nodejs8.9
 ```
 
 - [Click here to view the configuration document](https://github.com/serverless-tencent/tencent-express/blob/master/docs/configure.md)

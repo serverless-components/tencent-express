@@ -72,6 +72,7 @@ express:
   component: '@serverless/tencent-express'
   inputs:
     region: ap-guangzhou
+    runtime: Nodejs8.9
 ```
 
 - [点击此处查看配置文档](https://github.com/serverless-tencent/tencent-express/blob/master/docs/configure.md)

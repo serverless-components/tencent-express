@@ -3,6 +3,7 @@ ExpressFunc:
   inputs:
     functionName: express-function
     region: ap-guangzhou
+    runtime: Nodejs8.9
     code: ./
     exclude:
       - .env

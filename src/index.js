@@ -8,7 +8,7 @@ const { bundler } = require('@ygkit/bundler')
 const pkg = require('../package.json')
 
 const DEFAULTS = {
-  runtime: 'Nodejs10.15',
+  runtime: 'Nodejs8.9',
   framework: 'express'
 }
 
