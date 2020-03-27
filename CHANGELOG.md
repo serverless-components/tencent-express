@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.4](https://github.com/serverless-components/tencent-express/compare/v3.0.3...v3.0.4) (2020-03-27)
+
+### Bug Fixes
+
+- make default runtime to Nodejs8.9 ([71ddc28](https://github.com/serverless-components/tencent-express/commit/71ddc280e091181aafc10aa8a1e70a53c78f04d3))
+
 ### [3.0.3](https://github.com/serverless-components/tencent-express/compare/v3.0.2...v3.0.3) (2020-03-26)
 
 ### Features
