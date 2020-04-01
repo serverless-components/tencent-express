@@ -2,7 +2,7 @@ const {Component} = require('@serverless/core')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
 const random = require('ext/string/random')
-const {MultiApigw, MultiScf, MultiScf, Cos, Cns} = require('tencent-component-toolkit')
+const {MultiApigw, MultiScf, Cos, Cns} = require('tencent-component-toolkit')
 
 const DEFAULTS = {
 	handler: 'index.main_handler',
@@ -259,7 +259,7 @@ class Express extends Component {
 		const credentials = this.credentials.tencent
 
 		// 对Inputs内容进行标准化
-		const { region, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(inputs)
+		const {region, functionConf, apigatewayConf, cnsConf} = await this.prepareInputs(inputs)
 
 
 		// 获取地域列表
@@ -274,7 +274,7 @@ class Express extends Component {
 		])
 
 		// 云解析遇到等API网关部署完成才可以继续部署
-		this.deployCns(credentials, cnsConf, outputs)
+		// this.deployCns(credentials, cnsConf, outputs)
 
 
 		outputs.url = this.state.url
