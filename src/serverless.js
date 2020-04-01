@@ -79,9 +79,9 @@ class Express extends Component {
 		// 部署函数 + API网关 + 云解析
 		const outputs = {}
 		await Promise.all([
-			deployApigateway(credentials, inputs, regionList, outputs),
-			deployFunction(credentials, inputs, regionList, outputs),
-			deployCns(credentials, inputs, outputs)
+			this.deployApigateway(credentials, inputs, regionList, outputs),
+			this.deployFunction(credentials, inputs, regionList, outputs),
+			this.deployCns(credentials, inputs, outputs)
 		])
 
 
