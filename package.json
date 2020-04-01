@@ -9,11 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --fix --cache"
   },
-  "author": "Dfounderliu",
+  "author": "Tencent Cloud Inc.",
   "license": "Apache",
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-eslint": "9.0.0",
     "eslint": "5.6.0",

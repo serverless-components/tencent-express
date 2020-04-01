@@ -1,10 +1,10 @@
-name: express
+name: express-tencent
 version: 0.0.0-dev
-author: dfounderliu
-org: anycodes
+author: Tencent Cloud Inc.
+org: Tencent Cloud Inc.
 description: Deploys a serverless Express.js application onto Tencent SCF and Tencent APIGateway.
 keywords: tencent, serverless, express
-repo: https://github.com/serverless-components/express
-readme: ''
+repo: https://github.com/serverless-components/tencent-express/tree/v2
+readme: https://github.com/serverless-components/tencent-express/tree/v2
 license: MIT
 main: ./src

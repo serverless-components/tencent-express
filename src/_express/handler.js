@@ -1,5 +1,5 @@
 const fs = require('fs')
-const awsServerlessExpress = require('aws-serverless-express')
+const { createServer, proxy } = require('tencent-serverless-http')
 
 exports.handler = async (event, context) => {
   // NOTICE: require() is relative to this file, while existsSync() is relative to the cwd, which is the root of lambda
@@ -12,7 +12,6 @@ exports.handler = async (event, context) => {
     app = require('../_src/app.js')
   }
 
-  const server = awsServerlessExpress.createServer(app)
-  const res = await awsServerlessExpress.proxy(server, event, context, 'PROMISE')
-  return res.promise
+  const server = createServer(app)
+  return proxy(server, event, context, 'PROMISE').promise
 }
