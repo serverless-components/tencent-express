@@ -1,0 +1,10 @@
+name: express
+version: 0.0.0-dev
+author: dfounderliu
+org: anycodes
+description: Deploys a serverless Express.js application onto Tencent SCF and Tencent APIGateway.
+keywords: tencent, serverless, express
+repo: https://github.com/serverless-components/express
+readme: ''
+license: MIT
+main: ./src
