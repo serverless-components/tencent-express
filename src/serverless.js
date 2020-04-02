@@ -1,7 +1,8 @@
 const { Component } = require('@serverless/core')
+const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
-const { MultiApigw, Scf, Cos, Cns } = require('tencent-component-toolkit')
+const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
 const { packageExpress, generateId } = require('./utils')
 
 const DEFAULTS = {
@@ -9,10 +10,18 @@ const DEFAULTS = {
   runtime: 'Nodejs8.9',
   exclude: ['.git/**', '.gitignore', '.DS_Store'],
   timeout: 3,
-  memorySize: 128
+  memorySize: 128,
+  namespace: 'default'
 }
 
 class Express extends Component {
+  getDefaultProtocol(protocols) {
+    if (protocols.map((i) => i.toLowerCase()).includes('https')) {
+      return 'https'
+    }
+    return 'http'
+  }
+
   mergeJson(sourceJson, targetJson) {
     for (const eveKey in sourceJson) {
       if (targetJson.hasOwnProperty(eveKey)) {
@@ -48,39 +57,59 @@ class Express extends Component {
 
   async prepareInputs(inputs = {}) {
     // 对function inputs进行标准化
-    const tempFunctionConf = inputs.functionConf ? inputs.functionConf : undefined
+    const tempFunctionConf = inputs.functionConf ? inputs.functionConf : {}
     const fromClientRemark = `tencent-express`
+    const regionList = inputs.region
+      ? typeof inputs.region == 'string'
+        ? [inputs.region]
+        : inputs.region
+      : ['ap-guangzhou']
+
+    // chenck state function name
+    const stateFunctionName = this.state[regionList[0]] && this.state[regionList[0]].functionName
+    // check state service id
+    const stateServiceId = this.state[regionList[0]] && this.state[regionList[0]].serviceId
 
     const functionConf = {
+      code:
+        typeof inputs.src === 'object'
+          ? inputs.src
+          : {
+              src: inputs.src
+            },
       name:
         ensureString(inputs.functionName, { isOptional: true }) ||
-        this.state.functionName ||
+        stateFunctionName ||
         `express_component_${generateId()}`,
-      code:
-        ensureString(tempFunctionConf && tempFunctionConf.src ? tempFunctionConf.src : inputs.src, {
-          isOptional: true
-        }) || process.cwd(),
-      region: inputs.region
-        ? typeof inputs.region == 'string'
-          ? [inputs.region]
-          : inputs.region
-        : ['ap-guangzhou'],
-      handler: ensureString(
-        tempFunctionConf && tempFunctionConf.handler ? tempFunctionConf.handler : inputs.handler,
-        { default: DEFAULTS.handler }
+      region: regionList,
+      handler: ensureString(tempFunctionConf.handler ? tempFunctionConf.handler : inputs.handler, {
+        default: DEFAULTS.handler
+      }),
+      runtime: ensureString(tempFunctionConf.runtime ? tempFunctionConf.runtime : inputs.runtime, {
+        default: DEFAULTS.runtime
+      }),
+      namespace: ensureString(
+        tempFunctionConf.namespace ? tempFunctionConf.namespace : inputs.namespace,
+        { default: DEFAULTS.namespace }
       ),
-      runtime: ensureString(
-        tempFunctionConf && tempFunctionConf.runtime ? tempFunctionConf.runtime : inputs.runtime,
-        { default: DEFAULTS.runtime }
+      description: ensureString(
+        tempFunctionConf.description ? tempFunctionConf.description : inputs.description,
+        {
+          default: DEFAULTS.description
+        }
       ),
       fromClientRemark
     }
+    functionConf.tags = ensureObject(tempFunctionConf.tags ? tempFunctionConf.tags : inputs.tag, {
+      default: null
+    })
+
     functionConf.include = ensureIterable(
-      tempFunctionConf && tempFunctionConf.include ? tempFunctionConf.include : inputs.include,
+      tempFunctionConf.include ? tempFunctionConf.include : inputs.include,
       { default: [], ensureItem: ensureString }
     )
     functionConf.exclude = ensureIterable(
-      tempFunctionConf && tempFunctionConf.exclude ? tempFunctionConf.exclude : inputs.exclude,
+      tempFunctionConf.exclude ? tempFunctionConf.exclude : inputs.exclude,
       { default: [], ensureItem: ensureString }
     )
     functionConf.exclude.push('.git/**', '.gitignore', '.serverless', '.DS_Store')
@@ -104,7 +133,7 @@ class Express extends Component {
     apigatewayConf.fromClientRemark = fromClientRemark
     apigatewayConf.serviceName = inputs.serviceName
     apigatewayConf.description = `Serverless Framework Tencent-Express Component`
-    apigatewayConf.serviceId = inputs.serviceId
+    apigatewayConf.serviceId = inputs.serviceId || stateServiceId
     apigatewayConf.region = functionConf.region
     apigatewayConf.protocols = apigatewayConf.protocols || ['http']
     apigatewayConf.environment = apigatewayConf.environment ? apigatewayConf.environment : 'release'
@@ -179,10 +208,10 @@ class Express extends Component {
     }
 
     return {
-      region: functionConf.region,
-      functionConf: functionConf,
-      apigatewayConf: apigatewayConf,
-      cnsConf: cnsConf
+      regionList,
+      functionConf,
+      apigatewayConf,
+      cnsConf
     }
   }
 
@@ -190,26 +219,25 @@ class Express extends Component {
     // 创建cos对象
     const cos = new Cos(credentials, region)
     // 创建存储桶 + 设置生命周期
-    if (!inputs.code || !inputs.code.bucket) {
-      inputs.code = {}
+    if (!inputs.code.bucket) {
       inputs.code.bucket = `sls-cloudfunction-${region}-code`
       await cos.deploy({
         bucket: inputs.code.bucket,
-        force: true
-        // lifecycle: [
-        //   {
-        //     status: 'Enabled',
-        //     id: 'deleteObject',
-        //     filter: '',
-        //     expiration: { days: '10' },
-        //     abortIncompleteMultipartUpload: { daysAfterInitiation: '10' }
-        //   }
-        // ]
+        force: true,
+        lifecycle: [
+          {
+            status: 'Enabled',
+            id: 'deleteObject',
+            filter: '',
+            expiration: { days: '10' },
+            abortIncompleteMultipartUpload: { daysAfterInitiation: '10' }
+          }
+        ]
       })
     }
 
     // 上传代码
-    if (!inputs.code || inputs.code.object) {
+    if (!inputs.code.object) {
       const object = `${inputs.name}-${Math.floor(Date.now() / 1000)}.zip`
       inputs.code.object = object
       await cos.upload({
@@ -218,6 +246,9 @@ class Express extends Component {
         key: inputs.code.object
       })
     }
+    this.state.bucket = inputs.code.bucket
+    this.state.object = inputs.code.object
+
     return {
       bucket: inputs.code.bucket,
       object: inputs.code.object
@@ -225,32 +256,36 @@ class Express extends Component {
   }
 
   async deployFunction(credentials, inputs, regionList) {
-    // 打包代码
-    // todo 打包这里还没有仔细看，可能这样用的不对
-    const packageDir = await packageExpress(this, inputs)
+    // if set bucket and object not pack code
+    let packageDir
+    if (!inputs.code.bucket || !inputs.code.object) {
+      packageDir = await packageExpress(this, inputs)
+    }
 
     // 上传代码到COS
     const uploadCodeHandler = []
     const outputs = {}
+
     for (let eveRegionIndex = 0; eveRegionIndex < regionList.length; eveRegionIndex++) {
+      const curRegion = regionList[eveRegionIndex]
       const funcDeployer = async () => {
-        const { bucket, object } = await this.uploadCodeToCos(
-          credentials,
-          inputs,
-          regionList[eveRegionIndex],
-          packageDir
-        )
-        const scf = new Scf(credentials, regionList[eveRegionIndex])
+        const code = await this.uploadCodeToCos(credentials, inputs, curRegion, packageDir)
+        const scf = new Scf(credentials, curRegion)
         const tempInputs = {
           ...inputs,
-          code: {
-            bucket,
-            object
-          }
+          code
         }
-        console.log('tempInputs', tempInputs)
+        const scfOutput = await scf.deploy(tempInputs)
+        outputs[curRegion] = {
+          functionName: scfOutput.FunctionName,
+          runtime: scfOutput.Runtime,
+          namespace: scfOutput.Namespace
+        }
 
-        outputs[regionList[eveRegionIndex]] = await scf.deploy(tempInputs)
+        this.state[curRegion] = {
+          ...(this.state[curRegion] ? this.state[curRegion] : {}),
+          ...outputs[curRegion]
+        }
       }
       uploadCodeHandler.push(funcDeployer())
     }
@@ -261,7 +296,31 @@ class Express extends Component {
 
   async deployApigateway(credentials, inputs, regionList) {
     const apigw = new MultiApigw(credentials, regionList)
-    const outputs = await apigw.deploy(inputs)
+    inputs.oldState = {
+      apiList: (this.state[regionList[0]] && this.state[regionList[0]].apiList) || []
+    }
+    const apigwOutputs = await apigw.deploy(inputs)
+    const outputs = {}
+    Object.keys(apigwOutputs).forEach((curRegion) => {
+      const curOutput = apigwOutputs[curRegion]
+      outputs[curRegion] = {
+        serviceId: curOutput.serviceId,
+        subDomain: curOutput.subDomain,
+        environment: curOutput.environment,
+        url: `${this.getDefaultProtocol(inputs.protocols)}://${curOutput.subDomain}/${
+          curOutput.environment
+        }/`
+      }
+      if (curOutput.customDomains) {
+        outputs[curRegion].customDomains = curOutput.customDomains
+      }
+      this.state[curRegion] = {
+        created: curOutput.created,
+        ...(this.state[curRegion] ? this.state[curRegion] : {}),
+        ...outputs[curRegion],
+        apiList: curOutput.apiList
+      }
+    })
     return outputs
   }
 
@@ -271,20 +330,13 @@ class Express extends Component {
   }
 
   async deploy(inputs) {
-    console.log('++++++++++')
-    console.log('state', this.state)
-    console.log('++++++++++')
-
     console.log(`Deploying Express App...`)
 
     // 获取腾讯云密钥信息
     const credentials = this.credentials.tencent
 
     // 对Inputs内容进行标准化
-    const { region, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(inputs)
-
-    // 获取地域列表
-    const regionList = typeof inputs.region == 'string' ? [inputs.region] : inputs.region
+    const { regionList, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(inputs)
 
     // 部署函数 + API网关
     const outputs = {}
@@ -307,21 +359,36 @@ class Express extends Component {
     return outputs
   }
 
-  async remove() {
-    // const clients = getClients(
-    // 	process.env.SERVERLESS_PLATFORM_VENDOR === 'tencent'
-    // 		? this.credentials.tencent
-    // 		: this.credentials.aws,
-    // 	this.state.region
-    // )
-    //
-    // await removeAllRoles(this, clients)
-    // await removeLambda(this, clients)
-    // await removeDomain(this, clients)
-    // await removeApi(this, clients)
-    //
-    // this.state = {}
-    // return {}
+  async remove(inputs = {}) {
+    console.log(`Removing Express App...`)
+
+    const { regionList } = await this.prepareInputs(inputs)
+    const { state } = this
+    const credentials = this.credentials.tencent
+    const removeHandlers = []
+    for (let i = 0; i < regionList.length; i++) {
+      const curRegion = regionList[i]
+      const curState = state[curRegion]
+      const scf = new Scf(credentials, curRegion)
+      const apigw = new Apigw(credentials, curRegion)
+      const handler = async () => {
+        await scf.remove({
+          functionName: curState.functionName,
+          namespace: curState.namespace
+        })
+        await apigw.remove({
+          created: curState.created,
+          environment: curState.environment,
+          serviceId: curState.serviceId,
+          apiList: curState.apiList,
+          customDomains: curState.customDomains
+        })
+      }
+      removeHandlers.push(handler())
+    }
+
+    await Promise.all(removeHandlers)
+    this.state = {}
   }
 }
 

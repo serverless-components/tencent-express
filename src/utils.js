@@ -25,8 +25,8 @@ const packageExpress = async (instance, inputs) => {
   console.log(`Packaging Express.js application...`)
 
   // unzip source zip file
-  console.log(`Unzipping ${inputs.src || 'files'}...`)
-  const sourceDirectory = await instance.unzip(inputs.src)
+  console.log(`Unzipping ${inputs.code.src || 'files'}...`)
+  const sourceDirectory = await instance.unzip(inputs.code.src)
   console.log(`Files unzipped into ${sourceDirectory}...`)
 
   // add shim to the source directory
@@ -37,7 +37,7 @@ const packageExpress = async (instance, inputs) => {
   console.log(`Installing Serverless Framework SDK...`)
   instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
 
-  if (!inputs.src) {
+  if (!inputs.code.src) {
     // add default express app
     console.log(`Installing Default Express App...`)
     copySync(path.join(__dirname, '_src'), path.join(sourceDirectory, '_src'))
