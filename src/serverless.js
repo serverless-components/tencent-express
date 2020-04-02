@@ -290,7 +290,7 @@ class Express extends Component {
       uploadCodeHandler.push(funcDeployer())
     }
     await Promise.all(uploadCodeHandler)
-
+    this.save()
     return outputs
   }
 
@@ -321,6 +321,7 @@ class Express extends Component {
         apiList: curOutput.apiList
       }
     })
+    this.save()
     return outputs
   }
 
