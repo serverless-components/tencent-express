@@ -13,7 +13,7 @@
   "license": "Apache",
   "dependencies": {
     "fs-extra": "^8.1.0",
-    "tencent-component-toolkit": "^1.0.4",
+    "tencent-component-toolkit": "^1.0.7",
     "type": "^2.0.0"
   }
 }

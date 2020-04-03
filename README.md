@@ -96,23 +96,23 @@ The Express component is a zero configuration component, meaning that it'll work
 Here's a complete reference of the `serverless.yml` file for the express component:
 
 ```yml
-component: express               # (required) name of the component. In that case, it's express.
-name: express-api                # (required) name of your express component instance.
-org: serverlessinc               # (optional) serverless dashboard org. default is the first org you created during signup.
-app: myApp                       # (optional) serverless dashboard app. default is the same as the name property.
-stage: dev                       # (optional) serverless dashboard stage. default is dev.
+component: express # (required) name of the component. In that case, it's express.
+name: express-api # (required) name of your express component instance.
+org: serverlessinc # (optional) serverless dashboard org. default is the first org you created during signup.
+app: myApp # (optional) serverless dashboard app. default is the same as the name property.
+stage: dev # (optional) serverless dashboard stage. default is dev.
 
 inputs:
-  src: ./src                     # (optional) path to the source folder. default is a hello world app.
-  memory: 512                    # (optional) lambda memory size.
-  timeout: 10                    # (optional) lambda timeout.
-  description: My Express App    # (optional) lambda & api gateway description.
-  env:                           # (optional) env vars.
-    DEBUG: 'express:*'           #            this express specific env var will print express debug logs.
-  roleArn: arn:aws:abc           # (optional) custom role arn.
-  traffic: 0.2                   # (optional) traffic percentage to apply to this deployment.
-  domain: api.serverless.com     # (optional) domain name.
-  region: us-east-2              # (optional) aws region to deploy to. default is us-east-1.
+  src: ./src # (optional) path to the source folder. default is a hello world app.
+  memory: 512 # (optional) lambda memory size.
+  timeout: 10 # (optional) lambda timeout.
+  description: My Express App # (optional) lambda & api gateway description.
+  env: # (optional) env vars.
+    DEBUG: 'express:*' #            this express specific env var will print express debug logs.
+  roleArn: arn:aws:abc # (optional) custom role arn.
+  traffic: 0.2 # (optional) traffic percentage to apply to this deployment.
+  domain: api.serverless.com # (optional) domain name.
+  region: us-east-2 # (optional) aws region to deploy to. default is us-east-1.
 ```
 
 Once you've chosen your configuration, run `serverless deploy` again (or simply just `serverless`) to deploy your changes.
@@ -121,7 +121,7 @@ Once you've chosen your configuration, run `serverless deploy` again (or simply 
 
 <img src="/assets/dev-demo.gif" height="250" align="right">
 
-Now that you've got your basic express app up and running, it's time to develop that into a real world application. Instead of having to run `serverless deploy` everytime you make changes you wanna test, you could enable dev mode, which allows the CLI to watch for changes in your source directory as you develop, and deploy instantly on save. 
+Now that you've got your basic express app up and running, it's time to develop that into a real world application. Instead of having to run `serverless deploy` everytime you make changes you wanna test, you could enable dev mode, which allows the CLI to watch for changes in your source directory as you develop, and deploy instantly on save.
 
 Dev mode also enables live logs from your express app so that you can see the results of your tests right away on the CLI as they happen. To enable dev mode, simply run `serverless dev` from within the directory containing the `serverless.yml` file.
 
@@ -131,7 +131,7 @@ Dev mode also enables live logs from your express app so that you can see the re
 
 Anytime you need to know more about your running express instance, you can run `serverless info` to view the most critical info. This is especially helpful when you want to know the outputs of your instances so that you can reference them in another instance. You will also see a url where you'll be able to view more info about your instance on the Serverless Dashboard.
 
-It also shows you the status of your instance, when it was last deployed, and how many times it was deployed. To digg even deeper, you can pass the `--debug` flag to view the state of your component instance in case the deployment failed for any reason. 
+It also shows you the status of your instance, when it was last deployed, and how many times it was deployed. To digg even deeper, you can pass the `--debug` flag to view the state of your component instance in case the deployment failed for any reason.
 
 ### 8. Remove
 

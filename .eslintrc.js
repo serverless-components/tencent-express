@@ -43,11 +43,10 @@ module.exports = {
       }
     ],
     'no-alert': 'error',
-    'no-console': 'error',
+    'no-console': 'off',
     'no-const-assign': 'error',
     'no-else-return': 'error',
     'no-empty': 'off',
-    'no-console': 'off',
     'no-shadow': 'error',
     'no-undef': 'error',
     'no-unused-vars': 'error',
@@ -67,7 +66,7 @@ module.exports = {
     ],
     semi: ['error', 'never'],
     'spaced-comment': 'error',
-    strict: ['error', 'never'],
+    strict: ['error', 'global'],
     'prettier/prettier': 'error'
   }
 }

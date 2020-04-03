@@ -1,0 +1,22 @@
+language: node_js
+
+node_js:
+  - 8
+  - 10
+
+install:
+  - npm install
+
+# should change to serverless registry publish
+jobs:
+  include:
+    # Define the release stage that runs semantic-release
+    - stage: release
+      node_js: 10.18
+      # Advanced: optionally overwrite your default `script` step to skip the tests
+      # script: skip
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - npm run release
