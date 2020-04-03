@@ -184,11 +184,21 @@ class Express extends Component {
       this.deployFunction(credentials, functionConf, regionList, outputs)
     ])
 
-    outputs['apigw'] = apigwOutputs
-    outputs['scf'] = functionOutputs
+    // optimize outputs for one region
+    if (regionList.length === 1) {
+      const [oneRegion] = regionList
+      outputs.region = oneRegion
+      outputs['apigw'] = apigwOutputs[oneRegion]
+      outputs['scf'] = functionOutputs[oneRegion]
+    } else {
+      outputs['apigw'] = apigwOutputs
+      outputs['scf'] = functionOutputs
+    }
 
     // 云解析遇到等API网关部署完成才可以继续部署
-    outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
+    if (cnsConf.length > 0) {
+      outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
+    }
 
     this.state.region = regionList[0]
     this.state.regionList = regionList

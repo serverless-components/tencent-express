@@ -14,4 +14,4 @@ inputs:
     protocols:
       - http
       - https
-    environment: test
+    environment: release
