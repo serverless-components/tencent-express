@@ -191,16 +191,17 @@ class Express extends Component {
     outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
 
     this.state.region = regionList[0]
+    this.state.regionList = regionList
     this.state.lambdaArn = functionConf.name
 
     return outputs
   }
 
-  async remove(inputs = {}) {
+  async remove() {
     console.log(`Removing Express App...`)
 
-    const { regionList } = await prepareInputs(inputs)
     const { state } = this
+    const { regionList } = state
     const credentials = this.credentials.tencent
     const removeHandlers = []
     for (let i = 0; i < regionList.length; i++) {
