@@ -1,10 +1,10 @@
-const { Component } = require('@serverless/core')
+const {Component} = require('@serverless/core')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
 const Cam = require('tencent-cloud-sdk').cam
-const { MultiApigw, Scf, Apigw, Cos, Cns, Domain} = require('tencent-component-toolkit')
-const { packageExpress, generateId } = require('./utils')
+const {MultiApigw, Scf, Apigw, Cos, Cns, Domain} = require('tencent-component-toolkit')
+const {packageExpress, generateId} = require('./utils')
 
 const DEFAULTS = {
   handler: 'sl_handler.handler',
@@ -23,7 +23,7 @@ class Express extends Component {
     return 'http'
   }
 
-  async getUserInfo(credentials){
+  async getUserInfo(credentials) {
     const cam = new Cam(credentials)
     return await cam.request({
       Action: 'GetUserAppId',
@@ -107,10 +107,10 @@ class Express extends Component {
         typeof inputs.src === 'object'
           ? inputs.src
           : {
-              src: inputs.src
-            },
+            src: inputs.src
+          },
       name:
-        ensureString(inputs.functionName, { isOptional: true }) ||
+        ensureString(inputs.functionName, {isOptional: true}) ||
         stateFunctionName ||
         `express_component_${generateId()}`,
       region: regionList,
@@ -122,7 +122,7 @@ class Express extends Component {
       }),
       namespace: ensureString(
         tempFunctionConf.namespace ? tempFunctionConf.namespace : inputs.namespace,
-        { default: DEFAULTS.namespace }
+        {default: DEFAULTS.namespace}
       ),
       description: ensureString(
         tempFunctionConf.description ? tempFunctionConf.description : inputs.description,
@@ -138,11 +138,11 @@ class Express extends Component {
 
     functionConf.include = ensureIterable(
       tempFunctionConf.include ? tempFunctionConf.include : inputs.include,
-      { default: [], ensureItem: ensureString }
+      {default: [], ensureItem: ensureString}
     )
     functionConf.exclude = ensureIterable(
       tempFunctionConf.exclude ? tempFunctionConf.exclude : inputs.exclude,
-      { default: [], ensureItem: ensureString }
+      {default: [], ensureItem: ensureString}
     )
     functionConf.exclude.push('.git/**', '.gitignore', '.serverless', '.DS_Store')
     if (inputs.functionConf) {
@@ -260,8 +260,8 @@ class Express extends Component {
             status: 'Enabled',
             id: 'deleteObject',
             filter: '',
-            expiration: { days: '10' },
-            abortIncompleteMultipartUpload: { daysAfterInitiation: '10' }
+            expiration: {days: '10'},
+            abortIncompleteMultipartUpload: {daysAfterInitiation: '10'}
           }
         ]
       })
@@ -340,7 +340,7 @@ class Express extends Component {
         environment: curOutput.environment,
         url: `${this.getDefaultProtocol(inputs.protocols)}://${curOutput.subDomain}/${
           curOutput.environment
-        }/`
+          }/`
       }
       if (curOutput.customDomains) {
         outputs[curRegion].customDomains = curOutput.customDomains
@@ -372,7 +372,8 @@ class Express extends Component {
     }
 
     const state = []
-    const outputs = []
+    const outputs = {}
+    const tempJson = {}
     for (let i = 0; i < inputs.length; i++) {
       const curCns = inputs[i]
       for (let j = 0; j < curCns.records.length; j++) {
@@ -380,20 +381,27 @@ class Express extends Component {
           cnsRegion[curCns.records[j].value.replace('temp_value_about_', '')]
       }
       const tencentCnsOutputs = await cns.deploy(curCns)
-      if (tencentCnsOutputs.DNS) {
-        outputs[curCns.domain] = tencentCnsOutputs.DNS
-      }
+      outputs[curCns.domain] = tencentCnsOutputs.DNS ? tencentCnsOutputs.DNS : "The domain name has already been added."
+      tencentCnsOutputs.domain = curCns.domain
       state.push(tencentCnsOutputs)
+
     }
 
+    // 删除serverless创建的但是不在本次列表中
+    try{
+      for (let i = 0; i < state.length; i++) {
+        tempJson[state[i].domain] = state[i].records
+      }
+      const recordHistory = this.state.cns || []
+      for (let i = 0; i < recordHistory.length; i++) {
+        const delList = this.deleteRecord(tempJson[recordHistory[i].domain], recordHistory[i].records)
+        if (delList && delList.length > 0) {
+          await cns.remove({deleteList: delList})
+        }
+      }
+    }catch (e) {
 
-    // // 删除serverless创建的但是不在本次列表中
-    // for(const)
-    // const recordHistory = this.state.cns || []
-    // const delList = this.deleteRecord(state, recordHistory)
-    // for (let i = 0; i < recordHistory.length; i++) {
-    //   await cns.remove( {deleteList: delList})
-    // }
+    }
 
     this.state['cns'] = state
     this.save()
@@ -407,7 +415,7 @@ class Express extends Component {
     const credentials = this.credentials.tencent
 
     // 对Inputs内容进行标准化
-    const { regionList, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(credentials, inputs)
+    const {regionList, functionConf, apigatewayConf, cnsConf} = await this.prepareInputs(credentials, inputs
 
     // 部署函数 + API网关
     const outputs = {}
@@ -422,16 +430,14 @@ class Express extends Component {
     // 云解析遇到等API网关部署完成才可以继续部署
     outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
 
-    console.log(this.state)
-
     return outputs
   }
 
   async remove(inputs = {}) {
     console.log(`Removing Express App...`)
 
-    const { regionList } = await this.prepareInputs(inputs)
-    const { state } = this
+    const {regionList} = await this.prepareInputs(inputs)
+    const {state} = this
     const credentials = this.credentials.tencent
     const removeHandlers = []
     for (let i = 0; i < regionList.length; i++) {
@@ -457,10 +463,10 @@ class Express extends Component {
 
     await Promise.all(removeHandlers)
 
-    if(this.state.cns) {
+    if (this.state.cns) {
       const cns = new Cns(credentials)
       for (let i = 0; i < this.state.cns.length; i++) {
-        await cns.remove( {deleteList: this.state.cns[i].records})
+        await cns.remove({deleteList: this.state.cns[i].records})
       }
     }
 
