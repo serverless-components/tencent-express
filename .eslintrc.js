@@ -36,7 +36,7 @@ module.exports = {
     'id-length': [
       'error',
       {
-        min: 2,
+        min: 1,
         max: 50,
         properties: 'never',
         exceptions: ['e', 'i', 'n', 't', 'x', 'y', 'z', '_', '$']
