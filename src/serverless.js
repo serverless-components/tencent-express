@@ -357,7 +357,6 @@ class Express extends Component {
   }
 
   async deployCns(credentials, inputs, regionList, apigwOutputs) {
-
     const cns = new Cns(credentials)
     const cnsRegion = {}
     if (regionList.length == 1) {
@@ -416,7 +415,7 @@ class Express extends Component {
     const credentials = this.credentials.tencent
 
     // 对Inputs内容进行标准化
-    const {regionList, functionConf, apigatewayConf, cnsConf} = await this.prepareInputs(credentials, inputs)
+    const {regionList, functionConf, apigatewayConf, cnsConf} = await this.prepareInputs(credentials, inputs
 
     // 部署函数 + API网关
     const outputs = {}
