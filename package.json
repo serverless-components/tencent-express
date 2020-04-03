@@ -1,7 +1,7 @@
 {
   "name": "@serverless/tencent-express",
   "description": "Tencent Express Component",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -40,9 +40,9 @@
   },
   "dependencies": {
     "@serverless/core": "^1.1.2",
-    "@serverless/tencent-framework": "^0.0.6",
-    "@ygkit/bundler": "^0.0.4",
-    "tencent-serverless-http": "^1.0.5",
+    "@serverless/tencent-framework": "^0.1.1",
+    "@ygkit/bundler": "^0.0.5",
+    "tencent-serverless-http": "^1.0.7",
     "type": "^2.0.0"
   },
   "devDependencies": {
