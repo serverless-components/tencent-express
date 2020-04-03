@@ -2,7 +2,8 @@ const { Component } = require('@serverless/core')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
-const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
+const Cam = require('tencent-cloud-sdk').cam
+const { MultiApigw, Scf, Apigw, Cos, Cns, Domain} = require('tencent-component-toolkit')
 const { packageExpress, generateId } = require('./utils')
 
 const DEFAULTS = {
@@ -20,6 +21,14 @@ class Express extends Component {
       return 'https'
     }
     return 'http'
+  }
+
+  async getUserInfo(credentials){
+    const cam = new Cam(credentials)
+    return await cam.request({
+      Action: 'GetUserAppId',
+      Version: '2019-01-16'
+    })
   }
 
   mergeJson(sourceJson, targetJson) {
@@ -47,6 +56,29 @@ class Express extends Component {
     return targetJson
   }
 
+  deleteRecord(newRecords, historyRcords) {
+    const deleteList = []
+    for (let i = 0; i < historyRcords.length; i++) {
+      let temp = false
+      for (let j = 0; j < newRecords.length; j++) {
+        if (
+          newRecords[j].domain == historyRcords[i].domain &&
+          newRecords[j].subDomain == historyRcords[i].subDomain &&
+          newRecords[j].recordType == historyRcords[i].recordType &&
+          newRecords[j].value == historyRcords[i].value &&
+          newRecords[j].recordLine == historyRcords[i].recordLine
+        ) {
+          temp = true
+          break
+        }
+      }
+      if (!temp) {
+        deleteList.push(historyRcords[i])
+      }
+    }
+    return deleteList
+  }
+
   capitalString(str) {
     if (str.length < 2) {
       return str.toUpperCase()
@@ -55,7 +87,7 @@ class Express extends Component {
     return `${str[0].toUpperCase()}${str.slice(1)}`
   }
 
-  async prepareInputs(inputs = {}) {
+  async prepareInputs(credentials, inputs = {}) {
     // 对function inputs进行标准化
     const tempFunctionConf = inputs.functionConf ? inputs.functionConf : {}
     const fromClientRemark = `tencent-express`
@@ -181,11 +213,9 @@ class Express extends Component {
     const cnsConf = []
     // 对cns inputs进行检查和赋值
     if (apigatewayConf.customDomain && apigatewayConf.customDomain.length > 0) {
+      const domain = new Domain(credentials)
       for (let domianNum = 0; domianNum < apigatewayConf.customDomain.length; domianNum++) {
-        const tencentDomain = await this.load('@serverless/tencent-domain')
-        const domainData = await tencentDomain.check({
-          domain: apigatewayConf.customDomain[domianNum].domain
-        })
+        const domainData = await domain.check(apigatewayConf.customDomain[domianNum].domain)
         const tempInputs = {
           domain: domainData.domain,
           records: []
@@ -218,11 +248,12 @@ class Express extends Component {
   async uploadCodeToCos(credentials, inputs, region, filePath) {
     // 创建cos对象
     const cos = new Cos(credentials, region)
+    const userInfo = await this.getUserInfo(credentials)
     // 创建存储桶 + 设置生命周期
     if (!inputs.code.bucket) {
       inputs.code.bucket = `sls-cloudfunction-${region}-code`
       await cos.deploy({
-        bucket: inputs.code.bucket,
+        bucket: inputs.code.bucket + '-' + userInfo.Response.AppId,
         force: true,
         lifecycle: [
           {
@@ -241,7 +272,7 @@ class Express extends Component {
       const object = `${inputs.name}-${Math.floor(Date.now() / 1000)}.zip`
       inputs.code.object = object
       await cos.upload({
-        bucket: inputs.code.bucket,
+        bucket: inputs.code.bucket + '-' + userInfo.Response.AppId,
         file: filePath,
         key: inputs.code.object
       })
@@ -325,9 +356,48 @@ class Express extends Component {
     return outputs
   }
 
-  async deployCns(credentials, inputs, outputs = {}) {
+  async deployCns(credentials, inputs, regionList, apigwOutputs) {
     const cns = new Cns(credentials)
-    outputs['cns'] = await cns.deploy(inputs)
+    const cnsRegion = {}
+    if (regionList.length == 1) {
+      const [curRegion] = regionList
+      const curApigwOutput = apigwOutputs[curRegion]
+      cnsRegion[curRegion] = curApigwOutput.subDomain
+    } else {
+      for (let i = 0; i < regionList.length; i++) {
+        const curRegion = regionList[i]
+        const curApigwOutput = apigwOutputs[curRegion]
+        cnsRegion[curRegion] = curApigwOutput.subDomain
+      }
+    }
+
+    const state = []
+    const outputs = []
+    for (let i = 0; i < inputs.length; i++) {
+      const curCns = inputs[i]
+      for (let j = 0; j < curCns.records.length; j++) {
+        curCns.records[j].value =
+          cnsRegion[curCns.records[j].value.replace('temp_value_about_', '')]
+      }
+      const tencentCnsOutputs = await cns.deploy(curCns)
+      if (tencentCnsOutputs.DNS) {
+        outputs[curCns.domain] = tencentCnsOutputs.DNS
+      }
+      state.push(tencentCnsOutputs)
+    }
+
+
+    // // 删除serverless创建的但是不在本次列表中
+    // for(const)
+    // const recordHistory = this.state.cns || []
+    // const delList = this.deleteRecord(state, recordHistory)
+    // for (let i = 0; i < recordHistory.length; i++) {
+    //   await cns.remove( {deleteList: delList})
+    // }
+
+    this.state['cns'] = state
+    this.save()
+    return outputs
   }
 
   async deploy(inputs) {
@@ -337,7 +407,7 @@ class Express extends Component {
     const credentials = this.credentials.tencent
 
     // 对Inputs内容进行标准化
-    const { regionList, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(inputs)
+    const { regionList, functionConf, apigatewayConf, cnsConf } = await this.prepareInputs(credentials, inputs)
 
     // 部署函数 + API网关
     const outputs = {}
@@ -350,12 +420,9 @@ class Express extends Component {
     outputs['scf'] = functionOutputs
 
     // 云解析遇到等API网关部署完成才可以继续部署
-    // this.deployCns(credentials, cnsConf, outputs)
+    outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
 
-    outputs.url = this.state.url
-    if (this.state.domain) {
-      outputs.domain = `https://${this.state.domain}`
-    }
+    console.log(this.state)
 
     return outputs
   }
@@ -389,6 +456,14 @@ class Express extends Component {
     }
 
     await Promise.all(removeHandlers)
+
+    if(this.state.cns) {
+      const cns = new Cns(credentials)
+      for (let i = 0; i < this.state.cns.length; i++) {
+        await cns.remove( {deleteList: this.state.cns[i].records})
+      }
+    }
+
     this.state = {}
   }
 }
