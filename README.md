@@ -1,142 +1,181 @@
-[![Serverless Components](https://s3.amazonaws.com/assets.github.serverless/readme-serverless-components-3.gif)](http://serverless.com)
+[![Serverless Components](https://img.serverlesscloud.cn/2020210/1581352135771-express.png)](http://serverless.com)
 
 <br/>
 
-**Serverless Express Component** ⎯⎯⎯ Rapidly deploy express applications on serverless infrastructure with zero configuration, powered by [Serverless Components](https://github.com/serverless/components/tree/cloud).
+**腾讯云 Express 组件** ⎯⎯⎯ 通过使用 [Serverless Components](https://github.com/serverless/components/tree/cloud)，基于云上 Serverless 服务，实现“0”配置，极速部署你的 express 应用。
+
+**Serverless Express** ⎯⎯⎯ This [Serverless Framework Component](https://github.com/serverless/components) is a specialized developer experience focused on making it easy to deploy and manage Express.js applications on serverless infrastructure (specifically AWS HTTP API and AWS Lambda) on your own AWS account.  It comes loaded with powerful development features and represents possibly the easiest, cheapest and most scalable way to host Express.js.
 
 <br/>
 
-- [x] **Zero Configuration** - All we need is your code, then just deploy.
-- [x] **Fast Deployments** - Deploy your entire express app in seconds.
-- [x] **Canary Deployments** - Deploy your app gradually to a subset of your traffic overtime.
-- [x] **Realtime Cloud Development** - Develop your express app directly on the cloud, with real time logs.
-- [x] **Team Collaboration** - Collaborate with your teamates with shared state and outputs.
-- [x] **Built-in Monitoring** - Monitor your express app right from the Serverless Dashboard.
+特性介绍：
+- [×] **按需付费** - 按照请求的使用量进行收费，没有请求时无需付费
+- [x] **"0"配置** - 只需要关心项目代码，之后部署即可，Serverless Framework 会搞定所有配置。
+- [x] **极速部署** - 仅需几秒，部署你的整个 express 应用。
+- [x] **实时日志** - 通过实时日志的输出查看业务状态，便于直接在云端开发应用。
+- [x] **云端调试** - 针对 Node.js 框架支持一键云端调试能力，屏蔽本地环境的差异。
+- [x] **便捷协作** - 通过云端的状态信息和部署日志，方便的进行多人协作开发。
+- [×] **自定义域名** - 支持配置自定义域名及 HTTPS 访问
+
 
 <br/>
 
-<img src="/assets/deploy-demo.gif" height="250" align="right">
+<img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm_resize.gif" />
 
-1. [**Install**](#1-install)
-2. [**Login**](#2-login)
-3. [**Create**](#3-create)
-4. [**Deploy**](#4-deploy)
-5. [**Configure**](#5-configure)
-6. [**Develop**](#6-develop)
-7. [**Monitor**](#7-monitor)
-8. [**Remove**](#8-remove)
+快速开始：
+
+1. [**安装**](#1-安装)
+2. [**创建**](#2-创建)
+3. [**部署**](#3-部署)
+4. [**配置**](#4-配置)
+5. [**开发调试**](#5-开发调试)
+6. [**移除**](#6-移除)
+
+更多资源：
+* [**架构说明**](#架构说明)
+* [**账号配置**](#账号配置)
 
 &nbsp;
 
-### 1. Install
+### 1. 安装
 
-To get started with component, install the latest version of the Serverless Framework:
-
+通过 npm 安装最新版本的 Serverless Framework 
 ```
 $ npm install -g serverless
 ```
 
-### 2. Login
+### 2. 创建
 
-Unlike most solutions, all component deployments run in the cloud for maximum speed and reliability. Therefore, you'll need to login to deploy, share and monitor your components.
-
+创建并进入一个全新目录：
 ```
-$ serverless login
-```
-
-### 3. Create
-
-You can easily create a new express instance just by using the following command and template url.
-
-```
-$ serverless create --template-url https://github.com/serverless/components/tree/cloud/templates/express
-$ cd express
+$ mkdir tencent-express && cd tencent-express
 ```
 
-Then, create a new `.env` file in the root of the `express` directory right next to `serverless.yml`, and add your AWS access keys:
-
+通过如下命令和模板链接，快速创建一个 express 应用：
 ```
-# .env
-AWS_ACCESS_KEY_ID=XXX
-AWS_SECRET_ACCESS_KEY=XXX
+$ serverless create --template-url https://github.com/serverless-components/tencent-express/tree/v2/example
+$ cd example
 ```
 
-You should now have a directory that looks something like this:
+执行如下命令，安装 express 应用的对应依赖
 
+```
+$ cd src && npm install
+```
+安装完毕后，目录结构如下所示：
 ```
 |- src
-  |- app.js
-  |- package.json
-|- serverless.yml
-|- .env
+|   ├── app.js
+|   ├──node_modules
+|   └── package.json
+└──  serverless.yml
 ```
 
-Just like any express app, don't forget to install the express dependencies:
+### 3. 部署
 
-```
-$ cd src
-$ npm install
-$ cd ..
-```
+在 `serverless.yml` 文件下的目录中运行 `serverless deploy` 进行 express 项目的部署。第一次部署可能耗时相对较久，但后续的二次部署会在几秒钟之内完成。部署完毕后，你可以在命令行的输出中查看到你 express 应用的 URL 地址，点击地址即可访问你的 express 项目。
 
-### 4. Deploy
+**注意：** 
 
-<img src="/assets/deploy-debug-demo.gif" height="250" align="right">
+如您的账号未[登陆](https://cloud.tencent.com/login)或[注册](https://cloud.tencent.com/register)腾讯云，您可以直接通过`微信`扫描命令行中的二维码进行授权登陆和注册。
 
-Once you have the directory set up, you're now ready to deploy. Just run `serverless deploy` from within the directory containing the `serverless.yml` file.
+如果出现了 `internal server error` 的报错，请检查是否在创建模板后没有运行  `npm install`。
 
-Your first deployment might take a little while, but subsequent deployment would just take few seconds. For more information on what's going on during deployment, you could specify the `serverless deploy --debug` flag, which would view deployment logs in realtime.
+如果希望查看更多部署过程的信息，可以通过`sls deploy --debug` 命令查看部署过程中的实时日志信息，`sls`是 `serverless` 命令的缩写。
 
 <br/>
 
-### 5. Configure
+### 4. 配置
 
-The Express component is a zero configuration component, meaning that it'll work out of the box with no configuration and sane defaults. With that said, there are still a lot of optional configuration that you can specify.
+Express 组件支持 0 配置部署，也就是可以直接通过配置文件中的默认值进行部署。但你依然可以修改更多可选配置来进一步开发该 Express 项目。
 
-Here's a complete reference of the `serverless.yml` file for the express component:
+以下是 Express 组件的 `serverless.yml`完整配置说明：
 
 ```yml
-component: express # (required) name of the component. In that case, it's express.
-name: express-api # (required) name of your express component instance.
-org: serverlessinc # (optional) serverless dashboard org. default is the first org you created during signup.
-app: myApp # (optional) serverless dashboard app. default is the same as the name property.
-stage: dev # (optional) serverless dashboard stage. default is dev.
+# serverless.yml
+
+component: express-tencent # (必填) 引用 component 的名称，当前用到的是 express-tencent 组件
+name: express-api # (必填) 该 express 组件创建的实例名称
+org: test # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid
+app: expressApp # (可选) 该 express 应用名称
+stage: dev # (可选) 用于区分环境信息，默认值是 dev
 
 inputs:
-  src: ./src # (optional) path to the source folder. default is a hello world app.
-  memory: 512 # (optional) lambda memory size.
-  timeout: 10 # (optional) lambda timeout.
-  description: My Express App # (optional) lambda & api gateway description.
-  env: # (optional) env vars.
-    DEBUG: 'express:*' #            this express specific env var will print express debug logs.
-  roleArn: arn:aws:abc # (optional) custom role arn.
-  traffic: 0.2 # (optional) traffic percentage to apply to this deployment.
-  domain: api.serverless.com # (optional) domain name.
-  region: us-east-2 # (optional) aws region to deploy to. default is us-east-1.
+  region: ap-guangzhou
+  functionName: express-api
+  serviceName: mytest
+  runtime: Nodejs8.9
+  serviceId: service-np1uloxw
+  src: ./src
+  functionConf:
+    timeout: 10
+    memorySize: 128
+    environment:
+      variables:
+        TEST: vale
+  apigatewayConf:
+    customDomains:
+      - domain: abc.com
+        certificateId: abcdefg
+        isDefaultMapping: 'FALSE'
+        pathMappingSet:
+          - path: /
+            environment: release
+        protocols:
+          - http
+          - https
 ```
 
-Once you've chosen your configuration, run `serverless deploy` again (or simply just `serverless`) to deploy your changes.
+点此查看[全量配置及配置说明](https://github.com/serverless-components/tencent-express/blob/v2/docs/configure.md)
 
-### 6. Develop
+当你根据该配置文件更新配置字段后，再次运行 `serverless deploy` 或者 `serverless` 就可以更新配置到云端。
 
-<img src="/assets/dev-demo.gif" height="250" align="right">
+### 5. 开发调试
 
-Now that you've got your basic express app up and running, it's time to develop that into a real world application. Instead of having to run `serverless deploy` everytime you make changes you wanna test, you could enable dev mode, which allows the CLI to watch for changes in your source directory as you develop, and deploy instantly on save.
+部署了 Express.js 应用后，可以通过开发调试能力对该项目进行二次开发，从而开发一个生产应用。在本地修改和更新代码后，不需要每次都运行 `serverless deploy` 命令来反复部署。你可以直接通过 `serverless dev` 命令对本地代码的改动进行检测和自动上传。
 
-Dev mode also enables live logs from your express app so that you can see the results of your tests right away on the CLI as they happen. To enable dev mode, simply run `serverless dev` from within the directory containing the `serverless.yml` file.
+可以通过在 `serverless.yml`文件所在的目录下运行 `serverless dev` 命令开启开发调试能力。
 
-### 7. Monitor
+`serverless dev` 同时支持实时输出云端日志，每次部署完毕后，对项目进行访问，即可在命令行中实时输出调用日志，便于查看业务情况和排障。
 
-<img src="/assets/info-demo.gif" height="250" align="right">
+除了实时日志输出之外，针对 Node.js 应用，当前也支持云端调试能力。在开启 `serverless dev` 命令之后，将会自动监听远端端口，并将函数的超时时间临时配置为 900s。此时你可以通过访问 chrome://inspect/#devices 查找远端的调试路径，并直接对云端代码进行断点等调试。在调试模式结束后，需要再次部署从而将代码更新并将超时时间设置为原来的值。
 
-Anytime you need to know more about your running express instance, you can run `serverless info` to view the most critical info. This is especially helpful when you want to know the outputs of your instances so that you can reference them in another instance. You will also see a url where you'll be able to view more info about your instance on the Serverless Dashboard.
+### 6. 移除
 
-It also shows you the status of your instance, when it was last deployed, and how many times it was deployed. To digg even deeper, you can pass the `--debug` flag to view the state of your component instance in case the deployment failed for any reason.
+在`serverless.yml`文件所在的目录下，通过以下命令移除部署的 Express 服务。移除后该组件会对应删除云上部署时所创建的所有相关资源。
 
-### 8. Remove
+```
+$ serverless remove
+```
 
-<img src="/assets/remove-demo.gif" height="250" align="right">
+和部署类似，支持通过 `sls remove --debug` 命令查看移除过程中的实时日志信息，`sls`是 `serverless` 命令的缩写。
 
-If you wanna tear down your entire express infrastructure that was created during deployment, just run `serverless remove` in the directory containing the `serverless.yml` file. The express component will then use all the data it needs from the built-in state storage system to delete only the relavent cloud resources that it created.
+## 架构说明
 
-Just like deployment, you could also specify a `--debug` flag for realtime logs from the express component running in the cloud.
+Express 组件将在腾讯云账户中使用到如下 Serverless 服务：
+
+- [x] **API 网关** - API 网关将会接收外部请求并且转发到 SCF 云函数中。
+- [x] **SCF 云函数** - 云函数将承载 Express.js 应用。
+- [x] **CAM 访问控制** - 该组件会创建默认 CAM 角色用于授权访问关联资源。
+- [x] **COS 对象存储** - 为确保上传速度和质量，云函数压缩并上传代码时，会默认将代码包存储在特定命名的 COS 桶中。
+- [x] **SSL 证书服务** - 如果你在 yaml 文件中配置了 `domain` 字段，需要做自定义域名绑定并开启 HTTPS 时，也会用到证书管理服务和域名服务。Serverless Framework 会根据已经备案的域名自动申请并配置 SSL 证书。
+
+# 账号配置
+
+当前默认支持 CLI 扫描二维码登录，如您希望配置持久的环境变量/秘钥信息，也可以本地创建 `.env` 文件
+
+```console
+$ touch .env # 腾讯云的配置信息
+```
+
+在 `.env` 文件中配置腾讯云的 SecretId 和 SecretKey 信息并保存
+
+如果没有腾讯云账号，可以在此[注册新账号](https://cloud.tencent.com/register)。
+
+如果已有腾讯云账号，可以在[API 密钥管理](https://console.cloud.tencent.com/cam/capi)中获取 `SecretId` 和`SecretKey`.
+
+```
+# .env
+TENCENT_SECRET_ID=123
+TENCENT_SECRET_KEY=123
+```
