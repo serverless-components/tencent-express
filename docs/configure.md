@@ -65,7 +65,7 @@ Main param description
 | functionName                             |    N     |                 | Serverless Cloud Function Name                                                              |
 | serviceName                              |    N     |                 | API-Gateway service name, default to create a new serivce                                   |
 | serviceId                                |    N     |                 | API-Gateway service id, if it has will use this APII-Gateway service                        |
-| code                                     |    N     | `process.cwd()` | Default is current working directory, if it is object, refer to [code object](#code-object) |
+| src                                      |    N     | `process.cwd()` | Default is current working directory, if it is object, refer to [code object](#code-object) |
 | exclude                                  |    N     |                 | exclude file                                                                                |
 | include                                  |    N     |                 | include file, if relative path, should relative to `serverless.yml`                         |
 | [functionConf](#funtionConf)             |    N     |                 | Function configure                                                                          |
@@ -75,10 +75,10 @@ Main param description
 
 ## code object
 
-| Param  | Required |  Type  | Default | Description |
-| ------ | :------: | :----: | :-----: | :---------- |
-| bucket |    N     | String |         | bucket name |
-| key    |    N     | String |         | bucket key  |
+| Param  | Required |  Type  | Default | Description        |
+| ------ | :------: | :----: | :-----: | :----------------- |
+| bucket |    N     | String |         | bucket name        |
+| object |    N     | String |         | bucket object name |
 
 ### cloudDNSConf
 
