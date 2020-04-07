@@ -1,6 +1,6 @@
 {
   "name": "@serverless/express",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --fix --cache"
   },
-  "author": "Serverless, Inc.",
+  "author": "Tencent Cloud, Inc.",
   "license": "Apache",
   "dependencies": {
     "fs-extra": "^8.1.0",

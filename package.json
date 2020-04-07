@@ -1,6 +1,6 @@
 {
   "name": "@serverless/express",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "src/serverless.js",
   "publishConfig": {
     "access": "public"
@@ -33,7 +33,7 @@
       "git add ."
     ]
   },
-  "author": "Tencent Cloud Inc.",
+  "author": "Tencent Cloud, Inc.",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
