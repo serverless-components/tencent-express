@@ -7,6 +7,7 @@ const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
 
 const DEFAULTS = {
+  framework: 'express',
   handler: 'sl_handler.handler',
   runtime: 'Nodejs10.15',
   exclude: ['.git/**', '.gitignore', '.DS_Store'],
@@ -142,7 +143,7 @@ const deleteRecord = (newRecords, historyRcords) => {
 const prepareInputs = async (instance, credentials, inputs = {}) => {
   // 对function inputs进行标准化
   const tempFunctionConf = inputs.functionConf ? inputs.functionConf : {}
-  const fromClientRemark = `tencent-express`
+  const fromClientRemark = `tencent-${DEFAULTS.framework}`
   const regionList = inputs.region
     ? typeof inputs.region == 'string'
       ? [inputs.region]
@@ -165,7 +166,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
     name:
       ensureString(inputs.functionName, { isOptional: true }) ||
       stateFunctionName ||
-      `express_component_${generateId()}`,
+      `${DEFAULTS.framework}_component_${generateId()}`,
     region: regionList,
     handler: ensureString(tempFunctionConf.handler ? tempFunctionConf.handler : inputs.handler, {
       default: DEFAULTS.handler
@@ -217,7 +218,9 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   const apigatewayConf = inputs.apigatewayConf ? inputs.apigatewayConf : {}
   apigatewayConf.fromClientRemark = fromClientRemark
   apigatewayConf.serviceName = inputs.serviceName
-  apigatewayConf.description = `Serverless Framework Tencent-Express Component`
+  apigatewayConf.description = `Serverless Framework Tencent-${capitalString(
+    DEFAULTS.framework
+  )} Component`
   apigatewayConf.serviceId = inputs.serviceId || stateServiceId
   apigatewayConf.region = functionConf.region
   apigatewayConf.protocols = apigatewayConf.protocols || ['http']
