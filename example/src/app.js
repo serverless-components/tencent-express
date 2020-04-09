@@ -1,26 +1,17 @@
 const express = require('express')
 const app = express()
 
-app.get('/', function(req, res) {
-  console.log('Current environment: ', process.env.RUN_ENV)
-  res.cookie('c1', '1', {
-    maxAge: 315000000,
-    path: '/',
-    httpOnly: false,
-    overwrite: true
-  })
-  res.cookie('c2', 2, {
-    maxAge: 315000000,
-    path: '/',
-    httpOnly: false,
-    overwrite: true
-  })
+// Routes
+app.get(`/*`, (req, res) => {
   res.send({
-    message: 'Hello Express',
-    query: req.query,
-    runEnv: process.env.RUN_ENV
+    msg: `Hello Express, Request received: ${req.method} - ${req.path}`
   })
 })
 
-// don't forget to export!
+// Error handler
+app.use(function(err, req, res) {
+  console.error(err)
+  res.status(500).send('Internal Serverless Error')
+})
+
 module.exports = app

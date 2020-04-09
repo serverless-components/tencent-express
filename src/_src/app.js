@@ -3,7 +3,9 @@ const app = express()
 
 // Routes
 app.get(`/*`, (req, res) => {
-  res.send(`Request received: ${req.method} - ${req.path}`)
+  res.send({
+    msg: `Hello Express, Request received: ${req.method} - ${req.path}`
+  })
 })
 
 // Error handler

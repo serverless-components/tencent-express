@@ -1,16 +1,13 @@
 {
-  "name": "@serverless/express",
+  "name": "express-demo",
   "version": "1.0.0",
-  "main": "./app.js",
-  "publishConfig": {
-    "access": "public"
-  },
+  "description": "",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --fix --cache"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Serverless, Inc.",
-  "license": "Apache",
+  "author": "yugasun",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.17.1"
   }

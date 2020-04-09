@@ -1,23 +1,18 @@
 const { Component } = require('@serverless/core')
 const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
-const {
-  packageExpress,
-  getUserInfo,
-  getDefaultProtocol,
-  deleteRecord,
-  prepareInputs
-} = require('./utils')
+const { packageExpress, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
+const CONFIGS = require('./config')
 
 class Express extends Component {
   async uploadCodeToCos(credentials, inputs, region, filePath) {
+    const { appId } = this.credentials.tencent.tmpSecrets
     // 创建cos对象
     const cos = new Cos(credentials, region)
-    const userInfo = await getUserInfo(credentials)
     // 创建存储桶 + 设置生命周期
     if (!inputs.code.bucket) {
       inputs.code.bucket = `sls-cloudfunction-${region}-code`
       await cos.deploy({
-        bucket: inputs.code.bucket + '-' + userInfo.Response.AppId,
+        bucket: inputs.code.bucket + '-' + appId,
         force: true,
         lifecycle: [
           {
@@ -36,7 +31,7 @@ class Express extends Component {
       const object = `${inputs.name}-${Math.floor(Date.now() / 1000)}.zip`
       inputs.code.object = object
       await cos.upload({
-        bucket: inputs.code.bucket + '-' + userInfo.Response.AppId,
+        bucket: inputs.code.bucket + '-' + appId,
         file: filePath,
         key: inputs.code.object
       })
@@ -168,7 +163,12 @@ class Express extends Component {
     console.log(`Deploying Express App...`)
 
     // 获取腾讯云密钥信息
-    const credentials = this.credentials.tencent
+    const { tmpSecrets } = this.credentials.tencent
+    const credentials = {
+      SecretId: tmpSecrets.TmpSecretId,
+      SecretKey: tmpSecrets.TmpSecretKey,
+      Token: tmpSecrets.Token
+    }
 
     // 对Inputs内容进行标准化
     const { regionList, functionConf, apigatewayConf, cnsConf } = await prepareInputs(
@@ -179,6 +179,9 @@ class Express extends Component {
 
     // 部署函数 + API网关
     const outputs = {}
+    if (!functionConf.src) {
+      outputs.templateUrl = CONFIGS.templateUrl
+    }
     const [apigwOutputs, functionOutputs] = await Promise.all([
       this.deployApigateway(credentials, apigatewayConf, regionList, outputs),
       this.deployFunction(credentials, functionConf, regionList, outputs)

@@ -5,16 +5,7 @@ const { Domain } = require('tencent-component-toolkit')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
-
-const DEFAULTS = {
-  framework: 'express',
-  handler: 'sl_handler.handler',
-  runtime: 'Nodejs10.15',
-  exclude: ['.git/**', '.gitignore', '.DS_Store'],
-  timeout: 3,
-  memorySize: 128,
-  namespace: 'default'
-}
+const CONFIGS = require('./config')
 
 /*
  * Pauses execution for the provided miliseconds
@@ -143,7 +134,7 @@ const deleteRecord = (newRecords, historyRcords) => {
 const prepareInputs = async (instance, credentials, inputs = {}) => {
   // 对function inputs进行标准化
   const tempFunctionConf = inputs.functionConf ? inputs.functionConf : {}
-  const fromClientRemark = `tencent-${DEFAULTS.framework}`
+  const fromClientRemark = `tencent-${CONFIGS.framework}`
   const regionList = inputs.region
     ? typeof inputs.region == 'string'
       ? [inputs.region]
@@ -166,22 +157,22 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
     name:
       ensureString(inputs.functionName, { isOptional: true }) ||
       stateFunctionName ||
-      `${DEFAULTS.framework}_component_${generateId()}`,
+      `${CONFIGS.framework}_component_${generateId()}`,
     region: regionList,
     handler: ensureString(tempFunctionConf.handler ? tempFunctionConf.handler : inputs.handler, {
-      default: DEFAULTS.handler
+      default: CONFIGS.handler
     }),
     runtime: ensureString(tempFunctionConf.runtime ? tempFunctionConf.runtime : inputs.runtime, {
-      default: DEFAULTS.runtime
+      default: CONFIGS.runtime
     }),
     namespace: ensureString(
       tempFunctionConf.namespace ? tempFunctionConf.namespace : inputs.namespace,
-      { default: DEFAULTS.namespace }
+      { default: CONFIGS.namespace }
     ),
     description: ensureString(
       tempFunctionConf.description ? tempFunctionConf.description : inputs.description,
       {
-        default: DEFAULTS.description
+        default: CONFIGS.description
       }
     ),
     fromClientRemark
@@ -202,10 +193,10 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   if (inputs.functionConf) {
     functionConf.timeout = inputs.functionConf.timeout
       ? inputs.functionConf.timeout
-      : DEFAULTS.timeout
+      : CONFIGS.timeout
     functionConf.memorySize = inputs.functionConf.memorySize
       ? inputs.functionConf.memorySize
-      : DEFAULTS.memorySize
+      : CONFIGS.memorySize
     if (inputs.functionConf.environment) {
       functionConf.environment = inputs.functionConf.environment
     }
@@ -219,7 +210,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   apigatewayConf.fromClientRemark = fromClientRemark
   apigatewayConf.serviceName = inputs.serviceName
   apigatewayConf.description = `Serverless Framework Tencent-${capitalString(
-    DEFAULTS.framework
+    CONFIGS.framework
   )} Component`
   apigatewayConf.serviceId = inputs.serviceId || stateServiceId
   apigatewayConf.region = functionConf.region
