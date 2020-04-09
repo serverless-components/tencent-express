@@ -179,7 +179,7 @@ class Express extends Component {
 
     // 部署函数 + API网关
     const outputs = {}
-    if (!functionConf.src) {
+    if (!functionConf.code.src) {
       outputs.templateUrl = CONFIGS.templateUrl
     }
     const [apigwOutputs, functionOutputs] = await Promise.all([
