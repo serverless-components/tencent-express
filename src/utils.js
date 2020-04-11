@@ -219,6 +219,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   apigatewayConf.endpoints = [
     {
       path: '/',
+      enableCORS: apigatewayConf.enableCORS,
       method: 'ANY',
       function: {
         isIntegratedResponse: true,
