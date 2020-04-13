@@ -93,7 +93,7 @@ Express 组件支持 0 配置部署，也就是可以直接通过配置文件中
 ```yml
 # serverless.yml
 
-component: express-tencent # (必填) 引用 component 的名称，当前用到的是 express-tencent 组件
+component: express # (必填) 引用 component 的名称，当前用到的是 express-tencent 组件
 name: express-api # (必填) 该 express 组件创建的实例名称
 org: test # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid
 app: expressApp # (可选) 该 express 应用名称
