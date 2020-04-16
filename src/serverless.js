@@ -4,6 +4,22 @@ const { packageExpress, getDefaultProtocol, deleteRecord, prepareInputs } = requ
 const CONFIGS = require('./config')
 
 class Express extends Component {
+  getCredentials() {
+    const { tmpSecrets } = this.credentials.tencent
+
+    if (!tmpSecrets || !tmpSecrets.TmpSecretId) {
+      throw new Error(
+        'Cannot get secretId/Key, your account could be sub-account or does not have access, please check if SLS_QcsRole role exists in your account, and visit https://console.cloud.tencent.com/cam to bind this role to your account.'
+      )
+    }
+
+    return {
+      SecretId: tmpSecrets.TmpSecretId,
+      SecretKey: tmpSecrets.TmpSecretKey,
+      Token: tmpSecrets.Token
+    }
+  }
+
   async uploadCodeToCos(credentials, inputs, region, filePath) {
     const { appId } = this.credentials.tencent.tmpSecrets
     // 创建cos对象
@@ -162,13 +178,7 @@ class Express extends Component {
   async deploy(inputs) {
     console.log(`Deploying Express App...`)
 
-    // 获取腾讯云密钥信息
-    const { tmpSecrets } = this.credentials.tencent
-    const credentials = {
-      SecretId: tmpSecrets.TmpSecretId,
-      SecretKey: tmpSecrets.TmpSecretKey,
-      Token: tmpSecrets.Token
-    }
+    const credentials = this.getCredentials()
 
     // 对Inputs内容进行标准化
     const { regionList, functionConf, apigatewayConf, cnsConf } = await prepareInputs(
@@ -215,12 +225,9 @@ class Express extends Component {
 
     const { state } = this
     const { regionList = [] } = state
-    const { tmpSecrets } = this.credentials.tencent
-    const credentials = {
-      SecretId: tmpSecrets.TmpSecretId,
-      SecretKey: tmpSecrets.TmpSecretKey,
-      Token: tmpSecrets.Token
-    }
+
+    const credentials = this.getCredentials()
+
     const removeHandlers = []
     for (let i = 0; i < regionList.length; i++) {
       const curRegion = regionList[i]

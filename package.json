@@ -1,6 +1,6 @@
 {
   "name": "@serverless/express",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "main": "src/serverless.js",
   "publishConfig": {
     "access": "public"
