@@ -1,6 +1,6 @@
 {
   "name": "@serverless/express",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -10,7 +10,7 @@
     "lint": "eslint . --fix --cache"
   },
   "author": "Tencent Cloud, Inc.",
-  "license": "Apache",
+  "license": "MIT",
   "dependencies": {
     "fs-extra": "^8.1.0",
     "tencent-component-toolkit": "^1.1.1",

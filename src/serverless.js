@@ -214,8 +214,13 @@ class Express extends Component {
     console.log(`Removing Express App...`)
 
     const { state } = this
-    const { regionList } = state
-    const credentials = this.credentials.tencent
+    const { regionList = [] } = state
+    const { tmpSecrets } = this.credentials.tencent
+    const credentials = {
+      SecretId: tmpSecrets.TmpSecretId,
+      SecretKey: tmpSecrets.TmpSecretKey,
+      Token: tmpSecrets.Token
+    }
     const removeHandlers = []
     for (let i = 0; i < regionList.length; i++) {
       const curRegion = regionList[i]
