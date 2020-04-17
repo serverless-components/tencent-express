@@ -69,7 +69,7 @@ $ cd src && npm install
 
 ```
 |- src
-|   ├── app.js
+|   ├── sls.js
 |   ├──node_modules
 |   └── package.json
 └──  serverless.yml
