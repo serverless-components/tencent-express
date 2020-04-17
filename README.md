@@ -15,7 +15,6 @@
 - [x] **便捷协作** - 通过云端的状态信息和部署日志，方便的进行多人协作开发。
 - [x] **自定义域名** - 支持配置自定义域名及 HTTPS 访问
 
-
 <br/>
 
 <img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm_resize.gif" />
@@ -31,14 +30,16 @@
 7. [**移除**](#7-移除)
 
 更多资源：
-* [**架构说明**](#架构说明)
-* [**账号配置**](#账号配置)
+
+- [**架构说明**](#架构说明)
+- [**账号配置**](#账号配置)
 
 &nbsp;
 
 ### 1. 安装
 
-通过 npm 安装最新版本的 Serverless Framework 
+通过 npm 安装最新版本的 Serverless Framework
+
 ```
 $ npm install -g serverless
 ```
@@ -46,11 +47,13 @@ $ npm install -g serverless
 ### 2. 创建
 
 创建并进入一个全新目录：
+
 ```
 $ mkdir tencent-express && cd tencent-express
 ```
 
 通过如下命令和模板链接，快速创建一个 express 应用：
+
 ```
 $ serverless create --template-url https://github.com/serverless-components/tencent-express/tree/v2/example
 $ cd example
@@ -61,7 +64,9 @@ $ cd example
 ```
 $ cd src && npm install
 ```
+
 安装完毕后，目录结构如下所示：
+
 ```
 |- src
 |   ├── app.js
@@ -74,11 +79,11 @@ $ cd src && npm install
 
 在 `serverless.yml` 文件下的目录中运行 `serverless deploy` 进行 express 项目的部署。第一次部署可能耗时相对较久，但后续的二次部署会在几秒钟之内完成。部署完毕后，你可以在命令行的输出中查看到你 express 应用的 URL 地址，点击地址即可访问你的 express 项目。
 
-**注意：** 
+**注意：**
 
 如您的账号未[登陆](https://cloud.tencent.com/login)或[注册](https://cloud.tencent.com/register)腾讯云，您可以直接通过`微信`扫描命令行中的二维码进行授权登陆和注册。
 
-如果出现了 `internal server error` 的报错，请检查是否在创建模板后没有运行  `npm install`。
+如果出现了 `internal server error` 的报错，请检查是否在创建模板后没有运行 `npm install`。
 
 如果希望查看更多部署过程的信息，可以通过`sls deploy --debug` 命令查看部署过程中的实时日志信息，`sls`是 `serverless` 命令的缩写。
 
@@ -93,36 +98,24 @@ Express 组件支持 0 配置部署，也就是可以直接通过配置文件中
 ```yml
 # serverless.yml
 
-component: express # (必填) 引用 component 的名称，当前用到的是 express-tencent 组件
-name: express-api # (必填) 该 express 组件创建的实例名称
-org: test # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid
-app: expressApp # (可选) 该 express 应用名称
-stage: dev # (可选) 用于区分环境信息，默认值是 dev
+component: express # (required) name of the component. In that case, it's express.
+name: expressDemo # (required) name of your express component instance.
+org: orgDemo # (optional) serverless dashboard org. default is the first org you created during signup.
+app: appDemo # (optional) serverless dashboard app. default is the same as the name property.
+stage: dev # (optional) serverless dashboard stage. default is dev.
 
 inputs:
+  src: ./src # (optional) path to the source folder. default is a hello world app.
+  functionName: expressDemo
   region: ap-guangzhou
-  functionName: express-api
-  serviceName: mytest
-  runtime: Nodejs8.9
-  serviceId: service-np1uloxw
-  src: ./src
-  functionConf:
-    timeout: 10
-    memorySize: 128
-    environment:
-      variables:
-        TEST: vale
+  runtime: Nodejs10.15
+  exclude:
+    - .env
   apigatewayConf:
-    customDomains:
-      - domain: abc.com
-        certificateId: abcdefg
-        isDefaultMapping: 'FALSE'
-        pathMappingSet:
-          - path: /
-            environment: release
-        protocols:
-          - http
-          - https
+    protocols:
+      - http
+      - https
+    environment: release
 ```
 
 点此查看[全量配置及配置说明](https://github.com/serverless-components/tencent-express/blob/v2/docs/configure.md)

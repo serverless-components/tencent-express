@@ -1,6 +1,6 @@
 {
   "name": "@serverless/express",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -12,6 +12,7 @@
   "author": "Tencent Cloud, Inc.",
   "license": "MIT",
   "dependencies": {
+    "download": "^8.0.0",
     "fs-extra": "^8.1.0",
     "tencent-component-toolkit": "^1.1.1",
     "type": "^2.0.0"

@@ -5,6 +5,7 @@ const { Domain } = require('tencent-component-toolkit')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
+const download = require('download')
 const CONFIGS = require('./config')
 
 /*
@@ -32,7 +33,21 @@ const packageExpress = async (instance, inputs) => {
 
   // unzip source zip file
   console.log(`Unzipping ${inputs.code.src || 'files'}...`)
-  const sourceDirectory = await instance.unzip(inputs.code.src)
+  let sourceDirectory
+  if (!inputs.code.src) {
+    // add default nextjs template
+    const downloadPath = `/tmp/${generateId()}`
+    const filename = 'template'
+
+    console.log(`Installing Default Express.js App...`)
+    await download(CONFIGS.templateUrl, downloadPath, {
+      filename: `${filename}.zip`
+    })
+    const tempPath = await instance.unzip(`${downloadPath}/${filename}.zip`)
+    sourceDirectory = `${tempPath}/src`
+  } else {
+    sourceDirectory = await instance.unzip(inputs.code.src)
+  }
   console.log(`Files unzipped into ${sourceDirectory}...`)
 
   // add shim to the source directory
@@ -43,11 +58,6 @@ const packageExpress = async (instance, inputs) => {
   console.log(`Installing Serverless Framework SDK...`)
   instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
 
-  if (!inputs.code.src) {
-    // add default express app
-    console.log(`Installing Default Express App...`)
-    copySync(path.join(__dirname, '_src'), path.join(sourceDirectory, '_src'))
-  }
   // zip the source directory with the shim and the sdk
 
   console.log(`Zipping files...`)

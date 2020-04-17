@@ -1,15 +1,16 @@
 const fs = require('fs')
+const path = require('path')
 const { createServer, proxy } = require('tencent-serverless-http')
 
 exports.handler = async (event, context) => {
-  // NOTICE: require() is relative to this file, while existsSync() is relative to the cwd, which is the root of lambda
+  const userSls = path.join(__dirname, '..', 'sls.js')
   let app
-  if (fs.existsSync('./app.js')) {
+  if (fs.existsSync(userSls)) {
     // load the user provided app
-    app = require('../app.js')
+    app = await require(userSls)
   } else {
     // load the built-in default app
-    app = require('../_src/app.js')
+    app = require('./sls.js')
   }
 
   const server = createServer(app)
