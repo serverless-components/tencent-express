@@ -1,6 +1,5 @@
 const path = require('path')
 const { copySync } = require('fs-extra')
-const Cam = require('tencent-cloud-sdk').cam
 const { Domain } = require('tencent-component-toolkit')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
@@ -23,13 +22,13 @@ const generateId = () =>
     .toString(36)
     .substring(6)
 /*
- * Packages express app and injects shims and sdk
+ * Packages framework app and injects shims and sdk
  *
  * @param ${instance} instance - the component instance
  * @param ${object} config - the component config
  */
-const packageExpress = async (instance, inputs) => {
-  console.log(`Packaging Express.js application...`)
+const packageCode = async (instance, inputs) => {
+  console.log(`Packaging ${CONFIGS.frameworkFullname} application...`)
 
   // unzip source zip file
   console.log(`Unzipping ${inputs.code.src || 'files'}...`)
@@ -39,7 +38,7 @@ const packageExpress = async (instance, inputs) => {
     const downloadPath = `/tmp/${generateId()}`
     const filename = 'template'
 
-    console.log(`Installing Default Express.js App...`)
+    console.log(`Installing Default ${CONFIGS.frameworkFullname} App...`)
     await download(CONFIGS.templateUrl, downloadPath, {
       filename: `${filename}.zip`
     })
@@ -51,12 +50,12 @@ const packageExpress = async (instance, inputs) => {
   console.log(`Files unzipped into ${sourceDirectory}...`)
 
   // add shim to the source directory
-  console.log(`Installing Express + SCF handler...`)
-  copySync(path.join(__dirname, '_express'), path.join(sourceDirectory, '_express'))
+  console.log(`Installing ${CONFIGS.frameworkFullname} + SCF handler...`)
+  copySync(path.join(__dirname, '_shims'), path.join(sourceDirectory, '_shims'))
 
   // add sdk to the source directory, add original handler
   console.log(`Installing Serverless Framework SDK...`)
-  instance.state.handler = await instance.addSDK(sourceDirectory, '_express/handler.handler')
+  instance.state.handler = await instance.addSDK(sourceDirectory, '_shims/handler.handler')
 
   // zip the source directory with the shim and the sdk
 
@@ -108,14 +107,6 @@ const getDefaultProtocol = (protocols) => {
     return 'https'
   }
   return 'http'
-}
-
-const getUserInfo = async (credentials) => {
-  const cam = new Cam(credentials)
-  return await cam.request({
-    Action: 'GetUserAppId',
-    Version: '2019-01-16'
-  })
 }
 
 const deleteRecord = (newRecords, historyRcords) => {
@@ -306,11 +297,10 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 module.exports = {
   generateId,
   sleep,
-  packageExpress,
+  packageCode,
   mergeJson,
   capitalString,
   getDefaultProtocol,
-  getUserInfo,
   deleteRecord,
   prepareInputs
 }

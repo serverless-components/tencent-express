@@ -1,6 +1,6 @@
 const { Component } = require('@serverless/core')
 const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
-const { packageExpress, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
+const { packageCode, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
 const CONFIGS = require('./config')
 
 class Express extends Component {
@@ -65,7 +65,7 @@ class Express extends Component {
     // if set bucket and object not pack code
     let packageDir
     if (!inputs.code.bucket || !inputs.code.object) {
-      packageDir = await packageExpress(this, inputs)
+      packageDir = await packageCode(this, inputs)
     }
 
     // 上传代码到COS

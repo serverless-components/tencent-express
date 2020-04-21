@@ -13,6 +13,9 @@ exports.handler = async (event, context) => {
     app = require('./sls.js')
   }
 
+  context.callbackWaitsForEmptyEventLoop =
+    app.callbackWaitsForEmptyEventLoop === true ? true : false
+
   const server = createServer(app)
   return proxy(server, event, context, 'PROMISE').promise
 }
