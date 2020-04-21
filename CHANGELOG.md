@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.7](https://github.com/serverless-components/tencent-express/compare/v3.0.6...v3.0.7) (2020-04-21)
+
+### Bug Fixes
+
+- add compatibility for node10 ([fa2ee0c](https://github.com/serverless-components/tencent-express/commit/fa2ee0c2b30575779cb69ef49af345ffd24bf631))
+
 ### [3.0.6](https://github.com/serverless-components/tencent-express/compare/v3.0.4...v3.0.6) (2020-04-03)
 
 ### Bug Fixes
