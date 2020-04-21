@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.8](https://github.com/serverless-components/tencent-express/compare/v3.0.7...v3.0.8) (2020-04-21)
+
+### Bug Fixes
+
+- make callbackWaitsForEmptyEventLoop default false ([b407e1a](https://github.com/serverless-components/tencent-express/commit/b407e1a192ca4b6fbc6fc05ee71a0adf0384771c))
+
 ### [3.0.7](https://github.com/serverless-components/tencent-express/compare/v3.0.6...v3.0.7) (2020-04-21)
 
 ### Bug Fixes
