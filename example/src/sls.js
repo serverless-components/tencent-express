@@ -1,11 +1,10 @@
 const express = require('express')
+const path = require('path')
 const app = express()
 
 // Routes
 app.get(`/*`, (req, res) => {
-  res.send({
-    msg: `Hello Express, Request received: ${req.method} - ${req.path}`
-  })
+  res.sendFile(path.join(__dirname, 'index.html'))
 })
 
 // Error handler
