@@ -2,6 +2,8 @@ const { Component } = require('@serverless/core')
 const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
 const { packageCode, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
 const CONFIGS = require('./config')
+const { slsMonitor } = require('tencent-cloud-sdk')
+const moment = require('moment')
 
 class Express extends Component {
   getCredentials() {
@@ -260,6 +262,189 @@ class Express extends Component {
     }
 
     this.state = {}
+  }
+  
+  buildMetrics(datas) {
+    const filterMetricByName = function (metricName, metrics) {
+      const len = metrics.length
+
+      for (var i = 0; i < len; i++) {
+        if (metrics[i].Response.MetricName == metricName)
+          return metrics[i].Response
+      }
+      return null
+    }
+
+    const filteredMetrics = []
+    const response = {
+      rangeStart: '',
+      rangeEnd: '',
+      metrics: []
+    }
+
+    const funcInvAndErr = {
+      type: 'stacked-bar', // the chart widget type will use this
+      title: 'function invocations & error',
+      dataHint: {x: 'timestamp', y: 'count'},
+      y: []
+    }    
+
+    // build Invocation & error
+    const invocations = filterMetricByName('Invocation', datas)
+    if (invocations) {
+      response.rangeStart = invocations.StartTime
+      response.rangeEnd = invocations.EndTime
+
+      funcInvAndErr.x = invocations.DataPoints[0].Timestamps
+      const funcInvItem = {
+        name: invocations.MetricName.toLocaleLowerCase(),
+        primary: true,
+        total: invocations.DataPoints[0].Values.reduce(function(a, b){
+          return a + b;
+        }, 0),
+        values: invocations.DataPoints[0].Values
+      }
+      funcInvAndErr.y.push(funcInvItem)
+    }
+    filteredMetrics.push('Invocation')
+    const errors = filterMetricByName('Error', datas)
+    if (errors) {
+      response.rangeStart = errors.StartTime
+      response.rangeEnd = errors.EndTime
+      const funcErrItem = {
+        name: errors.MetricName.toLocaleLowerCase(),
+        primary: true,
+        total: errors.DataPoints[0].Values.reduce(function(a, b){
+          return a + b;
+        }, 0),
+        values: errors.DataPoints[0].Values
+      }
+      funcInvAndErr.y.push(funcErrItem)
+    }
+    filteredMetrics.push('Error')
+    response.metrics.push(funcInvAndErr)
+
+    // api requests & errors
+    const apiReqAndErr = {
+      type: 'stacked-bar', // the chart widget type will use this
+      title: 'api requests & errors',
+      dataHint: {x: 'timestamp', y: 'count'},
+      y: []
+    }
+    const http2xx = filterMetricByName('Http2xx', datas)
+    if (http2xx) {
+      response.rangeStart = http2xx.StartTime
+      response.rangeEnd = http2xx.EndTime
+      apiReqAndErr.x = http2xx.DataPoints[0].Timestamps
+      const apiReqSuc = {
+        name: 'requests',
+        // name: http2xx.MetricName.toLocaleLowerCase(),
+        primary: true,
+        total: http2xx.DataPoints[0].Values.reduce(function(a, b){
+          return a + b;
+        }, 0),
+        values: http2xx.DataPoints[0].Values
+      }
+      apiReqAndErr.y.push(apiReqSuc)
+    }
+    filteredMetrics.push('Http2xx')
+    const http4xx = filterMetricByName('Http4xx', datas)
+    if (http4xx) {
+      response.rangeStart = http4xx.StartTime
+      response.rangeEnd = http4xx.EndTime
+      const apiReqErr = {
+        // name: http4xx.MetricName.toLocaleLowerCase(),
+        name: 'errors',
+        primary: true,
+        total: http4xx.DataPoints[0].Values.reduce(function(a, b){
+          return a + b;
+        }, 0),
+        values: http4xx.DataPoints[0].Values
+      }
+      apiReqAndErr.y.push(apiReqErr)
+    }
+    // filteredMetrics.push('Http4xx')
+    response.metrics.push(apiReqAndErr)
+
+    const len = datas.length
+
+    for (var i = 0; i < len; i++) {
+      const metric = datas[i].Response
+
+      if (filteredMetrics.indexOf(metric.MetricName) != -1) {
+        continue
+      }
+
+      const item = {
+        type: 'stacked-bar', // the chart widget type will use this
+        title: metric.MetricName.toLocaleLowerCase(),
+        dataHint: {x: 'timestamp', y: 'count'},
+        y: []
+      }
+      const v = {
+        name: metric.MetricName.toLocaleLowerCase(),
+        primary: true,
+        total: metric.DataPoints[0].Values.reduce(function(a, b){
+          return a + b;
+        }, 0),
+        values: metric.DataPoints[0].Values
+      }
+      item.y.push(v)
+      item.x = metric.DataPoints[0].Timestamps
+      response.metrics.push(item)
+    }
+
+    return response
+  }
+
+  async metrics(inputs = {}) {
+    console.log(`Get Express Metrics Datas...`)
+    if (!inputs.rangeStart || !inputs.rangeEnd) {
+      throw new Error('rangeStart and rangeEnd are require inputs')
+    }
+
+    inputs.rangeStart = moment(inputs.rangeStart)
+    inputs.rangeEnd = moment(inputs.rangeEnd)
+    
+    if (inputs.rangeStart.isAfter(inputs.rangeEnd)) {
+      throw new Error(`The rangeStart provided is after the rangeEnd`)
+    }
+
+    // Validate: End is not longer than 30 days
+    if (inputs.rangeStart.diff(inputs.rangeEnd, 'days') >= 31) {
+      throw new Error(
+        `The range cannot be longer than 30 days.  The supplied range is: ${inputs.rangeStart.diff(
+          inputs.rangeEnd,
+          'days'
+        )}`
+      )
+    }
+
+    const diffMinutes = (inputs.rangeEnd - inputs.rangeStart) / 1000 / 60
+    let period
+    if (diffMinutes <= 16) {
+      // 16 mins
+      period = 60 // 1 min
+    } else if (diffMinutes <= 61) {
+      // 1 hour
+      period = 300 // 5 mins
+    } else if (diffMinutes <= 1500) {
+      // 24 hours
+      period = 3600 // hour
+    } else {
+      period = 86400 // day
+    }
+
+    const credentials = this.getCredentials()
+    const slsClient = new slsMonitor(credentials)
+
+    const rangeTime = {
+        rangeStart: inputs.rangeStart.format('YYYY-MM-DD\THH:mm:ssZ'),
+        rangeEnd: inputs.rangeEnd.format('YYYY-MM-DD\THH:mm:ssZ'),
+    }
+
+    const responses = await slsClient.getScfMetrics(inputs.region, rangeTime, period, inputs.functionName, inputs.namespace||'default')
+    return this.buildMetrics(responses)
   }
 }
 
