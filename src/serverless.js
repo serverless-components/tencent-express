@@ -734,13 +734,16 @@ class Express extends Component {
     const credentials = this.getCredentials()
     const slsClient = new slsMonitor(credentials)
 
+    let timeFormat = 'YYYY-MM-DD\THH:mm:ssZ'
+    if (inputs.tz)
+       timeFormat = 'YYYY-MM-DD\THH:mm:ss' + inputs.tz
+
     const rangeTime = {
-        rangeStart: inputs.rangeStart.format('YYYY-MM-DD\THH:mm:ssZ'),
-        rangeEnd: inputs.rangeEnd.format('YYYY-MM-DD\THH:mm:ssZ'),
+        rangeStart: inputs.rangeStart.format(timeFormat),
+        rangeEnd: inputs.rangeEnd.format(timeFormat),
     }
 
     const responses = await slsClient.getScfMetrics(inputs.region, rangeTime, period, inputs.functionName, inputs.namespace||'default')
-
     const metricResults = this.buildMetrics(responses)
 
     const reqCustomTime = {
