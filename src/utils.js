@@ -176,7 +176,10 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
         default: CONFIGS.description
       }
     ),
-    fromClientRemark
+    fromClientRemark,
+    layers: ensureIterable(tempFunctionConf.layers ? tempFunctionConf.layers : inputs.layers, {
+      default: []
+    })
   }
   functionConf.tags = ensureObject(tempFunctionConf.tags ? tempFunctionConf.tags : inputs.tag, {
     default: null

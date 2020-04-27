@@ -1,15 +1,19 @@
-component: express # (required) name of the component. In that case, it's express.
-name: expressDemo # (required) name of your express component instance.
 org: orgDemo # (optional) serverless dashboard org. default is the first org you created during signup.
 app: appDemo # (optional) serverless dashboard app. default is the same as the name property.
 stage: dev # (optional) serverless dashboard stage. default is dev.
+component: express # (required) name of the component. In that case, it's express.
+name: expressDemo # (required) name of your express component instance.
 
 inputs:
-  src: ./src
+  src:
+    src: ./src # (optional) path to the source folder. default is a hello world app.
+    exclude:
+      - .env
   region: ap-guangzhou
+  layers:
+    - name: nodeLayer
+      version: 1
   runtime: Nodejs10.15
-  exclude:
-    - .env
   apigatewayConf:
     protocols:
       - http
