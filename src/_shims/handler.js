@@ -1,3 +1,4 @@
+require('tencent-component-toolkit/src/monitor')
 const fs = require('fs')
 const path = require('path')
 const { createServer, proxy } = require('tencent-serverless-http')
@@ -17,5 +18,6 @@ exports.handler = async (event, context) => {
     app.callbackWaitsForEmptyEventLoop === true ? true : false
 
   const server = createServer(app)
-  return proxy(server, event, context, 'PROMISE').promise
+  const result = await proxy(server, event, context, 'PROMISE')
+  return result.promise
 }
