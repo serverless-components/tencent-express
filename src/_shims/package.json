@@ -12,6 +12,7 @@
   "author": "Serverless, Inc.",
   "license": "Apache",
   "dependencies": {
+    "tencent-component-toolkit": "^1.3.0",
     "tencent-serverless-http": "^1.0.7"
   }
 }
