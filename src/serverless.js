@@ -189,7 +189,9 @@ class Express extends Component {
       credentials,
       inputs
     )
-
+    if (!functionConf.role)
+      functionConf.role = 'QCS_SCFExcuteRole'
+    
     // 部署函数 + API网关
     const outputs = {}
     if (!functionConf.code.src) {
