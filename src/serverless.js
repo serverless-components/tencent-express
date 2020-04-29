@@ -283,15 +283,17 @@ class Express extends Component {
     }
 
     const funcInvAndErr = {
-      type: 'stacked-bar', // the chart widget type will use this
+      type: 'stacked-bar', 
       title: 'function invocations & error',
-      x: {type: 'timestamp', values: []},
-      y: []
     }    
 
     // build Invocation & error
     const invocations = filterMetricByName('Invocation', datas)
-    if (invocations) {
+    if (invocations && invocations.DataPoints[0].Timestamps.length > 0) {
+      funcInvAndErr.x = {type: 'timestamp'}
+      if (!funcInvAndErr.y)
+        funcInvAndErr.y = []
+
       response.rangeStart = invocations.StartTime
       response.rangeEnd = invocations.EndTime
 
@@ -307,12 +309,18 @@ class Express extends Component {
       funcInvAndErr.y.push(funcInvItem)
     }
     const errors = filterMetricByName('Error', datas)
-    if (errors) {
+    if (errors && errors.DataPoints[0].Timestamps.length > 0) {
+      funcInvAndErr.x = {type: 'timestamp'}
+      if (!funcInvAndErr.y)
+        funcInvAndErr.y = []
       response.rangeStart = errors.StartTime
       response.rangeEnd = errors.EndTime
+
+      funcInvAndErr.x.values = errors.DataPoints[0].Timestamps
       const funcErrItem = {
         name: errors.MetricName.toLocaleLowerCase(),
         type: 'count',
+        color: 'error',
         total: errors.DataPoints[0].Values.reduce(function(a, b){
           return a + b;
         }, 0),
@@ -320,20 +328,23 @@ class Express extends Component {
       }
       funcInvAndErr.y.push(funcErrItem)
     }
+    if ((!invocations || invocations.DataPoints[0].Timestamps.length == 0) && 
+      (!errors ||errors.DataPoints[0].Timestamps.length == 0))
+      funcInvAndErr.type = 'empty'
     response.metrics.push(funcInvAndErr)
 
     const latency = {
       type: 'multiline', // constant
       title: 'function latency', // constant
-      x: {
-        type: 'timestamp', // constant
-        values: []
-      },
-      y: []
     }
     const latencyP50 = filterMetricByName('Duration-P50', datas)
     const latencyP95 = filterMetricByName('Duration-P95', datas)
-    if (latencyP50) {
+    if (latencyP50 && latencyP50.DataPoints[0].Timestamps.length > 0) {
+      latency.x = {
+        type: 'timestamp'
+      }
+      if (!latency.y)
+        latency.y = []
       response.rangeStart = latencyP50.StartTime
       response.rangeEnd = latencyP50.EndTime
       latency.x.values = latencyP50.DataPoints[0].Timestamps
@@ -351,7 +362,12 @@ class Express extends Component {
       latency.y.push(p50)
     }
 
-    if (latencyP95) {
+    if (latencyP95 && latencyP95.DataPoints[0].Timestamps.length > 0) {
+      latency.x = {
+        type: 'timestamp'
+      }
+      if (!latency.y)
+        latency.y = []
       response.rangeStart = latencyP95.StartTime
       response.rangeEnd = latencyP95.EndTime
       latency.x.values = latencyP95.DataPoints[0].Timestamps
@@ -369,6 +385,10 @@ class Express extends Component {
         p95.total = parseFloat(p95.total.toFixed(2), 10)
       latency.y.push(p95)
     }
+    if ((!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) && 
+      (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)) 
+      latency.type = 'empty'
+   
     response.metrics.push(latency)
 
     return response
@@ -457,59 +477,87 @@ class Express extends Component {
     const requestDatas = filterMetricByName('request', responses)
     const errorDatas = filterMetricByName('error', responses)
     const apiReqAndErr = {
-      type: 'stacked-bar', // the chart widget type will use this
+      type: 'stacked-bar', 
       title: 'api requests & errors',
-      x: {type: 'timestamp'},
-      y: []
     }
     if (requestDatas) {
+      apiReqAndErr.x = {
+        type: 'timestamp'
+      }
+      if (!apiReqAndErr.y)
+        apiReqAndErr.y = []
+
       apiReqAndErr.x.values = requestDatas.Values.map((item) => {
         return item.Timestamp
       })
       apiReqAndErr.y.push(makeMetric('requests', requestDatas))
-    }
-    
+    } 
+
     if (errorDatas) {
+      apiReqAndErr.x = {
+        type: 'timestamp'
+      }
+      if (!apiReqAndErr.y)
+        apiReqAndErr.y = []
+
       apiReqAndErr.x.values = errorDatas.Values.map((item) => {
         return item.Timestamp
       })
-      apiReqAndErr.y.push(makeMetric('errors', errorDatas))
+      const errObj = makeMetric('errors', errorDatas)
+      errObj.color = 'error'
+      apiReqAndErr.y.push(errObj)
     }
+    if (!requestDatas && !errorDatas)
+      apiReqAndErr.type = 'empty'
+
     results.push(apiReqAndErr)
 
     // request latency
     const latencyP95Datas = filterMetricByName('latency-P95', responses)
     const latencyP50Datas = filterMetricByName('latency-P50', responses)
     const latency = {
-      type: 'multiline', // the chart widget type will use this
+      type: 'multiline', 
       title: 'api latency',
-      x: {type: 'timestamp'},
-      y: []
     }
     if (latencyP95Datas) {
+      if (!latency.y)
+        latency.y = []
+      latency.x = {
+        type: 'timestamp'
+      }
       latency.x.values = requestDatas.Values.map((item) => {
         return item.Timestamp
       })
       latency.y.push(makeMetric('p95 latency', latencyP95Datas))
-    }
+    } 
 
     if (latencyP50Datas) {
+      if (!latency.y)
+        latency.y = []
+      latency.x = {
+        type: 'timestamp'
+      }
       latency.x.values = requestDatas.Values.map((item) => {
         return item.Timestamp
       })
       latency.y.push(makeMetric('p50 latency', latencyP50Datas))
     }
+
+    if (!latencyP50Datas && !latencyP95Datas)
+      latency.type = 'empty'
     results.push(latency)
 
     // request 5xx error
     const err5xx = {
       type: 'stacked-bar', // the chart widget type will use this
-      title: 'api 500x errors',
-      x: {type: 'timestamp'},
-      y: []
+      title: 'api 5xx errors',
     }
     const err5xxDatas = filterMetricByName('5xx', responses)
     if (err5xxDatas) {
+      err5xx.y = []
+      err5xx.x = {
+        type: 'timestamp'
+      }
       err5xx.x.values = err5xxDatas.Values.map((item) => {
         return item.Timestamp
       })
@@ -517,18 +565,22 @@ class Express extends Component {
       errRet.color = 'error'
       errRet.type = 'count'
       err5xx.y.push(errRet)
-    }
+    } else 
+      err5xx.type = 'empty'
+
     results.push(err5xx)
 
     // request 4xx error
     const err4xxDatas = filterMetricByName('4xx', responses)
     const err4xx = {
       type: 'stacked-bar', // the chart widget type will use this
-      title: 'api 400x errors',
-      x: {type: 'timestamp'},
-      y: []
+      title: 'api 4xx errors',
     }
     if (err4xxDatas) {
+      err4xx.y = []
+      err4xx.x = {
+        type: 'timestamp'
+      }
       err4xx.x.values = err4xxDatas.Values.map((item) => {
         return item.Timestamp
       })
@@ -536,78 +588,78 @@ class Express extends Component {
       errRet.color = 'error'
       errRet.type = 'count'
       err4xx.y.push(errRet)
-    }
+    } else 
+      err4xx.type = 'empty'
     results.push(err4xx)
 
     // api request error 
     const apiPathRequest = {
       type: 'list-flat-bar', // constant
       title: 'api errors', // constant
-      color: 'error', // constant
-      x: {type: 'string', values: []},
-      y: []
     }
     const pathStatusDatas = filterMetricByName(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_(.*)_(\d+)$/i, responses, true)
-    const pathHash = {}
-    const recordHash = {}
     const pathLen = pathStatusDatas.length
-    for (let i = 0; i < pathLen; i++) {
-      const pathData = pathStatusDatas[i]
-      const path = parseErrorPath(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i, pathData.AttributeName)
-      const val = `${path.method} - ${path.path}`
-      
-      let total = 0
-      pathData.Values.map((item) => {
-        total += item.Value
-      })
-      if (!(~~total == total)) 
-        total = parseFloat(total.toFixed(2), 10)
-
-      if (!pathHash[val]) 
-        pathHash[val] = 1
-      else 
-        pathHash[val]++
-
-      if (!recordHash[path.code])
-        recordHash[path.code] = {}
-      recordHash[path.code][val] = total
-      
-    }
-    apiPathRequest.x.values = Object.keys(pathHash)
-
-    for (let key in recordHash) {
-      const item = recordHash[key]
-      const errItem = {
-        name: key, // the http error code
-        type: 'count', // constant
-        total: 0,
-        values: null,
+    if (pathLen > 0) {
+      apiPathRequest.x = {
+        type: 'string'
       }
-      const codeVals = []
-      let total = 0
-      for (var i = 0; i < apiPathRequest.x.values.length; i++) {
-        const path = apiPathRequest.x.values[i]
+      apiPathRequest.y = []
+      apiPathRequest.color = 'error'
 
-        codeVals.push(item[path]||0)
-        total += (item[path]||0)
+      const pathHash = {}
+      const recordHash = {}
+      for (let i = 0; i < pathLen; i++) {
+        const pathData = pathStatusDatas[i]
+        const path = parseErrorPath(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i, pathData.AttributeName)
+        const val = `${path.method} - ${path.path}`
+        
+        let total = 0
+        pathData.Values.map((item) => {
+          total += item.Value
+        })
+        if (!(~~total == total)) 
+          total = parseFloat(total.toFixed(2), 10)
+
+        if (!pathHash[val]) 
+          pathHash[val] = 1
+        else 
+          pathHash[val]++
+
+        if (!recordHash[path.code])
+          recordHash[path.code] = {}
+        recordHash[path.code][val] = total
+        
       }
-      errItem.values = codeVals
-      errItem.total = total
-      apiPathRequest.y.push(errItem)
-    }
+      apiPathRequest.x.values = Object.keys(pathHash)
+
+      for (let key in recordHash) {
+        const item = recordHash[key]
+        const errItem = {
+          name: key, // the http error code
+          type: 'count', // constant
+          total: 0,
+          values: null,
+        }
+        const codeVals = []
+        let total = 0
+        for (var i = 0; i < apiPathRequest.x.values.length; i++) {
+          const path = apiPathRequest.x.values[i]
+
+          codeVals.push(item[path]||0)
+          total += (item[path]||0)
+        }
+        errItem.values = codeVals
+        errItem.total = total
+        apiPathRequest.y.push(errItem)
+      }
+    } else
+      apiPathRequest.type = 'empty'
     results.push(apiPathRequest)
-
 
     // total request
     const requestTotal = {
       type: 'list-details-bar', // constant
       title: 'api path requests', // constant
-      x: {
-        type: 'string', // constant
-        values: [
-        ],
-      },
-      y: []
     }
 
     const pathRequestRegExp = /^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)$/i
@@ -660,7 +712,6 @@ class Express extends Component {
       else 
         pathLatencyHash[val] += total
     }
-    requestTotal.x.values = Object.keys(pathRequestHash)
     const pathRequestValues = {
       name: 'requests', // constant
       type: 'count', // constant
@@ -687,8 +738,19 @@ class Express extends Component {
       if (!(~~pathLatencyValues.total == pathLatencyValues.total)) 
         pathLatencyValues.total = parseFloat(pathLatencyValues.total.toFixed(2), 10)
     }
-    requestTotal.y.push(pathRequestValues)
-    requestTotal.y.push(pathLatencyValues)
+
+    const apiPaths = Object.keys(pathRequestHash)
+    if (apiPaths.length > 0) {
+      requestTotal.x = {
+        type: 'string'
+      }
+      requestTotal.y = []
+      requestTotal.x.values = apiPaths
+      requestTotal.y.push(pathRequestValues)
+      requestTotal.y.push(pathLatencyValues) 
+    } else 
+      requestTotal.type = 'empty'
+    
     results.push(requestTotal)
 
     return results
@@ -743,7 +805,13 @@ class Express extends Component {
         rangeEnd: inputs.rangeEnd.format(timeFormat),
     }
 
-    const responses = await slsClient.getScfMetrics(inputs.region, rangeTime, period, inputs.functionName, inputs.namespace||'default')
+    let functionName
+    if (this.state[this.state.region] && this.state[this.state.region].functionName) {
+      functionName = this.state[this.state.region].functionName
+    } else
+      throw new Error('function name not define')
+
+    const responses = await slsClient.getScfMetrics(inputs.region, rangeTime, period, functionName, inputs.namespace||'default')
     const metricResults = this.buildMetrics(responses)
 
     const reqCustomTime = {
@@ -757,6 +825,10 @@ class Express extends Component {
     const customResults = this.buildCustomMetrics(customMetrics)
     metricResults.metrics = metricResults.metrics.concat(customResults)
 
+    if (!metricResults.rangeStart)
+      metricResults.rangeStart = reqCustomTime.rangeStart
+    if (!metricResults.rangeEnd)
+      metricResults.rangeEnd = reqCustomTime.rangeEnd
     return metricResults
   }
 }
