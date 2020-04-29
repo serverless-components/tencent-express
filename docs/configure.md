@@ -18,6 +18,11 @@ inputs:
   runtime: Nodejs10.15
   serviceId: service-np1uloxw
   src: ./src
+  # src:
+  #   src: ./src
+  #   exclude:
+  #     - .env
+  #     - node_modules
   layers:
     - name: expressLayer
       version: 1
@@ -61,29 +66,30 @@ inputs:
 
 Main param description
 
-| Param                                    | Required |     Default     | Description                                                                                 |
-| ---------------------------------------- | :------: | :-------------: | :------------------------------------------------------------------------------------------ |
-| runtime                                  |    N     |   Nodejs10.15   | Function Runtime, support: Nodejs6.10, Nodejs8.9, Nodejs10.15                               |
-| region                                   |    N     |  ap-guangzhou   | Deploy region                                                                               |
-| functionName                             |    N     |                 | Serverless Cloud Function Name                                                              |
-| serviceName                              |    N     |                 | API-Gateway service name, default to create a new serivce                                   |
-| serviceId                                |    N     |                 | API-Gateway service id, if it has will use this APII-Gateway service                        |
-| src                                      |    N     | `process.cwd()` | Default is current working directory, if it is object, refer to [code object](#code-object) |
-| layers                                   |    N     |                 | Bind layers for scf, array of [Layer](#layer)                                               |
-| exclude                                  |    N     |                 | exclude file                                                                                |
-| include                                  |    N     |                 | include file, if relative path, should relative to `serverless.yml`                         |
-| [functionConf](#funtionConf)             |    N     |                 | Function configure                                                                          |
-| [apigatewayConf](#apigatewayConf)        |    N     |                 | API-Gateway configure                                                                       |
-| [cloudDNSConf](#cloudDNSConf)            |    N     |                 | Special config for region                                                                   |
-| [Region special config](#apigatewayConf) |    N     |                 | Special config for region. Use region name for key                                          |
+| Param                                    | Required |     Default     | Description                                                                               |
+| ---------------------------------------- | :------: | :-------------: | :---------------------------------------------------------------------------------------- |
+| runtime                                  |    N     |   Nodejs10.15   | Function Runtime, support: Nodejs6.10, Nodejs8.9, Nodejs10.15                             |
+| region                                   |    N     |  ap-guangzhou   | Deploy region                                                                             |
+| functionName                             |    N     |                 | Serverless Cloud Function Name                                                            |
+| serviceName                              |    N     |                 | API-Gateway service name, default to create a new serivce                                 |
+| serviceId                                |    N     |                 | API-Gateway service id, if it has will use this APII-Gateway service                      |
+| src                                      |    N     | `process.cwd()` | Default is current working directory, if it is object, refer to [src object](#src-object) |
+| layers                                   |    N     |                 | Bind layers for scf, array of [Layer](#layer)                                             |
+| exclude                                  |    N     |                 | exclude file                                                                              |
+| include                                  |    N     |                 | include file, if relative path, should relative to `serverless.yml`                       |
+| [functionConf](#funtionConf)             |    N     |                 | Function configure                                                                        |
+| [apigatewayConf](#apigatewayConf)        |    N     |                 | API-Gateway configure                                                                     |
+| [cloudDNSConf](#cloudDNSConf)            |    N     |                 | Special config for region                                                                 |
+| [Region special config](#apigatewayConf) |    N     |                 | Special config for region. Use region name for key                                        |
 
 ## src object
 
-| Param  | Required |  Type  | Default | Description        |
-| ------ | :------: | :----: | :-----: | :----------------- |
-| src    |    N     | String |         | code path          |
-| bucket |    N     | String |         | bucket name        |
-| object |    N     | String |         | bucket object name |
+| Param   | Required |      Type       | Default | Description                                                                   |
+| ------- | :------: | :-------------: | :-----: | :---------------------------------------------------------------------------- |
+| src     |    N     |     String      |         | code path                                                                     |
+| exclude |    N     | Array of String |         | Exclude path or file, using [glob sytax](https://github.com/isaacs/node-glob) |
+| bucket  |    N     |     String      |         | bucket name                                                                   |
+| object  |    N     |     String      |         | bucket object name                                                            |
 
 ## layer
 
