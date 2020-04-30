@@ -191,7 +191,6 @@ class Express extends Component {
     )
     if (!functionConf.role)
       functionConf.role = 'QCS_SCFExcuteRole'
-    
     // 部署函数 + API网关
     const outputs = {}
     if (!functionConf.code.src) {
@@ -401,6 +400,8 @@ class Express extends Component {
       const len = metrics.length
       const results = []
       for (var i = 0; i < len; i++) {
+        if (metrics[i].Response.Error)
+          continue
         if (metrics[i].Response.Data.length > 0 && 
           metrics[i].Response.Data[0].AttributeName.match(metricName)) {
           if (all)
@@ -431,7 +432,7 @@ class Express extends Component {
 
       const method = ret[1]
       const hexPath = ret[2]
-      const code = ret[3]
+      const code = parseInt(ret[3], 10)
 
       const pathObj = url.parse(hex2path(hexPath))
 
@@ -492,7 +493,9 @@ class Express extends Component {
       apiReqAndErr.x.values = requestDatas.Values.map((item) => {
         return item.Timestamp
       })
-      apiReqAndErr.y.push(makeMetric('requests', requestDatas))
+      const ret = makeMetric('requests', requestDatas)
+      ret.type = 'duration'
+      apiReqAndErr.y.push(ret)
     } 
 
     if (errorDatas) {
@@ -507,6 +510,7 @@ class Express extends Component {
       })
       const errObj = makeMetric('errors', errorDatas)
       errObj.color = 'error'
+      errObj.type = 'duration'
       apiReqAndErr.y.push(errObj)
     }
     if (!requestDatas && !errorDatas)
@@ -613,6 +617,8 @@ class Express extends Component {
       for (let i = 0; i < pathLen; i++) {
         const pathData = pathStatusDatas[i]
         const path = parseErrorPath(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i, pathData.AttributeName)
+        if (path.code < 400)
+          continue
         const val = `${path.method} - ${path.path}`
         
         let total = 0
