@@ -189,9 +189,9 @@ class Express extends Component {
       credentials,
       inputs
     )
-    if (!functionConf.role)
+    if (!functionConf.role) {
       functionConf.role = 'QCS_SCFExcuteRole'
-    
+    }
     // 部署函数 + API网关
     const outputs = {}
     if (!functionConf.code.src) {
@@ -266,14 +266,15 @@ class Express extends Component {
 
     this.state = {}
   }
-  
+
   buildMetrics(datas) {
-    const filterMetricByName = function (metricName, metrics) {
+    const filterMetricByName = function(metricName, metrics) {
       const len = metrics.length
 
       for (var i = 0; i < len; i++) {
-        if (metrics[i].Response.MetricName == metricName)
+        if (metrics[i].Response.MetricName == metricName) {
           return metrics[i].Response
+        }
       }
       return null
     }
@@ -285,26 +286,27 @@ class Express extends Component {
     }
 
     const funcInvAndErr = {
-      type: 'stacked-bar', 
-      title: 'function invocations & error',
-    }    
+      type: 'stacked-bar',
+      title: 'function invocations & errors'
+    }
 
     // build Invocation & error
     const invocations = filterMetricByName('Invocation', datas)
     if (invocations && invocations.DataPoints[0].Timestamps.length > 0) {
-      funcInvAndErr.x = {type: 'timestamp'}
-      if (!funcInvAndErr.y)
+      funcInvAndErr.x = { type: 'timestamp' }
+      if (!funcInvAndErr.y) {
         funcInvAndErr.y = []
+      }
 
       response.rangeStart = invocations.StartTime
       response.rangeEnd = invocations.EndTime
 
-      funcInvAndErr.x.values = invocations.DataPoints[0].Timestamps
+      funcInvAndErr.x.values = invocations.DataPoints[0].Timestamps.map((ts) => ts * 1000)
       const funcInvItem = {
         name: invocations.MetricName.toLocaleLowerCase(),
         type: 'count',
-        total: invocations.DataPoints[0].Values.reduce(function(a, b){
-          return a + b;
+        total: invocations.DataPoints[0].Values.reduce(function(a, b) {
+          return a + b
         }, 0),
         values: invocations.DataPoints[0].Values
       }
@@ -312,32 +314,36 @@ class Express extends Component {
     }
     const errors = filterMetricByName('Error', datas)
     if (errors && errors.DataPoints[0].Timestamps.length > 0) {
-      funcInvAndErr.x = {type: 'timestamp'}
-      if (!funcInvAndErr.y)
+      funcInvAndErr.x = { type: 'timestamp' }
+      if (!funcInvAndErr.y) {
         funcInvAndErr.y = []
+      }
       response.rangeStart = errors.StartTime
       response.rangeEnd = errors.EndTime
 
-      funcInvAndErr.x.values = errors.DataPoints[0].Timestamps
+      funcInvAndErr.x.values = errors.DataPoints[0].Timestamps.map((ts) => ts * 1000)
       const funcErrItem = {
         name: errors.MetricName.toLocaleLowerCase(),
         type: 'count',
         color: 'error',
-        total: errors.DataPoints[0].Values.reduce(function(a, b){
-          return a + b;
+        total: errors.DataPoints[0].Values.reduce(function(a, b) {
+          return a + b
         }, 0),
         values: errors.DataPoints[0].Values
       }
       funcInvAndErr.y.push(funcErrItem)
     }
-    if ((!invocations || invocations.DataPoints[0].Timestamps.length == 0) && 
-      (!errors ||errors.DataPoints[0].Timestamps.length == 0))
+    if (
+      (!invocations || invocations.DataPoints[0].Timestamps.length == 0) &&
+      (!errors || errors.DataPoints[0].Timestamps.length == 0)
+    ) {
       funcInvAndErr.type = 'empty'
+    }
     response.metrics.push(funcInvAndErr)
 
     const latency = {
       type: 'multiline', // constant
-      title: 'function latency', // constant
+      title: 'function latency' // constant
     }
     const latencyP50 = filterMetricByName('Duration-P50', datas)
     const latencyP95 = filterMetricByName('Duration-P95', datas)
@@ -345,22 +351,24 @@ class Express extends Component {
       latency.x = {
         type: 'timestamp'
       }
-      if (!latency.y)
+      if (!latency.y) {
         latency.y = []
+      }
       response.rangeStart = latencyP50.StartTime
       response.rangeEnd = latencyP50.EndTime
-      latency.x.values = latencyP50.DataPoints[0].Timestamps
+      latency.x.values = latencyP50.DataPoints[0].Timestamps.map((ts) => ts * 1000)
 
       const p50 = {
         name: 'p50 latency', // constant
         type: 'duration', // constant
-        total:  latencyP50.DataPoints[0].Values.reduce(function(a, b){
-          return a + b;
+        total: latencyP50.DataPoints[0].Values.reduce(function(a, b) {
+          return a + b
         }, 0),
         values: latencyP50.DataPoints[0].Values
       }
-      if (!(~~p50.total == p50.total)) 
+      if (!(~~p50.total == p50.total)) {
         p50.total = parseFloat(p50.total.toFixed(2), 10)
+      }
       latency.y.push(p50)
     }
 
@@ -368,70 +376,84 @@ class Express extends Component {
       latency.x = {
         type: 'timestamp'
       }
-      if (!latency.y)
+      if (!latency.y) {
         latency.y = []
+      }
       response.rangeStart = latencyP95.StartTime
       response.rangeEnd = latencyP95.EndTime
-      latency.x.values = latencyP95.DataPoints[0].Timestamps
+      latency.x.values = latencyP95.DataPoints[0].Timestamps.map((ts) => ts * 1000)
 
       const p95 = {
         name: 'p95 latency', // constant
         type: 'duration', // constant
-        total:  latencyP95.DataPoints[0].Values.reduce(function(a, b){
-          return a + b;
+        total: latencyP95.DataPoints[0].Values.reduce(function(a, b) {
+          return a + b
         }, 0),
         values: latencyP95.DataPoints[0].Values
       }
 
-      if (!(~~p95.total == p95.total)) 
+      if (!(~~p95.total == p95.total)) {
         p95.total = parseFloat(p95.total.toFixed(2), 10)
+      }
       latency.y.push(p95)
     }
-    if ((!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) && 
-      (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)) 
+    if (
+      (!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) &&
+      (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)
+    ) {
       latency.type = 'empty'
-   
+    }
+
     response.metrics.push(latency)
 
     return response
   }
 
   buildCustomMetrics(responses) {
-    const filterMetricByName = function (metricName, metrics, all) {
+    const filterMetricByName = function(metricName, metrics, all) {
       const len = metrics.length
       const results = []
       for (var i = 0; i < len; i++) {
-        if (metrics[i].Response.Data.length > 0 && 
-          metrics[i].Response.Data[0].AttributeName.match(metricName)) {
-          if (all)
+        if (metrics[i].Response.Error) {
+          continue
+        }
+        if (
+          metrics[i].Response.Data.length > 0 &&
+          metrics[i].Response.Data[0].AttributeName.match(metricName)
+        ) {
+          if (all) {
             results.push(metrics[i].Response.Data[0])
-          else
+          } else {
             return metrics[i].Response.Data[0]
+          }
         }
       }
       return all ? results : null
     }
 
-    const hex2path = function (hexPath) {
+    const hex2path = function(hexPath) {
       const len = hexPath.length
       let path = ''
       for (let i = 0; i < len; ) {
         const char = hexPath.slice(i, i + 2)
-        if (isNaN(parseInt(char, 16))) return null
+        if (isNaN(parseInt(char, 16))) {
+          return null
+        }
         path += String.fromCharCode(parseInt(char, 16))
         i += 2
       }
       return path.toLocaleLowerCase()
     }
 
-    const parseErrorPath = function (m, path) {
+    const parseErrorPath = function(m, path) {
       const ret = path.match(m)
-      if (!ret)
+      if (!ret) {
         return null
+      }
 
       const method = ret[1]
       const hexPath = ret[2]
-      const code = ret[3]
+      const code = parseInt(ret[3], 10)
 
       const pathObj = url.parse(hex2path(hexPath))
 
@@ -442,10 +464,11 @@ class Express extends Component {
       }
     }
 
-    const parsePath = function (m, path) {
+    const parsePath = function(m, path) {
       const ret = path.match(m)
-      if (!ret)
+      if (!ret) {
         return null
+      }
 
       const method = ret[1]
       const hexPath = ret[2]
@@ -454,11 +477,11 @@ class Express extends Component {
 
       return {
         method: method.toLocaleUpperCase(),
-        path: pathObj ? pathObj.pathname : hex2path(hexPath),
+        path: pathObj ? pathObj.pathname : hex2path(hexPath)
       }
     }
 
-    const makeMetric = function (name, metricData) {
+    const makeMetric = function(name, metricData) {
       const data = {
         name: name,
         type: 'duration',
@@ -467,92 +490,106 @@ class Express extends Component {
         })
       }
 
-      data.total = data.values.reduce(function(a, b){
+      data.total = data.values.reduce(function(a, b) {
         return a + b
       }, 0)
 
-      if (!(~~data.total == data.total)) 
+      if (!(~~data.total == data.total)) {
         data.total = parseFloat(data.total.toFixed(2), 10)
+      }
       return data
     }
     const results = []
     const requestDatas = filterMetricByName('request', responses)
     const errorDatas = filterMetricByName('error', responses)
     const apiReqAndErr = {
-      type: 'stacked-bar', 
-      title: 'api requests & errors',
+      type: 'stacked-bar',
+      title: 'api requests & errors'
     }
     if (requestDatas) {
       apiReqAndErr.x = {
         type: 'timestamp'
       }
-      if (!apiReqAndErr.y)
+      if (!apiReqAndErr.y) {
         apiReqAndErr.y = []
+      }
 
       apiReqAndErr.x.values = requestDatas.Values.map((item) => {
-        return item.Timestamp
+        return item.Timestamp * 1000
       })
-      apiReqAndErr.y.push(makeMetric('requests', requestDatas))
-    } 
+      const ret = makeMetric('requests', requestDatas)
+      ret.type = 'count'
+      apiReqAndErr.y.push(ret)
+    }
 
     if (errorDatas) {
       apiReqAndErr.x = {
         type: 'timestamp'
       }
-      if (!apiReqAndErr.y)
+      if (!apiReqAndErr.y) {
         apiReqAndErr.y = []
+      }
 
       apiReqAndErr.x.values = errorDatas.Values.map((item) => {
-        return item.Timestamp
+        return item.Timestamp * 1000
       })
       const errObj = makeMetric('errors', errorDatas)
       errObj.color = 'error'
+      errObj.type = 'count'
       apiReqAndErr.y.push(errObj)
     }
-    if (!requestDatas && !errorDatas)
+
+    if (!requestDatas && !errorDatas) {
       apiReqAndErr.type = 'empty'
+    }
 
     results.push(apiReqAndErr)
 
     // request latency
-    const latencyP95Datas = filterMetricByName('latency-P95', responses)
-    const latencyP50Datas = filterMetricByName('latency-P50', responses)
+    let latencyP95Datas, latencyP50Datas
     const latency = {
-      type: 'multiline', 
       title: 'api latency',
+      type: 'multiline'
     }
-    if (latencyP95Datas) {
-      if (!latency.y)
-        latency.y = []
-      latency.x = {
-        type: 'timestamp'
+    if (requestDatas) {
+      latencyP95Datas = filterMetricByName('latency-P95', responses)
+      latencyP50Datas = filterMetricByName('latency-P50', responses)
+      if (latencyP95Datas) {
+        if (!latency.y) {
+          latency.y = []
+        }
+        latency.x = {
+          type: 'timestamp'
+        }
+        latency.x.values = requestDatas.Values.map((item) => {
+          return item.Timestamp * 1000
+        })
+        latency.y.push(makeMetric('p95 latency', latencyP95Datas))
       }
-      latency.x.values = requestDatas.Values.map((item) => {
-        return item.Timestamp
-      })
-      latency.y.push(makeMetric('p95 latency', latencyP95Datas))
-    } 
 
-    if (latencyP50Datas) {
-      if (!latency.y)
-        latency.y = []
-      latency.x = {
-        type: 'timestamp'
+      if (latencyP50Datas) {
+        if (!latency.y) {
+          latency.y = []
+        }
+        latency.x = {
+          type: 'timestamp'
+        }
+        latency.x.values = requestDatas.Values.map((item) => {
+          return item.Timestamp * 1000
+        })
+        latency.y.push(makeMetric('p50 latency', latencyP50Datas))
       }
-      latency.x.values = requestDatas.Values.map((item) => {
-        return item.Timestamp
-      })
-      latency.y.push(makeMetric('p50 latency', latencyP50Datas))
     }
 
-    if (!latencyP50Datas && !latencyP95Datas)
+    if (!latencyP50Datas && !latencyP95Datas) {
       latency.type = 'empty'
+    }
     results.push(latency)
 
     // request 5xx error
     const err5xx = {
       type: 'stacked-bar', // the chart widget type will use this
-      title: 'api 5xx errors',
+      title: 'api 5xx errors'
     }
     const err5xxDatas = filterMetricByName('5xx', responses)
     if (err5xxDatas) {
@@ -561,14 +598,15 @@ class Express extends Component {
         type: 'timestamp'
       }
       err5xx.x.values = err5xxDatas.Values.map((item) => {
-        return item.Timestamp
+        return item.Timestamp * 1000
       })
       const errRet = makeMetric('5xx', err5xxDatas)
       errRet.color = 'error'
       errRet.type = 'count'
       err5xx.y.push(errRet)
-    } else 
+    } else {
       err5xx.type = 'empty'
+    }
 
     results.push(err5xx)
 
@@ -576,7 +614,7 @@ class Express extends Component {
     const err4xxDatas = filterMetricByName('4xx', responses)
     const err4xx = {
       type: 'stacked-bar', // the chart widget type will use this
-      title: 'api 4xx errors',
+      title: 'api 4xx errors'
     }
     if (err4xxDatas) {
       err4xx.y = []
@@ -584,22 +622,27 @@ class Express extends Component {
         type: 'timestamp'
       }
       err4xx.x.values = err4xxDatas.Values.map((item) => {
-        return item.Timestamp
+        return item.Timestamp * 1000
       })
       const errRet = makeMetric('4xx', err4xxDatas)
       errRet.color = 'error'
       errRet.type = 'count'
       err4xx.y.push(errRet)
-    } else 
+    } else {
       err4xx.type = 'empty'
+    }
     results.push(err4xx)
 
-    // api request error 
+    // api request error
     const apiPathRequest = {
       type: 'list-flat-bar', // constant
-      title: 'api errors', // constant
+      title: 'api errors' // constant
     }
-    const pathStatusDatas = filterMetricByName(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_(.*)_(\d+)$/i, responses, true)
+    const pathStatusDatas = filterMetricByName(
+      /^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_(.*)_(\d+)$/i,
+      responses,
+      true
+    )
     const pathLen = pathStatusDatas.length
     if (pathLen > 0) {
       apiPathRequest.x = {
@@ -612,56 +655,65 @@ class Express extends Component {
       const recordHash = {}
       for (let i = 0; i < pathLen; i++) {
         const pathData = pathStatusDatas[i]
-        const path = parseErrorPath(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i, pathData.AttributeName)
+        const path = parseErrorPath(
+          /^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i,
+          pathData.AttributeName
+        )
+        if (path.code < 400) {
+          continue
+        }
         const val = `${path.method} - ${path.path}`
-        
+
         let total = 0
         pathData.Values.map((item) => {
           total += item.Value
         })
-        if (!(~~total == total)) 
+        if (!(~~total == total)) {
           total = parseFloat(total.toFixed(2), 10)
+        }
 
-        if (!pathHash[val]) 
+        if (!pathHash[val]) {
           pathHash[val] = 1
-        else 
+        } else {
           pathHash[val]++
+        }
 
-        if (!recordHash[path.code])
+        if (!recordHash[path.code]) {
           recordHash[path.code] = {}
+        }
         recordHash[path.code][val] = total
-        
       }
       apiPathRequest.x.values = Object.keys(pathHash)
 
-      for (let key in recordHash) {
+      for (const key in recordHash) {
         const item = recordHash[key]
         const errItem = {
           name: key, // the http error code
           type: 'count', // constant
           total: 0,
-          values: null,
+          values: null
         }
         const codeVals = []
         let total = 0
         for (var i = 0; i < apiPathRequest.x.values.length; i++) {
           const path = apiPathRequest.x.values[i]
 
-          codeVals.push(item[path]||0)
-          total += (item[path]||0)
+          codeVals.push(item[path] || 0)
+          total += item[path] || 0
         }
         errItem.values = codeVals
         errItem.total = total
         apiPathRequest.y.push(errItem)
       }
-    } else
+    } else {
       apiPathRequest.type = 'empty'
+    }
     results.push(apiPathRequest)
 
     // total request
     const requestTotal = {
       type: 'list-details-bar', // constant
-      title: 'api path requests', // constant
+      title: 'api path requests' // constant
     }
 
     const pathRequestRegExp = /^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)$/i
@@ -670,9 +722,9 @@ class Express extends Component {
     const pathLatencyDatas = filterMetricByName(pathLatencyRegExp, responses, true)
 
     const pathRequestHash = {}
-    let requestTotalNum = 0
+    // let requestTotalNum = 0
     const pathRequestDatasLen = pathRequestDatas.length
-    for (let i = 0; i < pathRequestDatasLen; i++) {
+    for (i = 0; i < pathRequestDatasLen; i++) {
       const pathRequestItem = pathRequestDatas[i]
       const path = parsePath(pathRequestRegExp, pathRequestItem.AttributeName)
       const val = `${path.method} - ${path.path}`
@@ -681,20 +733,22 @@ class Express extends Component {
       pathRequestItem.Values.map((item) => {
         total += item.Value
       })
-      if (!(~~total == total)) 
+      if (!(~~total == total)) {
         total = parseFloat(total.toFixed(2), 10)
+      }
 
-      requestTotalNum += total
-      if (!pathRequestHash[val]) 
+      // requestTotalNum += total
+      if (!pathRequestHash[val]) {
         pathRequestHash[val] = total
-      else 
+      } else {
         pathRequestHash[val] += total
+      }
     }
 
     const pathLatencyHash = {}
-    let requestLatencyNum = 0
+    // let requestLatencyNum = 0
     const pathLatencyLen = pathLatencyDatas.length
-    for (let i = 0; i < pathLatencyLen; i++) {
+    for (i = 0; i < pathLatencyLen; i++) {
       const pathLatencyItem = pathLatencyDatas[i]
       const path = parsePath(pathLatencyRegExp, pathLatencyItem.AttributeName)
       const val = `${path.method} - ${path.path}`
@@ -705,40 +759,44 @@ class Express extends Component {
       })
 
       total = total / pathLatencyItem.Values.length
-      if (!(~~total == total)) 
+      if (!(~~total == total)) {
         total = parseFloat(total.toFixed(2), 10)
+      }
 
-      requestLatencyNum += total
-      if (!pathLatencyHash[val]) 
+      // requestLatencyNum += total
+      if (!pathLatencyHash[val]) {
         pathLatencyHash[val] = total
-      else 
+      } else {
         pathLatencyHash[val] += total
+      }
     }
     const pathRequestValues = {
       name: 'requests', // constant
       type: 'count', // constant
       total: 0,
-      values: [],
+      values: []
     }
     const pathLatencyValues = {
       name: 'avg latency', // constant
       type: 'duration', // constant
       total: 0,
-      values: [],
+      values: []
     }
-    for (let key in pathRequestHash) {
+    for (const key in pathRequestHash) {
       const reqNum = pathRequestHash[key]
       pathRequestValues.values.push(reqNum || 0)
-      pathRequestValues.total += (reqNum || 0)
-      if (!(~~pathRequestValues.total == pathRequestValues.total)) 
+      pathRequestValues.total += reqNum || 0
+      if (!(~~pathRequestValues.total == pathRequestValues.total)) {
         pathRequestValues.total = parseFloat(pathRequestValues.total.toFixed(2), 10)
+      }
 
       const latencyNum = pathLatencyHash[key]
       pathLatencyValues.values.push(latencyNum || 0)
-      pathLatencyValues.total += (latencyNum || 0)
+      pathLatencyValues.total += latencyNum || 0
 
-      if (!(~~pathLatencyValues.total == pathLatencyValues.total)) 
+      if (!(~~pathLatencyValues.total == pathLatencyValues.total)) {
         pathLatencyValues.total = parseFloat(pathLatencyValues.total.toFixed(2), 10)
+      }
     }
 
     const apiPaths = Object.keys(pathRequestHash)
@@ -749,10 +807,11 @@ class Express extends Component {
       requestTotal.y = []
       requestTotal.x.values = apiPaths
       requestTotal.y.push(pathRequestValues)
-      requestTotal.y.push(pathLatencyValues) 
-    } else 
+      requestTotal.y.push(pathLatencyValues)
+    } else {
       requestTotal.type = 'empty'
-    
+    }
+
     results.push(requestTotal)
 
     return results
@@ -765,7 +824,7 @@ class Express extends Component {
     }
     inputs.rangeStart = moment(inputs.rangeStart)
     inputs.rangeEnd = moment(inputs.rangeEnd)
-    
+
     if (inputs.rangeStart.isAfter(inputs.rangeEnd)) {
       throw new Error(`The rangeStart provided is after the rangeEnd`)
     }
@@ -798,22 +857,39 @@ class Express extends Component {
     const credentials = this.getCredentials()
     const slsClient = new slsMonitor(credentials)
 
-    let timeFormat = 'YYYY-MM-DD\THH:mm:ssZ'
-    if (inputs.tz)
-       timeFormat = 'YYYY-MM-DD\THH:mm:ss' + inputs.tz
+    let timeFormat = 'YYYY-MM-DDTHH:mm:ssZ'
+    if (inputs.tz) {
+      timeFormat = 'YYYY-MM-DDTHH:mm:ss' + inputs.tz
+    }
 
     const rangeTime = {
-        rangeStart: inputs.rangeStart.format(timeFormat),
-        rangeEnd: inputs.rangeEnd.format(timeFormat),
+      rangeStart: inputs.rangeStart.format(timeFormat),
+      rangeEnd: inputs.rangeEnd.format(timeFormat)
     }
 
     let functionName
     if (this.state[this.state.region] && this.state[this.state.region].functionName) {
-      functionName = this.state[this.state.region].functionName
-    } else
+      ;({ functionName } = this.state[this.state.region])
+    } else {
       throw new Error('function name not define')
+    }
 
-    const responses = await slsClient.getScfMetrics(inputs.region, rangeTime, period, functionName, inputs.namespace||'default')
+    console.log(
+      'getScfMetrics params>>',
+      inputs.region,
+      rangeTime,
+      period,
+      functionName,
+      inputs.namespace
+    )
+    const responses = await slsClient.getScfMetrics(
+      inputs.region,
+      rangeTime,
+      period,
+      functionName,
+      inputs.namespace || 'default'
+    )
+    console.log('getScf>>>', responses)
     const metricResults = this.buildMetrics(responses)
 
     const reqCustomTime = {
@@ -821,16 +897,25 @@ class Express extends Component {
       rangeEnd: inputs.rangeEnd.format('YYYY-MM-DD HH:mm:ss')
     }
 
-    const instances = [inputs.instance||'default']
-    const customMetrics = await slsClient.getCustomMetrics(inputs.region, instances, reqCustomTime, period)
+    const instances = [inputs.instance || 'default']
+    console.log('customMetrics params>>', inputs.region, instances, reqCustomTime, period)
+    const customMetrics = await slsClient.getCustomMetrics(
+      inputs.region,
+      instances,
+      reqCustomTime,
+      period
+    )
+    console.log('customMetrics>>>', customMetrics)
 
     const customResults = this.buildCustomMetrics(customMetrics)
     metricResults.metrics = metricResults.metrics.concat(customResults)
 
-    if (!metricResults.rangeStart)
+    if (!metricResults.rangeStart) {
       metricResults.rangeStart = reqCustomTime.rangeStart
-    if (!metricResults.rangeEnd)
+    }
+    if (!metricResults.rangeEnd) {
       metricResults.rangeEnd = reqCustomTime.rangeEnd
+    }
     return metricResults
   }
 }
