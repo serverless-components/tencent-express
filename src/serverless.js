@@ -881,8 +881,8 @@ class Express extends Component {
       functionName,
       inputs.namespace || 'default'
     )
-    console.log('getScf>>>', responses)
-    const metricResults = this.buildMetrics(responses)
+    console.log('getScf>>>', JSON.stringify(responses))
+    const metricResults = this.buildMetrics(responses, inputs.rangeStart, inputs.rangeEnd, period)
 
     const reqCustomTime = {
       rangeStart: inputs.rangeStart.format('YYYY-MM-DD HH:mm:ss'),
@@ -897,7 +897,7 @@ class Express extends Component {
       reqCustomTime,
       period
     )
-    console.log('customMetrics>>>', customMetrics)
+    console.log('customMetrics>>>', JSON.stringify(customMetrics))
 
     const customResults = this.buildCustomMetrics(customMetrics)
     metricResults.metrics = metricResults.metrics.concat(customResults)
