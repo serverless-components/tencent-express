@@ -267,7 +267,7 @@ class Express extends Component {
     this.state = {}
   }
 
-  buildMetrics(datas) {
+  buildMetrics(datas, period) {
     const filterMetricByName = function(metricName, metrics) {
       const len = metrics.length
 
@@ -280,10 +280,13 @@ class Express extends Component {
     }
 
     const response = {
-      rangeStart: '',
-      rangeEnd: '',
+      rangeStart: datas[0].Response.StartTime,
+      rangeEnd: datas[0].Response.EndTime,
       metrics: []
     }
+
+    const endTimeObj = new Date(datas[0].Response.EndTime)
+    const startTimeObj = new Date(datas[0].Response.StartTime)
 
     const funcInvAndErr = {
       type: 'stacked-bar',
@@ -302,6 +305,16 @@ class Express extends Component {
       response.rangeEnd = invocations.EndTime
 
       funcInvAndErr.x.values = invocations.DataPoints[0].Timestamps.map((ts) => ts * 1000)
+
+      const padTimes = []
+      const padValues = []
+      let timestamp = startTimeObj.getTime()
+      while (timestamp < funcInvAndErr.x.values[0]) {
+        padTimes.push(timestamp)
+        padValues.push(0)
+        timestamp += (period * 1000)
+      }
+
       const funcInvItem = {
         name: invocations.MetricName.toLocaleLowerCase(),
         type: 'count',
@@ -310,6 +323,10 @@ class Express extends Component {
         }, 0),
         values: invocations.DataPoints[0].Values
       }
+      if (padTimes.length > 0)
+        funcInvAndErr.x.values = padTimes.concat(funcInvAndErr.x.values)
+      if (padValues.length > 0)
+        funcInvItem.values = padValues.concat(funcInvItem.values)
       funcInvAndErr.y.push(funcInvItem)
     }
     const errors = filterMetricByName('Error', datas)
@@ -322,6 +339,16 @@ class Express extends Component {
       response.rangeEnd = errors.EndTime
 
       funcInvAndErr.x.values = errors.DataPoints[0].Timestamps.map((ts) => ts * 1000)
+
+      const padTimes = []
+      const padValues = []
+      let timestamp = startTimeObj.getTime()
+      while (timestamp < funcInvAndErr.x.values[0]) {
+        padTimes.push(timestamp)
+        padValues.push(0)
+        timestamp += (period * 1000)
+      }
+
       const funcErrItem = {
         name: errors.MetricName.toLocaleLowerCase(),
         type: 'count',
@@ -331,6 +358,11 @@ class Express extends Component {
         }, 0),
         values: errors.DataPoints[0].Values
       }
+
+      if (padTimes.length > 0)
+        funcInvAndErr.x.values = padTimes.concat(funcInvAndErr.x.values)
+      if (padValues.length > 0)
+        funcErrItem.values = padValues.concat(funcErrItem.values)
       funcInvAndErr.y.push(funcErrItem)
     }
     if (
@@ -358,6 +390,15 @@ class Express extends Component {
       response.rangeEnd = latencyP50.EndTime
       latency.x.values = latencyP50.DataPoints[0].Timestamps.map((ts) => ts * 1000)
 
+      const padTimes = []
+      const padValues = []
+      let timestamp = startTimeObj.getTime()
+      while (timestamp < latency.x.values[0]) {
+        padTimes.push(timestamp)
+        padValues.push(0)
+        timestamp += (period * 1000)
+      }
+
       const p50 = {
         name: 'p50 latency', // constant
         type: 'duration', // constant
@@ -366,6 +407,11 @@ class Express extends Component {
         }, 0),
         values: latencyP50.DataPoints[0].Values
       }
+      if (padTimes.length > 0)
+        latency.x.values = padTimes.concat(latency.x.values)
+      if (padValues.length > 0)
+        p50.values = padValues.concat(p50.values)
+
       if (!(~~p50.total == p50.total)) {
         p50.total = parseFloat(p50.total.toFixed(2), 10)
       }
@@ -383,6 +429,15 @@ class Express extends Component {
       response.rangeEnd = latencyP95.EndTime
       latency.x.values = latencyP95.DataPoints[0].Timestamps.map((ts) => ts * 1000)
 
+      const padTimes = []
+      const padValues = []
+      let timestamp = startTimeObj.getTime()
+      while (timestamp < latency.x.values[0]) {
+        padTimes.push(timestamp)
+        padValues.push(0)
+        timestamp += (period * 1000)
+      }
+
       const p95 = {
         name: 'p95 latency', // constant
         type: 'duration', // constant
@@ -391,6 +446,10 @@ class Express extends Component {
         }, 0),
         values: latencyP95.DataPoints[0].Values
       }
+      if (padTimes.length > 0)
+        latency.x.values = padTimes.concat(latency.x.values)
+      if (padValues.length > 0)
+        p95.values = padValues.concat(p95.values)
 
       if (!(~~p95.total == p95.total)) {
         p95.total = parseFloat(p95.total.toFixed(2), 10)
