@@ -149,12 +149,11 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   const stateServiceId = instance.state[regionList[0]] && instance.state[regionList[0]].serviceId
 
   const functionConf = {
-    code:
-      typeof inputs.src === 'object'
-        ? inputs.src
-        : {
-            src: inputs.src
-          },
+    code: {
+      src: inputs.src,
+      bucket: inputs.srcOriginal && inputs.srcOriginal.bucket,
+      object: inputs.srcOriginal && inputs.srcOriginal.object
+    },
     name:
       ensureString(inputs.functionName, { isOptional: true }) ||
       stateFunctionName ||
