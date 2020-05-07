@@ -437,46 +437,6 @@ const buildMetrics = (datas, period) => {
   if (latencyP95 == null)
     latencyP95 = filterMetricByName('Duration', datas)
 
-  if (latencyP50 && latencyP50.DataPoints[0].Timestamps.length > 0) {
-    latency.x = { type: 'timestamp' }
-    if (!latency.y) 
-      latency.y = []
-    response.rangeStart = latencyP50.StartTime
-    response.rangeEnd = latencyP50.EndTime
-    latency.x.values = latencyP50.DataPoints[0].Timestamps.map((ts) => ts * 1000)
-
-    const p50 = {
-      name: 'p50 latency', // constant
-      type: 'duration', // constant
-      total: latencyP50.DataPoints[0].Values.reduce(function(a, b) {
-        return a + b
-      }, 0),
-      values: latencyP50.DataPoints[0].Values
-    }
-
-    const padStart = padBody(startTimestamp, latency.x.values[0], period)
-    if (padStart.timestamp.length > 0) 
-      latency.x.values = padStart.timestamp.concat(latency.x.values)
-    if (padStart.values.length > 0)
-      p50.values = padStart.values.concat(p50.values)
-
-    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], 
-      endTimestamp, period)
-    if (padEnd.timestamp.length > 0) {
-      padEnd.timestamp.shift()
-      latency.x.values = latency.x.values.concat(padEnd.timestamp)
-    }
-    if (padEnd.values.length > 0) {
-      padEnd.values.shift()
-      p50.values = p50.values.concat(padEnd.values)
-    }
-
-    if (!(~~p50.total == p50.total)) 
-      p50.total = parseFloat(p50.total.toFixed(2), 10)
-    
-    latency.y.push(p50)
-  }
-
   if (latencyP95 && latencyP95.DataPoints[0].Timestamps.length > 0) {
     latency.x = { type: 'timestamp' }
     if (!latency.y) 
@@ -516,6 +476,47 @@ const buildMetrics = (datas, period) => {
       p95.total = parseFloat(p95.total.toFixed(2), 10)
     latency.y.push(p95)
   }
+
+  if (latencyP50 && latencyP50.DataPoints[0].Timestamps.length > 0) {
+    latency.x = { type: 'timestamp' }
+    if (!latency.y) 
+      latency.y = []
+    response.rangeStart = latencyP50.StartTime
+    response.rangeEnd = latencyP50.EndTime
+    latency.x.values = latencyP50.DataPoints[0].Timestamps.map((ts) => ts * 1000)
+
+    const p50 = {
+      name: 'p50 latency', // constant
+      type: 'duration', // constant
+      total: latencyP50.DataPoints[0].Values.reduce(function(a, b) {
+        return a + b
+      }, 0),
+      values: latencyP50.DataPoints[0].Values
+    }
+
+    const padStart = padBody(startTimestamp, latency.x.values[0], period)
+    if (padStart.timestamp.length > 0) 
+      latency.x.values = padStart.timestamp.concat(latency.x.values)
+    if (padStart.values.length > 0)
+      p50.values = padStart.values.concat(p50.values)
+
+    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], 
+      endTimestamp, period)
+    if (padEnd.timestamp.length > 0) {
+      padEnd.timestamp.shift()
+      latency.x.values = latency.x.values.concat(padEnd.timestamp)
+    }
+    if (padEnd.values.length > 0) {
+      padEnd.values.shift()
+      p50.values = p50.values.concat(padEnd.values)
+    }
+
+    if (!(~~p50.total == p50.total)) 
+      p50.total = parseFloat(p50.total.toFixed(2), 10)
+    
+    latency.y.push(p50)
+  }
+  
   if ((!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) &&
     (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)) 
     latency.type = 'empty'
@@ -655,6 +656,11 @@ const buildCustomMetrics = (responses) => {
   if (requestDatas) {
     latencyP95Datas = filterMetricByName('latency-P95', responses)
     latencyP50Datas = filterMetricByName('latency-P50', responses)
+
+    if (latencyP50Datas == null)
+      latencyP50Datas = filterMetricByName('latency', responses)
+    if (latencyP95Datas == null)
+      latencyP95Datas = filterMetricByName('latency', responses)
     if (latencyP95Datas) {
       if (!latency.y) 
         latency.y = []
