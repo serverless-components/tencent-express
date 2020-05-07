@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
 
   // cache server, not create repeatly
   if (!server) {
-    server = createServer(app)
+    server = createServer(app, null, app.binaryTypes || [])
   }
 
   context.callbackWaitsForEmptyEventLoop =
