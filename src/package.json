@@ -15,7 +15,6 @@
     "download": "^8.0.0",
     "fs-extra": "^8.1.0",
     "moment": "^2.24.0",
-    "tencent-cloud-sdk": "git+https://github.com/serverless-tencent/tencent-cloud-sdk.git#develop",
     "tencent-component-toolkit": "^1.4.0",
     "type": "^2.0.0"
   }
