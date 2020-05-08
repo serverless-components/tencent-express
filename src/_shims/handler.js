@@ -1,3 +1,4 @@
+require('tencent-component-monitor')
 const fs = require('fs')
 const path = require('path')
 const { createServer, proxy } = require('tencent-serverless-http')
