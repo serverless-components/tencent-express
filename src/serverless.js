@@ -1,12 +1,20 @@
 const { Component } = require('@serverless/core')
-const { MultiApigw, Scf, Apigw, Cos, Cns, Cam } = require('tencent-component-toolkit')
-const { packageCode, getDefaultProtocol, deleteRecord, prepareInputs, buildMetrics, buildCustomMetrics } = require('./utils')
-const CONFIGS = require('./config')
-const { slsMonitor } = require('tencent-cloud-sdk')
+const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
 const moment = require('moment')
 const util = require('util')
+const { slsMonitor } = require('tencent-cloud-sdk')
 
-class Express extends Component {
+const {
+  packageCode,
+  getDefaultProtocol,
+  deleteRecord,
+  prepareInputs,
+  buildMetrics,
+  buildCustomMetrics
+} = require('./utils')
+const CONFIGS = require('./config')
+
+class ServerlessComponent extends Component {
   getCredentials() {
     const { tmpSecrets } = this.credentials.tencent
 
@@ -71,12 +79,6 @@ class Express extends Component {
       packageDir = await packageCode(this, inputs)
     }
 
-    const camClient = new Cam(credentials)
-    if (!inputs.role) {
-      if (camClient.CheckSCFExcuteRole())
-        inputs.role = 'QCS_SCFExcuteRole'
-    }
-
     // 上传代码到COS
     const uploadCodeHandler = []
     const outputs = {}
@@ -110,6 +112,9 @@ class Express extends Component {
   }
 
   async deployApigateway(credentials, inputs, regionList) {
+    if (inputs.isDisabled) {
+      return {}
+    }
     const apigw = new MultiApigw(credentials, regionList)
     inputs.oldState = {
       apiList: (this.state[regionList[0]] && this.state[regionList[0]].apiList) || []
@@ -185,7 +190,7 @@ class Express extends Component {
   }
 
   async deploy(inputs) {
-    console.log(`Deploying Express App...`)
+    console.log(`Deploying ${CONFIGS.frameworkFullname} App...`)
 
     const credentials = this.getCredentials()
 
@@ -195,16 +200,21 @@ class Express extends Component {
       credentials,
       inputs
     )
-    
+
     // 部署函数 + API网关
     const outputs = {}
     if (!functionConf.code.src) {
       outputs.templateUrl = CONFIGS.templateUrl
     }
-    const [apigwOutputs, functionOutputs] = await Promise.all([
-      this.deployApigateway(credentials, apigatewayConf, regionList, outputs),
-      this.deployFunction(credentials, functionConf, regionList, outputs)
-    ])
+
+    const deployTasks = [this.deployFunction(credentials, functionConf, regionList, outputs)]
+    // support apigatewayConf.isDisabled
+    if (apigatewayConf.isDisabled !== true) {
+      deployTasks.push(this.deployApigateway(credentials, apigatewayConf, regionList, outputs))
+    } else {
+      this.state.apigwDisabled = true
+    }
+    const [functionOutputs, apigwOutputs = {}] = await Promise.all(deployTasks)
 
     // optimize outputs for one region
     if (regionList.length === 1) {
@@ -217,8 +227,8 @@ class Express extends Component {
       outputs['scf'] = functionOutputs
     }
 
-    // 云解析遇到等API网关部署完成才可以继续部署
-    if (cnsConf.length > 0) {
+    // cns depends on apigw, so if disabled apigw, just ignore it.
+    if (cnsConf.length > 0 && apigatewayConf.isDisabled !== true) {
       outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
     }
 
@@ -230,7 +240,7 @@ class Express extends Component {
   }
 
   async remove() {
-    console.log(`Removing Express App...`)
+    console.log(`Removing ${CONFIGS.frameworkFullname} App...`)
 
     const { state } = this
     const { regionList = [] } = state
@@ -248,13 +258,16 @@ class Express extends Component {
           functionName: curState.functionName,
           namespace: curState.namespace
         })
-        await apigw.remove({
-          created: curState.created,
-          environment: curState.environment,
-          serviceId: curState.serviceId,
-          apiList: curState.apiList,
-          customDomains: curState.customDomains
-        })
+        // if disable apigw, no need to remove
+        if (state.apigwDisabled !== true) {
+          await apigw.remove({
+            created: curState.created,
+            environment: curState.environment,
+            serviceId: curState.serviceId,
+            apiList: curState.apiList,
+            customDomains: curState.customDomains
+          })
+        }
       }
       removeHandlers.push(handler())
     }
@@ -330,14 +343,7 @@ class Express extends Component {
       throw new Error('function name not define')
     }
 
-    console.log(
-      'getScfMetrics params>>',
-      inputs.region,
-      rangeTime,
-      period,
-      functionName,
-      namespace
-    )
+    console.log('getScfMetrics params>>', inputs.region, rangeTime, period, functionName, namespace)
     const responses = await slsClient.getScfMetrics(
       inputs.region,
       rangeTime,
@@ -353,7 +359,9 @@ class Express extends Component {
       rangeEnd: inputs.rangeEnd.format('YYYY-MM-DD HH:mm:ss')
     }
 
-    const instances = [util.format('%s|%s|%s', namespace || 'default', functionName, functionVersion || '$LATEST')]
+    const instances = [
+      util.format('%s|%s|%s', namespace || 'default', functionName, functionVersion || '$LATEST')
+    ]
     console.log('customMetrics params>>', inputs.region, instances, reqCustomTime, period)
     const customMetrics = await slsClient.getCustomMetrics(
       inputs.region,
@@ -376,4 +384,4 @@ class Express extends Component {
   }
 }
 
-module.exports = Express
+module.exports = ServerlessComponent

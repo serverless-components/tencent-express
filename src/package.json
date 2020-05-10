@@ -15,7 +15,8 @@
     "download": "^8.0.0",
     "fs-extra": "^8.1.0",
     "moment": "^2.24.0",
-    "tencent-component-toolkit": "^1.4.0",
+    "tencent-cloud-sdk": "^0.1.2",
+    "tencent-component-toolkit": "^1.4.3",
     "type": "^2.0.0"
   }
 }

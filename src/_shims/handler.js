@@ -24,5 +24,6 @@ exports.handler = async (event, context) => {
   context.callbackWaitsForEmptyEventLoop =
     app.callbackWaitsForEmptyEventLoop === true ? true : false
 
-  return proxy(server, event, context, 'PROMISE').promise
+  const result = await proxy(server, event, context, 'PROMISE')
+  return result.promise
 }
