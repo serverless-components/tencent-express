@@ -1,5 +1,5 @@
 const { Component } = require('@serverless/core')
-const { MultiApigw, Scf, Apigw, Cos, Cns } = require('tencent-component-toolkit')
+const { MultiApigw, Scf, Apigw, Cos, Cns, Cam } = require('tencent-component-toolkit')
 const moment = require('moment')
 const util = require('util')
 const { slsMonitor } = require('tencent-cloud-sdk')
@@ -77,6 +77,13 @@ class ServerlessComponent extends Component {
     let packageDir
     if (!inputs.code.bucket || !inputs.code.object) {
       packageDir = await packageCode(this, inputs)
+    }
+
+    const camClient = new Cam(credentials)
+    if (!inputs.role) {
+      if (camClient.CheckSCFExcuteRole()) {
+        inputs.role = 'QCS_SCFExcuteRole'
+      }
     }
 
     // 上传代码到COS
