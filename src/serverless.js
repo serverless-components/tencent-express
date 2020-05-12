@@ -332,14 +332,14 @@ class Express extends Component {
 
     console.log(
       'getScfMetrics params>>',
-      inputs.region,
+      this.state.region,
       rangeTime,
       period,
       functionName,
       namespace
     )
     const responses = await slsClient.getScfMetrics(
-      inputs.region,
+      this.state.region,
       rangeTime,
       period,
       functionName,
@@ -354,9 +354,9 @@ class Express extends Component {
     }
 
     const instances = [util.format('%s|%s|%s', namespace || 'default', functionName, functionVersion || '$LATEST')]
-    console.log('customMetrics params>>', inputs.region, instances, reqCustomTime, period)
+    console.log('customMetrics params>>', this.state.region, instances, reqCustomTime, period)
     const customMetrics = await slsClient.getCustomMetrics(
-      inputs.region,
+      this.state.region,
       instances,
       reqCustomTime,
       period
