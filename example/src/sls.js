@@ -3,12 +3,12 @@ const path = require('path')
 const app = express()
 
 // Routes
-app.get(`/*`, (req, res) => {
+app.get(`/`, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
 
 // Error handler
-app.use(function(err, req, res) {
+app.use(function(err, req, res, next) {
   console.error(err)
   res.status(500).send('Internal Serverless Error')
 })
