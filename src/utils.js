@@ -1,4 +1,4 @@
-const path = require('path')
+const { join } = require('path')
 const { copySync } = require('fs-extra')
 const { Domain } = require('tencent-component-toolkit')
 const ensureObject = require('type/object/ensure')
@@ -52,7 +52,7 @@ const packageCode = async (instance, inputs) => {
 
   // add shim to the source directory
   console.log(`Installing ${CONFIGS.frameworkFullname} + SCF handler...`)
-  copySync(path.join(__dirname, '_shims'), path.join(sourceDirectory, '_shims'))
+  copySync(join(__dirname, '_shims'), join(sourceDirectory, '_shims'))
 
   // add sdk to the source directory, add original handler
   console.log(`Installing Serverless Framework SDK...`)
@@ -298,24 +298,25 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 }
 
 const buildMetrics = (datas, period) => {
-  const padBody = (startTime, endTime, period) => {
-    let padTimes = []
-    let padValues = []
+  const padBody = (startTime, endTime, pd) => {
+    const padTimes = []
+    const padValues = []
 
     while (startTime < endTime) {
       padTimes.push(startTime)
       padValues.push(0)
-      startTime += (period * 1000)
+      startTime += pd * 1000
     }
-    return {timestamp: padTimes, values: padValues}
+    return { timestamp: padTimes, values: padValues }
   }
 
   const filterMetricByName = function(metricName, metrics) {
     const len = metrics.length
 
     for (var i = 0; i < len; i++) {
-      if (metrics[i].Response.MetricName == metricName) 
+      if (metrics[i].Response.MetricName == metricName) {
         return metrics[i].Response
+      }
     }
     return null
   }
@@ -330,13 +331,13 @@ const buildMetrics = (datas, period) => {
   const startTimeObj = new Date(datas[0].Response.StartTime)
 
   // response timestamp is tz +08:00
-  let startTimestamp, endTimestamp
   let offsetMs = 0
-  if (startTimeObj.getTimezoneOffset() == 0)
+  if (startTimeObj.getTimezoneOffset() == 0) {
     offsetMs = 480 * 60 * 1000
-  
-  startTimestamp = startTimeObj.getTime() - offsetMs
-  endTimestamp = endTimeObj.getTime() - offsetMs
+  }
+
+  const startTimestamp = startTimeObj.getTime() - offsetMs
+  const endTimestamp = endTimeObj.getTime() - offsetMs
 
   const funcInvAndErr = {
     type: 'stacked-bar',
@@ -347,8 +348,9 @@ const buildMetrics = (datas, period) => {
   const invocations = filterMetricByName('Invocation', datas)
   if (invocations && invocations.DataPoints[0].Timestamps.length > 0) {
     funcInvAndErr.x = { type: 'timestamp' }
-    if (!funcInvAndErr.y) 
+    if (!funcInvAndErr.y) {
       funcInvAndErr.y = []
+    }
 
     response.rangeStart = invocations.StartTime
     response.rangeEnd = invocations.EndTime
@@ -365,13 +367,18 @@ const buildMetrics = (datas, period) => {
     }
 
     const padStart = padBody(startTimestamp, funcInvAndErr.x.values[0], period)
-    if (padStart.timestamp.length > 0) 
+    if (padStart.timestamp.length > 0) {
       funcInvAndErr.x.values = padStart.timestamp.concat(funcInvAndErr.x.values)
-    if (padStart.values.length > 0)
+    }
+    if (padStart.values.length > 0) {
       funcInvItem.values = padStart.values.concat(funcInvItem.values)
+    }
 
-    const padEnd = padBody(funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1], 
-      endTimestamp, period)
+    const padEnd = padBody(
+      funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1],
+      endTimestamp,
+      period
+    )
     if (padEnd.timestamp.length > 0) {
       padEnd.timestamp.shift()
 
@@ -386,8 +393,9 @@ const buildMetrics = (datas, period) => {
   const errors = filterMetricByName('Error', datas)
   if (errors && errors.DataPoints[0].Timestamps.length > 0) {
     funcInvAndErr.x = { type: 'timestamp' }
-    if (!funcInvAndErr.y) 
+    if (!funcInvAndErr.y) {
       funcInvAndErr.y = []
+    }
 
     response.rangeStart = errors.StartTime
     response.rangeEnd = errors.EndTime
@@ -405,13 +413,18 @@ const buildMetrics = (datas, period) => {
     }
 
     const padStart = padBody(startTimestamp, funcInvAndErr.x.values[0], period)
-    if (padStart.timestamp.length > 0) 
+    if (padStart.timestamp.length > 0) {
       funcInvAndErr.x.values = padStart.timestamp.concat(funcInvAndErr.x.values)
-    if (padStart.values.length > 0)
+    }
+    if (padStart.values.length > 0) {
       funcErrItem.values = padStart.values.concat(funcErrItem.values)
+    }
 
-    const padEnd = padBody(funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1], 
-      endTimestamp, period)
+    const padEnd = padBody(
+      funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1],
+      endTimestamp,
+      period
+    )
     if (padEnd.timestamp.length > 0) {
       padEnd.timestamp.shift()
       funcInvAndErr.x.values = funcInvAndErr.x.values.concat(padEnd.timestamp)
@@ -422,9 +435,12 @@ const buildMetrics = (datas, period) => {
     }
     funcInvAndErr.y.push(funcErrItem)
   }
-  if ((!invocations || invocations.DataPoints[0].Timestamps.length == 0) &&
-    (!errors || errors.DataPoints[0].Timestamps.length == 0)) 
+  if (
+    (!invocations || invocations.DataPoints[0].Timestamps.length == 0) &&
+    (!errors || errors.DataPoints[0].Timestamps.length == 0)
+  ) {
     funcInvAndErr.type = 'empty'
+  }
 
   response.metrics.push(funcInvAndErr)
 
@@ -434,15 +450,18 @@ const buildMetrics = (datas, period) => {
   }
   let latencyP50 = filterMetricByName('Duration-P50', datas)
   let latencyP95 = filterMetricByName('Duration-P95', datas)
-  if (latencyP50 == null)
+  if (latencyP50 == null) {
     latencyP50 = filterMetricByName('Duration', datas)
-  if (latencyP95 == null)
+  }
+  if (latencyP95 == null) {
     latencyP95 = filterMetricByName('Duration', datas)
+  }
 
   if (latencyP95 && latencyP95.DataPoints[0].Timestamps.length > 0) {
     latency.x = { type: 'timestamp' }
-    if (!latency.y) 
+    if (!latency.y) {
       latency.y = []
+    }
 
     response.rangeStart = latencyP95.StartTime
     response.rangeEnd = latencyP95.EndTime
@@ -458,13 +477,14 @@ const buildMetrics = (datas, period) => {
     }
 
     const padStart = padBody(startTimestamp, latency.x.values[0], period)
-    if (padStart.timestamp.length > 0) 
+    if (padStart.timestamp.length > 0) {
       latency.x.values = padStart.timestamp.concat(latency.x.values)
-    if (padStart.values.length > 0)
+    }
+    if (padStart.values.length > 0) {
       p95.values = padStart.values.concat(p95.values)
+    }
 
-    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], 
-      endTimestamp, period)
+    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], endTimestamp, period)
     if (padEnd.timestamp.length > 0) {
       padEnd.timestamp.shift()
       latency.x.values = latency.x.values.concat(padEnd.timestamp)
@@ -474,15 +494,17 @@ const buildMetrics = (datas, period) => {
       p95.values = p95.values.concat(padEnd.values)
     }
 
-    if (!(~~p95.total == p95.total)) 
+    if (!(~~p95.total == p95.total)) {
       p95.total = parseFloat(p95.total.toFixed(2), 10)
+    }
     latency.y.push(p95)
   }
 
   if (latencyP50 && latencyP50.DataPoints[0].Timestamps.length > 0) {
     latency.x = { type: 'timestamp' }
-    if (!latency.y) 
+    if (!latency.y) {
       latency.y = []
+    }
     response.rangeStart = latencyP50.StartTime
     response.rangeEnd = latencyP50.EndTime
     latency.x.values = latencyP50.DataPoints[0].Timestamps.map((ts) => ts * 1000)
@@ -497,13 +519,14 @@ const buildMetrics = (datas, period) => {
     }
 
     const padStart = padBody(startTimestamp, latency.x.values[0], period)
-    if (padStart.timestamp.length > 0) 
+    if (padStart.timestamp.length > 0) {
       latency.x.values = padStart.timestamp.concat(latency.x.values)
-    if (padStart.values.length > 0)
+    }
+    if (padStart.values.length > 0) {
       p50.values = padStart.values.concat(p50.values)
+    }
 
-    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], 
-      endTimestamp, period)
+    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], endTimestamp, period)
     if (padEnd.timestamp.length > 0) {
       padEnd.timestamp.shift()
       latency.x.values = latency.x.values.concat(padEnd.timestamp)
@@ -513,15 +536,19 @@ const buildMetrics = (datas, period) => {
       p50.values = p50.values.concat(padEnd.values)
     }
 
-    if (!(~~p50.total == p50.total)) 
+    if (!(~~p50.total == p50.total)) {
       p50.total = parseFloat(p50.total.toFixed(2), 10)
-    
+    }
+
     latency.y.push(p50)
   }
-  
-  if ((!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) &&
-    (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)) 
+
+  if (
+    (!latencyP50 || latencyP50.DataPoints[0].Timestamps.length == 0) &&
+    (!latencyP95 || latencyP95.DataPoints[0].Timestamps.length == 0)
+  ) {
     latency.type = 'empty'
+  }
 
   response.metrics.push(latency)
 
@@ -533,14 +560,18 @@ const buildCustomMetrics = (responses) => {
     const len = metrics.length
     const results = []
     for (var i = 0; i < len; i++) {
-      if (metrics[i].Response.Error)
+      if (metrics[i].Response.Error) {
         continue
-      if (metrics[i].Response.Data.length > 0 && 
-        metrics[i].Response.Data[0].AttributeName.match(metricName)) {
-        if (all)
+      }
+      if (
+        metrics[i].Response.Data.length > 0 &&
+        metrics[i].Response.Data[0].AttributeName.match(metricName)
+      ) {
+        if (all) {
           results.push(metrics[i].Response.Data[0])
-        else 
+        } else {
           return metrics[i].Response.Data[0]
+        }
       }
     }
     return all ? results : null
@@ -551,8 +582,9 @@ const buildCustomMetrics = (responses) => {
     let path = ''
     for (let i = 0; i < len; ) {
       const char = hexPath.slice(i, i + 2)
-      if (isNaN(parseInt(char, 16))) 
+      if (isNaN(parseInt(char, 16))) {
         return null
+      }
       path += String.fromCharCode(parseInt(char, 16))
       i += 2
     }
@@ -561,8 +593,9 @@ const buildCustomMetrics = (responses) => {
 
   const parseErrorPath = function(m, path) {
     const ret = path.match(m)
-    if (!ret) 
+    if (!ret) {
       return null
+    }
 
     const method = ret[1]
     const hexPath = ret[2]
@@ -579,8 +612,9 @@ const buildCustomMetrics = (responses) => {
 
   const parsePath = function(m, path) {
     const ret = path.match(m)
-    if (!ret) 
+    if (!ret) {
       return null
+    }
 
     const method = ret[1]
     const hexPath = ret[2]
@@ -606,8 +640,9 @@ const buildCustomMetrics = (responses) => {
       return a + b
     }, 0)
 
-    if (!(~~data.total == data.total)) 
+    if (!(~~data.total == data.total)) {
       data.total = parseFloat(data.total.toFixed(2), 10)
+    }
     return data
   }
   const results = []
@@ -619,8 +654,9 @@ const buildCustomMetrics = (responses) => {
   }
   if (requestDatas) {
     apiReqAndErr.x = { type: 'timestamp' }
-    if (!apiReqAndErr.y) 
+    if (!apiReqAndErr.y) {
       apiReqAndErr.y = []
+    }
 
     apiReqAndErr.x.values = requestDatas.Values.map((item) => {
       return item.Timestamp * 1000
@@ -628,12 +664,13 @@ const buildCustomMetrics = (responses) => {
     const ret = makeMetric('requests', requestDatas)
     ret.type = 'count'
     apiReqAndErr.y.push(ret)
-  } 
+  }
 
   if (errorDatas) {
     apiReqAndErr.x = { type: 'timestamp' }
-    if (!apiReqAndErr.y) 
+    if (!apiReqAndErr.y) {
       apiReqAndErr.y = []
+    }
 
     apiReqAndErr.x.values = errorDatas.Values.map((item) => {
       return item.Timestamp * 1000
@@ -644,8 +681,9 @@ const buildCustomMetrics = (responses) => {
     apiReqAndErr.y.push(errObj)
   }
 
-  if (!requestDatas && !errorDatas) 
+  if (!requestDatas && !errorDatas) {
     apiReqAndErr.type = 'empty'
+  }
 
   results.push(apiReqAndErr)
 
@@ -659,13 +697,16 @@ const buildCustomMetrics = (responses) => {
     latencyP95Datas = filterMetricByName('latency-P95', responses)
     latencyP50Datas = filterMetricByName('latency-P50', responses)
 
-    if (latencyP50Datas == null)
+    if (latencyP50Datas == null) {
       latencyP50Datas = filterMetricByName('latency', responses)
-    if (latencyP95Datas == null)
+    }
+    if (latencyP95Datas == null) {
       latencyP95Datas = filterMetricByName('latency', responses)
+    }
     if (latencyP95Datas) {
-      if (!latency.y) 
+      if (!latency.y) {
         latency.y = []
+      }
 
       latency.x = { type: 'timestamp' }
       latency.x.values = requestDatas.Values.map((item) => {
@@ -675,8 +716,9 @@ const buildCustomMetrics = (responses) => {
     }
 
     if (latencyP50Datas) {
-      if (!latency.y) 
+      if (!latency.y) {
         latency.y = []
+      }
 
       latency.x = { type: 'timestamp' }
       latency.x.values = requestDatas.Values.map((item) => {
@@ -686,8 +728,9 @@ const buildCustomMetrics = (responses) => {
     }
   }
 
-  if (!latencyP50Datas && !latencyP95Datas) 
+  if (!latencyP50Datas && !latencyP95Datas) {
     latency.type = 'empty'
+  }
 
   results.push(latency)
 
@@ -707,8 +750,9 @@ const buildCustomMetrics = (responses) => {
     errRet.color = 'error'
     errRet.type = 'count'
     err5xx.y.push(errRet)
-  } else 
+  } else {
     err5xx.type = 'empty'
+  }
 
   results.push(err5xx)
 
@@ -728,8 +772,9 @@ const buildCustomMetrics = (responses) => {
     errRet.color = 'error'
     errRet.type = 'count'
     err4xx.y.push(errRet)
-  } else 
+  } else {
     err4xx.type = 'empty'
+  }
 
   results.push(err4xx)
 
@@ -753,26 +798,33 @@ const buildCustomMetrics = (responses) => {
     const recordHash = {}
     for (let i = 0; i < pathLen; i++) {
       const pathData = pathStatusDatas[i]
-      const path = parseErrorPath(/^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i, pathData.AttributeName)
-      if (path.code < 400)
+      const path = parseErrorPath(
+        /^(GET|POST|DEL|DELETE|PUT|OPTIONS|HEAD)_([a-zA-Z0-9]+)_(\d+)$/i,
+        pathData.AttributeName
+      )
+      if (path.code < 400) {
         continue
+      }
       const val = `${path.method} - ${path.path}`
 
       let total = 0
       pathData.Values.map((item) => {
         total += item.Value
       })
-      if (!(~~total == total)) 
+      if (!(~~total == total)) {
         total = parseFloat(total.toFixed(2), 10)
+      }
 
-      if (!pathHash[val]) 
+      if (!pathHash[val]) {
         pathHash[val] = 1
-      else 
+      } else {
         pathHash[val]++
+      }
 
-      if (!recordHash[path.code]) 
+      if (!recordHash[path.code]) {
         recordHash[path.code] = {}
-      
+      }
+
       recordHash[path.code][val] = total
     }
     apiPathRequest.x.values = Object.keys(pathHash)
@@ -797,9 +849,10 @@ const buildCustomMetrics = (responses) => {
       errItem.total = total
       apiPathRequest.y.push(errItem)
     }
-  } else 
+  } else {
     apiPathRequest.type = 'empty'
-  
+  }
+
   results.push(apiPathRequest)
 
   // total request
@@ -825,13 +878,15 @@ const buildCustomMetrics = (responses) => {
     pathRequestItem.Values.map((item) => {
       total += item.Value
     })
-    if (!(~~total == total)) 
+    if (!(~~total == total)) {
       total = parseFloat(total.toFixed(2), 10)
+    }
 
-    if (!pathRequestHash[val]) 
+    if (!pathRequestHash[val]) {
       pathRequestHash[val] = total
-    else 
+    } else {
       pathRequestHash[val] += total
+    }
   }
 
   const pathLatencyHash = {}
@@ -847,13 +902,15 @@ const buildCustomMetrics = (responses) => {
     })
 
     total = total / pathLatencyItem.Values.length
-    if (!(~~total == total)) 
+    if (!(~~total == total)) {
       total = parseFloat(total.toFixed(2), 10)
+    }
 
-    if (!pathLatencyHash[val]) 
+    if (!pathLatencyHash[val]) {
       pathLatencyHash[val] = total
-    else 
+    } else {
       pathLatencyHash[val] += total
+    }
   }
   const pathRequestValues = {
     name: 'requests', // constant
@@ -871,15 +928,17 @@ const buildCustomMetrics = (responses) => {
     const reqNum = pathRequestHash[key]
     pathRequestValues.values.push(reqNum || 0)
     pathRequestValues.total += reqNum || 0
-    if (!(~~pathRequestValues.total == pathRequestValues.total)) 
+    if (!(~~pathRequestValues.total == pathRequestValues.total)) {
       pathRequestValues.total = parseFloat(pathRequestValues.total.toFixed(2), 10)
+    }
 
     const latencyNum = pathLatencyHash[key]
     pathLatencyValues.values.push(latencyNum || 0)
     pathLatencyValues.total += latencyNum || 0
 
-    if (!(~~pathLatencyValues.total == pathLatencyValues.total)) 
+    if (!(~~pathLatencyValues.total == pathLatencyValues.total)) {
       pathLatencyValues.total = parseFloat(pathLatencyValues.total.toFixed(2), 10)
+    }
   }
 
   const apiPaths = Object.keys(pathRequestHash)
@@ -889,8 +948,9 @@ const buildCustomMetrics = (responses) => {
     requestTotal.x.values = apiPaths
     requestTotal.y.push(pathRequestValues)
     requestTotal.y.push(pathLatencyValues)
-  } else 
+  } else {
     requestTotal.type = 'empty'
+  }
 
   results.push(requestTotal)
 
