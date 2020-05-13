@@ -16,6 +16,10 @@ exports.handler = async (event, context) => {
     app = require('./sls.js')
   }
 
+  // attach event and context to request
+  app.request.__SLS_EVENT__ = event
+  app.request.__SLS_CONTEXT__ = context
+
   // cache server, not create repeatly
   if (!server) {
     server = createServer(app, null, app.binaryTypes || [])
