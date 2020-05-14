@@ -301,18 +301,6 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 }
 
 const buildMetrics = (datas, period) => {
-  const padBody = (startTime, endTime, pd) => {
-    const padTimes = []
-    const padValues = []
-
-    while (startTime < endTime) {
-      padTimes.push(startTime)
-      padValues.push(0)
-      startTime += pd * 1000
-    }
-    return { timestamp: padTimes, values: padValues }
-  }
-
   const filterMetricByName = function(metricName, metrics) {
     const len = metrics.length
 
@@ -329,18 +317,6 @@ const buildMetrics = (datas, period) => {
     rangeEnd: datas[0].Response.EndTime,
     metrics: []
   }
-
-  const endTimeObj = new Date(datas[0].Response.EndTime)
-  const startTimeObj = new Date(datas[0].Response.StartTime)
-
-  // response timestamp is tz +08:00
-  let offsetMs = 0
-  if (startTimeObj.getTimezoneOffset() == 0) {
-    offsetMs = 480 * 60 * 1000
-  }
-
-  const startTimestamp = startTimeObj.getTime() - offsetMs
-  const endTimestamp = endTimeObj.getTime() - offsetMs
 
   const funcInvAndErr = {
     type: 'stacked-bar',
@@ -368,29 +344,6 @@ const buildMetrics = (datas, period) => {
       }, 0),
       values: invocations.DataPoints[0].Values
     }
-
-    const padStart = padBody(startTimestamp, funcInvAndErr.x.values[0], period)
-    if (padStart.timestamp.length > 0) {
-      funcInvAndErr.x.values = padStart.timestamp.concat(funcInvAndErr.x.values)
-    }
-    if (padStart.values.length > 0) {
-      funcInvItem.values = padStart.values.concat(funcInvItem.values)
-    }
-
-    const padEnd = padBody(
-      funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1],
-      endTimestamp,
-      period
-    )
-    if (padEnd.timestamp.length > 0) {
-      padEnd.timestamp.shift()
-
-      funcInvAndErr.x.values = funcInvAndErr.x.values.concat(padEnd.timestamp)
-    }
-    if (padEnd.values.length > 0) {
-      padEnd.values.shift()
-      funcInvItem.values = funcInvItem.values.concat(padEnd.values)
-    }
     funcInvAndErr.y.push(funcInvItem)
   }
   const errors = filterMetricByName('Error', datas)
@@ -413,28 +366,6 @@ const buildMetrics = (datas, period) => {
         return a + b
       }, 0),
       values: errors.DataPoints[0].Values
-    }
-
-    const padStart = padBody(startTimestamp, funcInvAndErr.x.values[0], period)
-    if (padStart.timestamp.length > 0) {
-      funcInvAndErr.x.values = padStart.timestamp.concat(funcInvAndErr.x.values)
-    }
-    if (padStart.values.length > 0) {
-      funcErrItem.values = padStart.values.concat(funcErrItem.values)
-    }
-
-    const padEnd = padBody(
-      funcInvAndErr.x.values[funcInvAndErr.x.values.length - 1],
-      endTimestamp,
-      period
-    )
-    if (padEnd.timestamp.length > 0) {
-      padEnd.timestamp.shift()
-      funcInvAndErr.x.values = funcInvAndErr.x.values.concat(padEnd.timestamp)
-    }
-    if (padEnd.values.length > 0) {
-      padEnd.values.shift()
-      funcErrItem.values = funcErrItem.values.concat(padEnd.values)
     }
     funcInvAndErr.y.push(funcErrItem)
   }
@@ -478,25 +409,6 @@ const buildMetrics = (datas, period) => {
       }, 0),
       values: latencyP95.DataPoints[0].Values
     }
-
-    const padStart = padBody(startTimestamp, latency.x.values[0], period)
-    if (padStart.timestamp.length > 0) {
-      latency.x.values = padStart.timestamp.concat(latency.x.values)
-    }
-    if (padStart.values.length > 0) {
-      p95.values = padStart.values.concat(p95.values)
-    }
-
-    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], endTimestamp, period)
-    if (padEnd.timestamp.length > 0) {
-      padEnd.timestamp.shift()
-      latency.x.values = latency.x.values.concat(padEnd.timestamp)
-    }
-    if (padEnd.values.length > 0) {
-      padEnd.values.shift()
-      p95.values = p95.values.concat(padEnd.values)
-    }
-
     if (!(~~p95.total == p95.total)) {
       p95.total = parseFloat(p95.total.toFixed(2), 10)
     }
@@ -520,29 +432,9 @@ const buildMetrics = (datas, period) => {
       }, 0),
       values: latencyP50.DataPoints[0].Values
     }
-
-    const padStart = padBody(startTimestamp, latency.x.values[0], period)
-    if (padStart.timestamp.length > 0) {
-      latency.x.values = padStart.timestamp.concat(latency.x.values)
-    }
-    if (padStart.values.length > 0) {
-      p50.values = padStart.values.concat(p50.values)
-    }
-
-    const padEnd = padBody(latency.x.values[latency.x.values.length - 1], endTimestamp, period)
-    if (padEnd.timestamp.length > 0) {
-      padEnd.timestamp.shift()
-      latency.x.values = latency.x.values.concat(padEnd.timestamp)
-    }
-    if (padEnd.values.length > 0) {
-      padEnd.values.shift()
-      p50.values = p50.values.concat(padEnd.values)
-    }
-
     if (!(~~p50.total == p50.total)) {
       p50.total = parseFloat(p50.total.toFixed(2), 10)
     }
-
     latency.y.push(p50)
   }
 
