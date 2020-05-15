@@ -40,6 +40,7 @@ inputs:
       subnetId: ''  //私有网络的Id
       vpcId: ''		//子网ID
   apigatewayConf:  // api网关配置
+    enableCORS: true // 允许跨域
     customDomains: //自定义域名绑定
       - domain: abc.com //待绑定的自定义的域名
         certificateId: abcdefg //待绑定自定义域名的证书唯一 ID

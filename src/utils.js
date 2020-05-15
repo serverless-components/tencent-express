@@ -160,6 +160,9 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
       stateFunctionName ||
       `${CONFIGS.framework}_component_${generateId()}`,
     region: regionList,
+    role: ensureString(tempFunctionConf.role ? tempFunctionConf.role : inputs.role, {
+      default: ''
+    }),
     handler: ensureString(tempFunctionConf.handler ? tempFunctionConf.handler : inputs.handler, {
       default: CONFIGS.handler
     }),
