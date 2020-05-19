@@ -1,6 +1,5 @@
 {
   "name": "@serverless/express",
-  "version": "0.0.8",
   "main": "./serverless.js",
   "publishConfig": {
     "access": "public"
@@ -16,7 +15,7 @@
     "fs-extra": "^8.1.0",
     "moment": "^2.24.0",
     "tencent-cloud-sdk": "^0.1.4",
-    "tencent-component-toolkit": "^1.4.5",
+    "tencent-component-toolkit": "^1.5.5",
     "type": "^2.0.0"
   }
 }
