@@ -6,7 +6,6 @@ const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
 const download = require('download')
 const CONFIGS = require('./config')
-const url = require('url')
 
 /*
  * Pauses execution for the provided miliseconds

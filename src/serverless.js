@@ -1,15 +1,6 @@
 const { Component } = require('@serverless/core')
 const { MultiApigw, Scf, Apigw, Cos, Cns, Cam, Metrics } = require('tencent-component-toolkit')
-const moment = require('moment')
-const util = require('util')
-const { slsMonitor } = require('tencent-cloud-sdk')
-
-const {
-  packageCode,
-  getDefaultProtocol,
-  deleteRecord,
-  prepareInputs
-} = require('./utils')
+const { packageCode, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
 const CONFIGS = require('./config')
 
 class ServerlessComponent extends Component {
