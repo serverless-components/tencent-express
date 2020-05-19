@@ -8,9 +8,7 @@ const {
   packageCode,
   getDefaultProtocol,
   deleteRecord,
-  prepareInputs,
-  buildMetrics,
-  buildCustomMetrics
+  prepareInputs
 } = require('./utils')
 const CONFIGS = require('./config')
 

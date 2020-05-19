@@ -308,7 +308,5 @@ module.exports = {
   capitalString,
   getDefaultProtocol,
   deleteRecord,
-  prepareInputs,
-  buildMetrics,
-  buildCustomMetrics
+  prepareInputs
 }
