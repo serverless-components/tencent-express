@@ -1,17 +1,6 @@
 const { Component } = require('@serverless/core')
-const { MultiApigw, Scf, Apigw, Cos, Cns, Cam } = require('tencent-component-toolkit')
-const moment = require('moment')
-const util = require('util')
-const { slsMonitor } = require('tencent-cloud-sdk')
-
-const {
-  packageCode,
-  getDefaultProtocol,
-  deleteRecord,
-  prepareInputs,
-  buildMetrics,
-  buildCustomMetrics
-} = require('./utils')
+const { MultiApigw, Scf, Apigw, Cos, Cns, Cam, Metrics } = require('tencent-component-toolkit')
+const { packageCode, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
 const CONFIGS = require('./config')
 
 class ServerlessComponent extends Component {
@@ -305,51 +294,6 @@ class ServerlessComponent extends Component {
     if (!inputs.rangeStart || !inputs.rangeEnd) {
       throw new Error('rangeStart and rangeEnd are require inputs')
     }
-    inputs.rangeStart = moment(inputs.rangeStart)
-    inputs.rangeEnd = moment(inputs.rangeEnd)
-
-    if (inputs.rangeStart.isAfter(inputs.rangeEnd)) {
-      throw new Error(`The rangeStart provided is after the rangeEnd`)
-    }
-
-    // Validate: End is not longer than 30 days
-    if (inputs.rangeStart.diff(inputs.rangeEnd, 'days') >= 31) {
-      throw new Error(
-        `The range cannot be longer than 30 days.  The supplied range is: ${inputs.rangeStart.diff(
-          inputs.rangeEnd,
-          'days'
-        )}`
-      )
-    }
-
-    const diffMinutes = (inputs.rangeEnd - inputs.rangeStart) / 1000 / 60
-    let period
-    if (diffMinutes <= 16) {
-      // 16 mins
-      period = 60 // 1 min
-    } else if (diffMinutes <= 61) {
-      // 1 hour
-      period = 300 // 5 mins
-    } else if (diffMinutes <= 1500) {
-      // 24 hours
-      period = 3600 // hour
-    } else {
-      period = 86400 // day
-    }
-
-    const credentials = this.getCredentials()
-    const slsClient = new slsMonitor(credentials)
-
-    let timeFormat = 'YYYY-MM-DDTHH:mm:ssZ'
-    if (inputs.tz) {
-      timeFormat = 'YYYY-MM-DDTHH:mm:ss' + inputs.tz
-    }
-
-    const rangeTime = {
-      rangeStart: inputs.rangeStart.format(timeFormat),
-      rangeEnd: inputs.rangeEnd.format(timeFormat)
-    }
-
     let functionName, namespace, functionVersion
     if (this.state[this.state.region] && this.state[this.state.region].functionName) {
       ;({ functionName, namespace, functionVersion } = this.state[this.state.region])
@@ -357,50 +301,16 @@ class ServerlessComponent extends Component {
       throw new Error('function name not define')
     }
 
-    console.log(
-      'getScfMetrics params>>',
-      this.state.region,
-      rangeTime,
-      period,
-      functionName,
-      namespace
-    )
-    const responses = await slsClient.getScfMetrics(
-      this.state.region,
-      rangeTime,
-      period,
-      functionName,
-      namespace || 'default'
-    )
-    console.log('getScf>>>', JSON.stringify(responses))
-    const metricResults = buildMetrics(responses, period)
-
-    const reqCustomTime = {
-      rangeStart: inputs.rangeStart.format('YYYY-MM-DD HH:mm:ss'),
-      rangeEnd: inputs.rangeEnd.format('YYYY-MM-DD HH:mm:ss')
+    const options = {
+      funcName: functionName,
+      namespace: namespace,
+      version: functionVersion,
+      region: this.state.region,
+      timezone: inputs.tz
     }
-
-    const instances = [
-      util.format('%s|%s|%s', namespace || 'default', functionName, functionVersion || '$LATEST')
-    ]
-    console.log('customMetrics params>>', this.state.region, instances, reqCustomTime, period)
-    const customMetrics = await slsClient.getCustomMetrics(
-      this.state.region,
-      instances,
-      reqCustomTime,
-      period
-    )
-    console.log('customMetrics>>>', JSON.stringify(customMetrics))
-
-    const customResults = buildCustomMetrics(customMetrics)
-    metricResults.metrics = metricResults.metrics.concat(customResults)
-
-    if (!metricResults.rangeStart) {
-      metricResults.rangeStart = reqCustomTime.rangeStart
-    }
-    if (!metricResults.rangeEnd) {
-      metricResults.rangeEnd = reqCustomTime.rangeEnd
-    }
+    const credentials = this.getCredentials()
+    const mertics = new Metrics(credentials, options)
+    const metricResults = await mertics.getDatas(inputs.rangeStart, inputs.rangeEnd)
     return metricResults
   }
 }
