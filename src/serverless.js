@@ -68,9 +68,9 @@ class ServerlessComponent extends Component {
       packageDir = await packageCode(this, inputs)
     }
 
-    const camClient = new Cam(credentials)
     if (!inputs.role) {
       try {
+        const camClient = new Cam(credentials)
         const roleExist = await camClient.CheckSCFExcuteRole()
         if (roleExist) {
           inputs.role = 'QCS_SCFExcuteRole'

@@ -179,3 +179,9 @@ $ touch .env # 腾讯云的配置信息
 TENCENT_SECRET_ID=123
 TENCENT_SECRET_KEY=123
 ```
+
+## License
+
+MIT License
+
+Copyright (c) 2020 Tencent Cloud, Inc.
