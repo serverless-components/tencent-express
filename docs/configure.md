@@ -7,60 +7,60 @@
 
 component: express # (必选) 组件名称，在该实例中为express
 name: expressDemo # 必选) 组件实例名称.
-org: orgDemo # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid
-app: appDemo # (可选) 用于记录组织信息. 默认与name相同.
+org: orgDemo # (可选) 用于记录组织信息，默认值为您的腾讯云账户 appid，必须为字符串
+app: appDemo # (可选) 用于记录组织信息. 默认与name相同，必须为字符串
 stage: dev # (可选) 用于区分环境信息，默认值是 dev
 
 inputs:
-  region: ap-guangzhou  //云函数所在区域
-  functionName: expressDemo //云函数名称
-  serviceName: mytest  //api网关服务名称
-  runtime: Nodejs10.15 //运行环境
-  serviceId: service-np1uloxw //api网关服务ID
-  src: ./src  //第一种为string时，会打包src对应目录下的代码上传到默认cos上。
-  # src:  //第二种，部署src下的文件代码，并打包成zip上传到bucket上
-  #   src: ./src  //本地需要打包的文件目录
+  region: ap-guangzhou # 云函数所在区域
+  functionName: expressDemo # 云函数名称
+  serviceName: mytest # api网关服务名称
+  runtime: Nodejs10.15 # 运行环境
+  serviceId: service-np1uloxw # api网关服务ID
+  src: ./src # 第一种为string时，会打包src对应目录下的代码上传到默认cos上。
+  # src:  # 第二种，部署src下的文件代码，并打包成zip上传到bucket上
+  #   src: ./src  # 本地需要打包的文件目录
   #   bucket: bucket01 # bucket name，当前会默认在bucket name后增加 appid 后缀, 本例中为 bucket01-appid
-  #   exclude:   //被排除的文件或目录
+  #   exclude:   # 被排除的文件或目录
   #     - .env
   #     - node_modules
-  # src: //第三种，在指定存储桶bucket中已经存在了object代码，直接部署
+  # src: # 第三种，在指定存储桶bucket中已经存在了object代码，直接部署
   #   bucket: bucket01 # bucket name，当前会默认在bucket name后增加 appid 后缀, 本例中为 bucket01-appid
   #   object: cos.zip  # bucket key 指定存储桶内的文件
   layers:
-    - name: expressLayer    // layer名称
-      version: 1           // 版本
-  functionConf:         //函数配置相关
-    timeout: 10		   //超时时间，单位秒
-    memorySize: 128		//内存大小，单位MB
-    environment:		// 环境变量
-      variables:		// 环境变量数组
+    - name: layerName #  layer名称
+      version: 1 #  版本
+  functionConf: # 函数配置相关
+    timeout: 10 # 超时时间，单位秒
+    memorySize: 128 # 内存大小，单位MB
+    environment: #  环境变量
+      variables: #  环境变量数组
         TEST: vale
-    vpcConfig:		//私有网络配置
-      subnetId: ''  //私有网络的Id
-      vpcId: ''		//子网ID
-  apigatewayConf:  // api网关配置
-    enableCORS: true // 允许跨域
-    customDomains: //自定义域名绑定
-      - domain: abc.com //待绑定的自定义的域名
-        certificateId: abcdefg //待绑定自定义域名的证书唯一 ID
-        isDefaultMapping: 'FALSE' //是否使用默认路径映射，默认为 TRUE。为 FALSE 时，表示自定义路径映射，此时 pathMappingSet 必填。
-        pathMappingSet:  自定义路径映射的路径。使用自定义映射时，可一次仅映射一个 path 到一个环境，也可映射多个 path 到多个环境。并且一旦使用自定义映射，原本的默认映射规则不再生效，只有自定义映射路径生效。
+    vpcConfig: # 私有网络配置
+      subnetId: '' # 私有网络的Id
+      vpcId: '' # 子网ID
+  apigatewayConf: #  api网关配置
+    enableCORS: true #  允许跨域
+    customDomains: # 自定义域名绑定
+      - domain: abc.com # 待绑定的自定义的域名
+        certificateId: abcdefg # 待绑定自定义域名的证书唯一 ID
+        # 自定义路径映射的路径。使用自定义映射时，可一次仅映射一个 path 到一个环境，也可映射多个 path 到多个环境。并且一旦使用自定义映射，原本的默认映射规则不再生效，只有自定义映射路径生效。
+        pathMappingSet:
           - path: /
             environment: release
-        protocols: //绑定自定义域名的协议类型，默认与服务的前端协议一致。
-          - http  //支持http协议
-          - https //支持https协议
+        protocols: # 绑定自定义域名的协议类型，默认与服务的前端协议一致。
+          - http # 支持http协议
+          - https # 支持https协议
     protocols:
       - http
       - https
     environment: test
-    usagePlan: // 用户使用计划
+    usagePlan: #  用户使用计划
       usagePlanId: 1111
       usagePlanName: slscmp
       usagePlanDesc: sls create
       maxRequestNum: 1000
-    auth: // 密钥
+    auth: #  密钥
       serviceTimeout: 15
       secretName: secret
       secretIds:
@@ -92,7 +92,7 @@ inputs:
 | 参数名称 | 是否必选 |      类型       | 默认值 | 描述                                                                                                                                                                                 |
 | -------- | :------: | :-------------: | :----: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | src      |    否    |     String      |        | 代码路径。与 object 不能同时存在。                                                                                                                                                   |
-| exclude  |    否    | Array of String |        | 不包含的文件或路径, 遵守 [glob 语法](https://github.com/isaacs/node-glob)                                                                                                            |
+| exclude  |    否    | Array of String |        | 不包含的文件或路径, 遵守 [glob 语法](https:# github.com/isaacs/node-glob)                                                                                                            |
 | bucket   |    否    |     String      |        | bucket 名称。如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 bucket-appid 对应的存储桶中；如果配置了 object，表示获取 bucket-appid 对应存储桶中 object 对应的代码进行部署。 |
 | object   |    否    |     String      |        | 部署的代码在存储桶中的路径。                                                                                                                                                         |
 
@@ -105,7 +105,7 @@ inputs:
 
 ### DNS 配置
 
-参考: https://cloud.tencent.com/document/product/302/8516
+参考: https:# cloud.tencent.com/document/product/302/8516
 
 | 参数名称   | 是否必选 | 类型     | 默认值 | 描述                                            |
 | ---------- | :------: | -------- | :----: | :---------------------------------------------- |
@@ -122,7 +122,7 @@ inputs:
 
 ### 函数配置
 
-参考: https://cloud.tencent.com/document/product/583/18586
+参考: https:# cloud.tencent.com/document/product/583/18586
 
 | 参数名称    | 是否必选 |  类型  | 默认值 | 描述                                                                            |
 | ----------- | :------: | :----: | :----: | :------------------------------------------------------------------------------ |
@@ -157,7 +157,7 @@ inputs:
 
 - 使用计划
 
-参考: https://cloud.tencent.com/document/product/628/14947
+参考: https:# cloud.tencent.com/document/product/628/14947
 
 | 参数名称      | 是否必选 | 类型   | 描述                                                    |
 | ------------- | :------: | ------ | :------------------------------------------------------ |
@@ -168,7 +168,7 @@ inputs:
 
 - API 密钥配置
 
-参考: https://cloud.tencent.com/document/product/628/14916
+参考: https:# cloud.tencent.com/document/product/628/14916
 
 | 参数名称   | 类型   | 描述     |
 | ---------- | :----- | :------- |
@@ -177,7 +177,7 @@ inputs:
 
 ##### 自定义域名
 
-Refer to: https://cloud.tencent.com/document/product/628/14906
+Refer to: https:# cloud.tencent.com/document/product/628/14906
 
 | 参数名称         | 是否必选 |   类型   |  默认值  | 描述                                                                                                                                                                                 |
 | ---------------- | :------: | :------: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

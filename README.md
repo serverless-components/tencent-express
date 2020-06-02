@@ -40,39 +40,23 @@
 
 通过 npm 安装最新版本的 Serverless Framework
 
-```
+```bash
 $ npm install -g serverless
 ```
 
 ### 2. 创建
 
-创建并进入一个全新目录：
-
-```
-$ mkdir tencent-express && cd tencent-express
-```
-
 通过如下命令和模板链接，快速创建一个 express 应用：
 
-```
-$ serverless create --template-url https://github.com/serverless-components/tencent-express/tree/v2/example
-$ cd example
+```bash
+$ serverless create --template-url https://github.com/serverless-components/tencent-express/tree/v2/serverless-express
+$ cd serverless-express
 ```
 
 执行如下命令，安装 express 应用的对应依赖
 
 ```
-$ cd src && npm install
-```
-
-安装完毕后，目录结构如下所示：
-
-```
-|- src
-|   ├── sls.js
-|   ├──node_modules
-|   └── package.json
-└──  serverless.yml
+$ npm install
 ```
 
 ### 3. 部署
@@ -105,7 +89,7 @@ app: appDemo # (optional) serverless dashboard app. default is the same as the n
 stage: dev # (optional) serverless dashboard stage. default is dev.
 
 inputs:
-  src: ./src # (optional) path to the source folder. default is a hello world app.
+  src: ./ # (optional) path to the source folder. default is a hello world app.
   functionName: expressDemo
   region: ap-guangzhou
   runtime: Nodejs10.15
@@ -158,7 +142,7 @@ Express 组件将在腾讯云账户中使用到如下 Serverless 服务：
 - [x] **SCF 云函数** - 云函数将承载 Express.js 应用。
 - [x] **CAM 访问控制** - 该组件会创建默认 CAM 角色用于授权访问关联资源。
 - [x] **COS 对象存储** - 为确保上传速度和质量，云函数压缩并上传代码时，会默认将代码包存储在特定命名的 COS 桶中。
-- [x] **SSL 证书服务** - 如果你在 yaml 文件中配置了 `domain` 字段，需要做自定义域名绑定并开启 HTTPS 时，也会用到证书管理服务和域名服务。Serverless Framework 会根据已经备案的域名自动申请并配置 SSL 证书。
+- [x] **SSL 证书服务** - 如果你在 yaml 文件中配置了 `apigatewayConf.customDomains` 字段，需要做自定义域名绑定并开启 HTTPS 时，也会用到证书管理服务和域名服务。Serverless Framework 会根据已经备案的域名自动申请并配置 SSL 证书。
 
 ## 账号配置
 

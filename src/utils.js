@@ -1,6 +1,5 @@
-const { join } = require('path')
-const { copySync } = require('fs-extra')
-const { Domain } = require('tencent-component-toolkit')
+const path = require('path')
+const { Domain, Cos } = require('tencent-component-toolkit')
 const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
@@ -21,20 +20,14 @@ const generateId = () =>
   Math.random()
     .toString(36)
     .substring(6)
-/*
- * Packages framework app and injects shims and sdk
- *
- * @param ${instance} instance - the component instance
- * @param ${object} config - the component config
- */
-const packageCode = async (instance, inputs) => {
+
+const getCodeZipPath = async (instance, inputs) => {
   console.log(`Packaging ${CONFIGS.frameworkFullname} application...`)
 
   // unzip source zip file
-  console.log(`Unzipping ${inputs.code.src || 'files'}...`)
-  let sourceDirectory
+  let zipPath
   if (!inputs.code.src) {
-    // add default nextjs template
+    // add default template
     const downloadPath = `/tmp/${generateId()}`
     const filename = 'template'
 
@@ -42,31 +35,78 @@ const packageCode = async (instance, inputs) => {
     await download(CONFIGS.templateUrl, downloadPath, {
       filename: `${filename}.zip`
     })
-    const tempPath = await instance.unzip(`${downloadPath}/${filename}.zip`)
-    sourceDirectory = `${tempPath}/src`
+    zipPath = `${downloadPath}/${filename}.zip`
   } else {
-    sourceDirectory = await instance.unzip(inputs.code.src)
+    zipPath = inputs.code.src
   }
-  console.log(`Files unzipped into ${sourceDirectory}...`)
-
-  // add shim to the source directory
-  console.log(`Installing ${CONFIGS.frameworkFullname} + SCF handler...`)
-  copySync(join(__dirname, '_shims'), join(sourceDirectory, '_shims'))
-
-  // add sdk to the source directory, add original handler
-  console.log(`Installing Serverless Framework SDK...`)
-  instance.state.handler = await instance.addSDK(sourceDirectory, '_shims/handler.handler')
-
-  // zip the source directory with the shim and the sdk
-
-  console.log(`Zipping files...`)
-  const zipPath = await instance.zip(sourceDirectory)
-  console.log(`Files zipped into ${zipPath}...`)
-
-  // save the zip path to state for lambda to use it
-  instance.state.zipPath = zipPath
 
   return zipPath
+}
+
+/**
+ * Upload code to COS
+ * @param {Component} instance serverless component instance
+ * @param {string} appId app id
+ * @param {object} credentials credentials
+ * @param {object} inputs component inputs parameters
+ * @param {string} region region
+ */
+const uploadCodeToCos = async (instance, appId, credentials, inputs, region) => {
+  const bucketName = inputs.code.bucket || `sls-cloudfunction-${region}-code`
+  const objectName = inputs.code.object || `${inputs.name}-${Math.floor(Date.now() / 1000)}.zip`
+  // if set bucket and object not pack code
+  if (!inputs.code.bucket || !inputs.code.object) {
+    const zipPath = await getCodeZipPath(instance, inputs)
+    console.log(`Code zip path ${zipPath}`)
+
+    // save the zip path to state for lambda to use it
+    instance.state.zipPath = zipPath
+
+    const cos = new Cos(credentials, region)
+
+    if (!inputs.code.bucket) {
+      // create default bucket
+      await cos.deploy({
+        bucket: bucketName + '-' + appId,
+        force: true,
+        lifecycle: [
+          {
+            status: 'Enabled',
+            id: 'deleteObject',
+            filter: '',
+            expiration: { days: '10' },
+            abortIncompleteMultipartUpload: { daysAfterInitiation: '10' }
+          }
+        ]
+      })
+    }
+
+    // upload code to cos
+    if (!inputs.code.object) {
+      console.log(`Getting cos upload url for bucket ${bucketName}`)
+      const uploadUrl = await cos.getObjectUrl({
+        bucket: bucketName + '-' + appId,
+        object: objectName,
+        method: 'PUT'
+      })
+      const slsSDKEntries = instance.getSDKEntries('_shims/handler.handler')
+
+      console.log(`Uploading code to bucket ${bucketName}`)
+      await instance.uploadSourceZipToCOS(zipPath, uploadUrl, slsSDKEntries, {
+        _shims: path.join(__dirname, '_shims')
+      })
+      console.log(`Upload ${objectName} to bucket ${bucketName} success`)
+    }
+  }
+
+  // save bucket state
+  instance.state.bucket = bucketName
+  instance.state.object = objectName
+
+  return {
+    bucket: bucketName,
+    object: objectName
+  }
 }
 
 const mergeJson = (sourceJson, targetJson) => {
@@ -302,7 +342,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 module.exports = {
   generateId,
   sleep,
-  packageCode,
+  uploadCodeToCos,
   mergeJson,
   capitalString,
   getDefaultProtocol,

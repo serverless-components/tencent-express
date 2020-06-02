@@ -12,9 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "download": "^8.0.0",
-    "fs-extra": "^8.1.0",
-    "tencent-cloud-sdk": "^0.1.4",
-    "tencent-component-toolkit": "^1.5.5",
+    "tencent-component-toolkit": "^1.8.3",
     "type": "^2.0.0"
   }
 }
