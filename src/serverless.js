@@ -1,5 +1,6 @@
 const { Component } = require('@serverless/core')
 const { MultiApigw, Scf, Apigw, Cns, Cam, Metrics } = require('tencent-component-toolkit')
+const { TypeError } = require('tencent-component-toolkit/src/utils/error')
 const { uploadCodeToCos, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
 const CONFIGS = require('./config')
 
@@ -8,7 +9,8 @@ class ServerlessComponent extends Component {
     const { tmpSecrets } = this.credentials.tencent
 
     if (!tmpSecrets || !tmpSecrets.TmpSecretId) {
-      throw new Error(
+      throw new TypeError(
+        'CREDENTIAL',
         'Cannot get secretId/Key, your account could be sub-account or does not have access, please check if SLS_QcsRole role exists in your account, and visit https://console.cloud.tencent.com/cam to bind this role to your account.'
       )
     }
@@ -247,11 +249,11 @@ class ServerlessComponent extends Component {
   async metrics(inputs = {}) {
     console.log(`Get ${CONFIGS.frameworkFullname} Metrics Datas...`)
     if (!inputs.rangeStart || !inputs.rangeEnd) {
-      throw new Error('rangeStart and rangeEnd are require inputs')
+      throw new TypeError('PARAMETER_METRICS', 'rangeStart and rangeEnd are require inputs')
     }
     const { region } = this.state
     if (!region) {
-      throw new Error('No region property in state')
+      throw new TypeError('PARAMETER_METRICS', 'No region property in state')
     }
     const { functionName, namespace, functionVersion } = this.state[region] || {}
     if (functionName) {

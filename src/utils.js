@@ -4,6 +4,7 @@ const ensureObject = require('type/object/ensure')
 const ensureIterable = require('type/iterable/ensure')
 const ensureString = require('type/string/ensure')
 const download = require('download')
+const { TypeError } = require('tencent-component-toolkit/src/utils/error')
 const CONFIGS = require('./config')
 
 /*
@@ -32,9 +33,13 @@ const getCodeZipPath = async (instance, inputs) => {
     const filename = 'template'
 
     console.log(`Installing Default ${CONFIGS.frameworkFullname} App...`)
-    await download(CONFIGS.templateUrl, downloadPath, {
-      filename: `${filename}.zip`
-    })
+    try {
+      await download(CONFIGS.templateUrl, downloadPath, {
+        filename: `${filename}.zip`
+      })
+    } catch (e) {
+      throw new TypeError(`DOWNLOAD_TEMPLATE`, 'Download default template failed.')
+    }
     zipPath = `${downloadPath}/${filename}.zip`
   } else {
     zipPath = inputs.code.src

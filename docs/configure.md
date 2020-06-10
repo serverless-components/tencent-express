@@ -71,21 +71,21 @@ inputs:
 
 主要的参数
 
-| 参数名称                                 | 是否必选 |     默认值      | 描述                                                             |
-| ---------------------------------------- | :------: | :-------------: | :--------------------------------------------------------------- |
-| runtime                                  |    否    |   Nodejs10.15   | 执行环境, 目前支持: Nodejs6.10, Nodejs8.9, Nodejs10.15           |
-| region                                   |    否    |  ap-guangzhou   | 项目部署所在区域，默认广州区                                     |
-| functionName                             |    否    |                 | 云函数名称                                                       |
-| serviceName                              |    否    |                 | API 网关服务名称, 默认创建一个新的服务名称                       |
-| serviceId                                |    否    |                 | API 网关服务 ID,如果存在将使用这个 API 网关服务                  |
-| src                                      |    否    | `process.cwd()` | 默认为当前目录, 如果是对象, 配置参数参考 [执行目录](#src-object) |
-| layers                                   |    否    |                 | 云函数绑定的 layer, 配置参数参考 [层配置](#layer)                |
-| exclude                                  |    否    |                 | 不包含的文件                                                     |
-| include                                  |    否    |                 | 包含的文件, 如果是相对路径，是相对于 `serverless.yml`的路径      |
-| [functionConf](#funtionConf)             |    否    |                 | 函数配置                                                         |
-| [apigatewayConf](#apigatewayConf)        |    否    |                 | API 网关配置                                                     |
-| [cloudDNSConf](#cloudDNSConf)            |    否    |                 | DNS 配置                                                         |
-| [Region special config](#apigatewayConf) |    否    |                 | 指定区配置                                                       |
+| 参数名称                                 | 是否必选 |     默认值      | 描述                                                                |
+| ---------------------------------------- | :------: | :-------------: | :------------------------------------------------------------------ |
+| runtime                                  |    否    |   Nodejs10.15   | 执行环境, 目前支持: Nodejs6.10, Nodejs8.9, Nodejs10.15, Nodejs12.16 |
+| region                                   |    否    |  ap-guangzhou   | 项目部署所在区域，默认广州区                                        |
+| functionName                             |    否    |                 | 云函数名称                                                          |
+| serviceName                              |    否    |                 | API 网关服务名称, 默认创建一个新的服务名称                          |
+| serviceId                                |    否    |                 | API 网关服务 ID,如果存在将使用这个 API 网关服务                     |
+| src                                      |    否    | `process.cwd()` | 默认为当前目录, 如果是对象, 配置参数参考 [执行目录](#src-object)    |
+| layers                                   |    否    |                 | 云函数绑定的 layer, 配置参数参考 [层配置](#layer)                   |
+| exclude                                  |    否    |                 | 不包含的文件                                                        |
+| include                                  |    否    |                 | 包含的文件, 如果是相对路径，是相对于 `serverless.yml`的路径         |
+| [functionConf](#funtionConf)             |    否    |                 | 函数配置                                                            |
+| [apigatewayConf](#apigatewayConf)        |    否    |                 | API 网关配置                                                        |
+| [cloudDNSConf](#cloudDNSConf)            |    否    |                 | DNS 配置                                                            |
+| [Region special config](#apigatewayConf) |    否    |                 | 指定区配置                                                          |
 
 ## 执行目录
 
