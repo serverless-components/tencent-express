@@ -56,13 +56,13 @@ inputs:
       - http
       - https
     environment: test
+    serviceTimeout: 15
     usagePlan: #  用户使用计划
       usagePlanId: 1111
       usagePlanName: slscmp
       usagePlanDesc: sls create
       maxRequestNum: 1000
     auth: #  密钥
-      serviceTimeout: 15
       secretName: secret
       secretIds:
         - xxx
@@ -93,7 +93,7 @@ inputs:
 | 参数名称 | 是否必选 |      类型       | 默认值 | 描述                                                                                                                                                                                 |
 | -------- | :------: | :-------------: | :----: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | src      |    否    |     String      |        | 代码路径。与 object 不能同时存在。                                                                                                                                                   |
-| exclude  |    否    | Array of String |        | 不包含的文件或路径, 遵守 [glob 语法](https:# github.com/isaacs/node-glob)                                                                                                            |
+| exclude  |    否    | Array of String |        | 不包含的文件或路径, 遵守 [glob 语法](https://github.com/isaacs/node-glob)                                                                                                            |
 | bucket   |    否    |     String      |        | bucket 名称。如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 bucket-appid 对应的存储桶中；如果配置了 object，表示获取 bucket-appid 对应存储桶中 object 对应的代码进行部署。 |
 | object   |    否    |     String      |        | 部署的代码在存储桶中的路径。                                                                                                                                                         |
 
@@ -106,7 +106,7 @@ inputs:
 
 ### DNS 配置
 
-参考: https:# cloud.tencent.com/document/product/302/8516
+参考: https://cloud.tencent.com/document/product/302/8516
 
 | 参数名称   | 是否必选 | 类型     | 默认值 | 描述                                            |
 | ---------- | :------: | -------- | :----: | :---------------------------------------------- |
@@ -123,7 +123,7 @@ inputs:
 
 ### 函数配置
 
-参考: https:# cloud.tencent.com/document/product/583/18586
+参考: https://cloud.tencent.com/document/product/583/18586
 
 | 参数名称    | 是否必选 |  类型  | 默认值 | 描述                                                                            |
 | ----------- | :------: | :----: | :----: | :------------------------------------------------------------------------------ |
@@ -147,19 +147,20 @@ inputs:
 
 ### API 网关配置
 
-| 参数名称     | 是否必选 | 类型     | 默认值   | 描述                                                                               |
-| ------------ | :------: | :------- | :------- | :--------------------------------------------------------------------------------- |
-| protocols    |    否    | String[] | ['http'] | 前端请求的类型，如 http，https，http 与 https                                      |
-| environment  |    否    | String   | release  | 发布环境. 目前支持三种发布环境: test（测试）, prepub（预发布） 与 release（发布）. |
-| usagePlan    |    否    |          |          | 使用计划配置, 参考 [使用计划](#使用计划)                                           |
-| auth         |    否    |          |          | API 密钥配置, 参考 [API 密钥](#API-密钥配置)                                       |
-| customDomain |    否    | Object[] |          | 自定义 API 域名配置, 参考 [自定义域名](#自定义域名)                                |
-| enableCORS   |    否    | Boolean  | `false`  | 开启跨域。默认值为否。                                                             |
-| isDisabled   |    否    | Boolean  | `false`  | 关闭自动创建 API 网关功能。默认值为否，即默认自动创建 API 网关。                   |
+| 参数名称       | 是否必选 | 类型     | 默认值   | 描述                                                                               |
+| -------------- | :------: | :------- | :------- | :--------------------------------------------------------------------------------- |
+| protocols      |    否    | String[] | ['http'] | 前端请求的类型，如 http，https，http 与 https                                      |
+| environment    |    否    | String   | release  | 发布环境. 目前支持三种发布环境: test（测试）, prepub（预发布） 与 release（发布）. |
+| usagePlan      |    否    |          |          | 使用计划配置, 参考 [使用计划](#使用计划)                                           |
+| auth           |    否    |          |          | API 密钥配置, 参考 [API 密钥](#API-密钥配置)                                       |
+| customDomain   |    否    | Object[] |          | 自定义 API 域名配置, 参考 [自定义域名](#自定义域名)                                |
+| enableCORS     |    否    | Boolean  | `false`  | 开启跨域。默认值为否。                                                             |
+| serviceTimeout |    否    | Number   | `15`     | Api 超时时间，单位: 秒                                                             |
+| isDisabled     |    否    | Boolean  | `false`  | 关闭自动创建 API 网关功能。默认值为否，即默认自动创建 API 网关。                   |
 
 ##### 使用计划
 
-参考: https:# cloud.tencent.com/document/product/628/14947
+参考: https://cloud.tencent.com/document/product/628/14947
 
 | 参数名称      | 是否必选 | 类型   | 描述                                                    |
 | ------------- | :------: | ------ | :------------------------------------------------------ |
@@ -170,7 +171,7 @@ inputs:
 
 ##### API 密钥配置
 
-参考: https:# cloud.tencent.com/document/product/628/14916
+参考: https://cloud.tencent.com/document/product/628/14916
 
 | 参数名称   | 类型   | 描述     |
 | ---------- | :----- | :------- |
@@ -179,7 +180,7 @@ inputs:
 
 ##### 自定义域名
 
-Refer to: https:# cloud.tencent.com/document/product/628/14906
+Refer to: https://cloud.tencent.com/document/product/628/14906
 
 | 参数名称         | 是否必选 |   类型   |  默认值  | 描述                                                                                                                                                                                 |
 | ---------------- | :------: | :------: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
