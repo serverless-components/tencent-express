@@ -25,8 +25,7 @@ exports.handler = async (event, context) => {
     server = createServer(app, null, app.binaryTypes || [])
   }
 
-  context.callbackWaitsForEmptyEventLoop =
-    app.callbackWaitsForEmptyEventLoop === true ? true : false
+  context.callbackWaitsForEmptyEventLoop = app.callbackWaitsForEmptyEventLoop === true
 
   // provide sls intialize hooks
   if (app.slsInitialize && typeof app.slsInitialize === 'function') {
