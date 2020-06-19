@@ -280,7 +280,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
       }
     }
   ]
-  if (apigatewayConf.usagePlan && apigatewayConf.usagePlan !== {}) {
+  if (apigatewayConf.usagePlan) {
     apigatewayConf.endpoints[0].usagePlan = {
       usagePlanId: apigatewayConf.usagePlan.usagePlanId,
       usagePlanName: apigatewayConf.usagePlan.usagePlanName,
@@ -288,7 +288,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
       maxRequestNum: apigatewayConf.usagePlan.maxRequestNum
     }
   }
-  if (apigatewayConf.auth && apigatewayConf.auth !== {}) {
+  if (apigatewayConf.auth) {
     apigatewayConf.endpoints[0].auth = {
       secretName: apigatewayConf.auth.secretName,
       secretIds: apigatewayConf.auth.secretIds
