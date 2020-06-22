@@ -11,7 +11,7 @@ class ServerlessComponent extends Component {
     if (!tmpSecrets || !tmpSecrets.TmpSecretId) {
       throw new TypeError(
         'CREDENTIAL',
-        'Cannot get secretId/Key, your account could be sub-account or does not have access, please check if SLS_QcsRole role exists in your account, and visit https://console.cloud.tencent.com/cam to bind this role to your account.'
+        'Cannot get secretId/Key, your account could be sub-account and does not have the access to use SLS_QcsRole, please make sure the role exists first, then visit https://cloud.tencent.com/document/product/1154/43006, follow the instructions to bind the role to your account.'
       )
     }
 
