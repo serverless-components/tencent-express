@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "download": "^8.0.0",
-    "tencent-component-toolkit": "^1.11.2",
+    "tencent-component-toolkit": "^1.11.4",
     "type": "^2.0.0"
   }
 }
