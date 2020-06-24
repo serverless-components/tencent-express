@@ -1,7 +1,7 @@
 org: orgDemo # (optional) serverless dashboard org. default is the first org you created during signup.
 app: appDemo # (optional) serverless dashboard app. default is the same as the name property.
 stage: dev # (optional) serverless dashboard stage. default is dev.
-component: express@dev # (required) name of the component. In that case, it's express.
+component: express # (required) name of the component. In that case, it's express.
 name: expressDemo # (required) name of your express component instance.
 
 inputs:
@@ -11,39 +11,8 @@ inputs:
       - .env
   region: ap-guangzhou
   runtime: Nodejs10.15
-  functionName: expressDemo1
-  serviceName: testexpress
-  # serviceId: service-1111
-  functionConf:
-    timeout: 10
-    memorySize: 128
-    environment:
-      variables:
-        TEST: vale
-    vpcConfig:
-      subnetId: ''
-      vpcId: ''
   apigatewayConf:
-    isDisabled: false
-    enableCORS: true
-    # customDomains:
-    #   - domain: test.yuga.chat
-    #     certificateId: e5eRpRhB
-    #     pathMappingSet:
-    #       - path: /
-    #         environment: release
-    #     protocols:
-    #       - http
-    #       - https
     protocols:
       - http
       - https
     environment: release
-    serviceTimeout: 15
-    # usagePlan:
-    #     # usagePlanId: 'usagePlan-gulpv8oa'
-    #     usagePlanName: 'slsgw_usageplan_index'
-    #     usagePlanDesc: 'slsgw usage plan test'
-    #     maxRequestNum: 1000
-    # auth:
-    #   secretName: secrettest
