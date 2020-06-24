@@ -39,6 +39,8 @@ it('should successfully deploy express app', async () => {
   const instance = await sdk.deploy(instanceYaml, { tencent: {} })
   expect(instance).toBeDefined()
   expect(instance.instanceName).toEqual(instanceYaml.name)
+  // get src from template by default
+  expect(instance.outputs.templateUrl).toBeDefined()
 })
 
 it('should successfully update basic configuration', async () => {
@@ -75,6 +77,7 @@ it('should successfully update source code', async () => {
   const response = await axios.get(instance.outputs.apigw.url)
 
   expect(response.data).toEqual('hello world')
+  expect(instance.outputs.templateUrl).not.toBeDefined()
 })
 
 it('should successfully disable auto create api gateway', async () => {
