@@ -21,6 +21,7 @@ const instanceYaml = {
 process.env.SERVERLESS_PLATFORM_VENDOR = 'tencent'
 process.env.TENCENT_SECRET_ID = ''
 process.env.TENCENT_SECRET_KEY = ''
+process.env.SERVERLESS_PLATFORM_STAGE = 'dev'
 
 // get credentials from process.env but need to init empty credentials object
 const credentials = {
@@ -46,7 +47,7 @@ it('should successfully deploy express app', async () => {
 it('should successfully update basic configuration', async () => {
   instanceYaml.inputs.region = 'ap-shanghai'
   instanceYaml.inputs.runtime = 'Nodejs8.9'
-  instanceYaml.inputs.functionName = 'expressDemo01'
+  instanceYaml.inputs.functionName = 'expressDemoTest'
 
   const instance = await sdk.deploy(instanceYaml, credentials)
 
