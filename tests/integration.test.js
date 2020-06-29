@@ -18,11 +18,6 @@ const instanceYaml = {
   }
 }
 
-process.env.SERVERLESS_PLATFORM_VENDOR = 'tencent'
-process.env.TENCENT_SECRET_ID = ''
-process.env.TENCENT_SECRET_KEY = ''
-process.env.SERVERLESS_PLATFORM_STAGE = 'dev'
-
 // get credentials from process.env but need to init empty credentials object
 const credentials = {
   tencent: {}
