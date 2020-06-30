@@ -63,6 +63,16 @@ class ServerlessComponent extends Component {
           ...(this.state[curRegion] ? this.state[curRegion] : {}),
           ...outputs[curRegion]
         }
+
+        if (scfOutput.LastVersion) {
+          outputs[curRegion].lastVersion = scfOutput.LastVersion
+          this.state.lastVersion = scfOutput.LastVersion
+        }
+
+        if (scfOutput.Traffic) {
+          outputs[curRegion].traffic = scfOutput.Traffic
+          this.state.functionTraffic = scfOutput.Traffic
+        }
       }
       uploadCodeHandler.push(funcDeployer())
     }
@@ -249,11 +259,17 @@ class ServerlessComponent extends Component {
   async metrics(inputs = {}) {
     console.log(`Get ${CONFIGS.compFullname} Metrics Datas...`)
     if (!inputs.rangeStart || !inputs.rangeEnd) {
-      throw new TypeError('PARAMETER_EXPRESS_METRICS', 'rangeStart and rangeEnd are require inputs')
+      throw new TypeError(
+        `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
+        'rangeStart and rangeEnd are require inputs'
+      )
     }
     const { region } = this.state
     if (!region) {
-      throw new TypeError('PARAMETER_EXPRESS_METRICS', 'No region property in state')
+      throw new TypeError(
+        `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
+        'No region property in state'
+      )
     }
     const { functionName, namespace, functionVersion } = this.state[region] || {}
     if (functionName) {
@@ -273,7 +289,10 @@ class ServerlessComponent extends Component {
       )
       return metricResults
     }
-    throw new TypeError('PARAMETER_EXPRESS_METRICS', 'Function name not define')
+    throw new TypeError(
+      `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
+      'Function name not define'
+    )
   }
 }
 

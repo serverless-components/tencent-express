@@ -8,19 +8,32 @@ const { TypeError } = require('tencent-component-toolkit/src/utils/error')
 const CONFIGS = require('./config')
 
 /*
- * Pauses execution for the provided miliseconds
- *
- * @param ${number} wait - number of miliseconds to wait
- */
-const sleep = async (wait) => new Promise((resolve) => setTimeout(() => resolve(), wait))
-
-/*
  * Generates a random id
  */
 const generateId = () =>
   Math.random()
     .toString(36)
     .substring(6)
+
+const getType = (obj) => {
+  return Object.prototype.toString.call(obj).slice(8, -1)
+}
+
+const validateTraffic = (num) => {
+  if (getType(num) !== 'Number') {
+    throw new TypeError(
+      `PARAMETER_${CONFIGS.compName.toUpperCase()}_TRAFFIC`,
+      'traffic must be a number'
+    )
+  }
+  if (num < 0 || num > 1) {
+    throw new TypeError(
+      `PARAMETER_${CONFIGS.compName.toUpperCase()}_TRAFFIC`,
+      'traffic must be a number between 0 and 1'
+    )
+  }
+  return true
+}
 
 const getCodeZipPath = async (instance, inputs) => {
   console.log(`Packaging ${CONFIGS.compFullname} application...`)
@@ -226,8 +239,18 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
     fromClientRemark,
     layers: ensureIterable(tempFunctionConf.layers ? tempFunctionConf.layers : inputs.layers, {
       default: []
-    })
+    }),
+    publish: inputs.publish,
+    traffic: inputs.traffic,
+    lastVersion: instance.state.lastVersion
   }
+
+  // validate traffic
+  if (inputs.traffic !== undefined) {
+    validateTraffic(inputs.traffic)
+  }
+  functionConf.needSetTraffic = inputs.traffic !== undefined && functionConf.lastVersion
+
   functionConf.tags = ensureObject(tempFunctionConf.tags ? tempFunctionConf.tags : inputs.tag, {
     default: null
   })
@@ -258,6 +281,7 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 
   // 对apigw inputs进行标准化
   const apigatewayConf = inputs.apigatewayConf ? inputs.apigatewayConf : {}
+  apigatewayConf.isDisabled = inputs.apigatewayConf === true
   apigatewayConf.fromClientRemark = fromClientRemark
   apigatewayConf.serviceName = inputs.serviceName
   apigatewayConf.description = `Serverless Framework Tencent-${capitalString(
@@ -276,7 +300,8 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
       function: {
         isIntegratedResponse: apigatewayConf.isIntegratedResponse === false ? false : true,
         functionName: functionConf.name,
-        functionNamespace: functionConf.namespace
+        functionNamespace: functionConf.namespace,
+        functionQualifier: functionConf.needSetTraffic ? '$DEFAULT' : '$LATEST'
       }
     }
   ]
@@ -361,7 +386,6 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
 
 module.exports = {
   generateId,
-  sleep,
   uploadCodeToCos,
   mergeJson,
   capitalString,
