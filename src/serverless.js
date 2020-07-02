@@ -64,15 +64,25 @@ class ServerlessComponent extends Component {
           ...outputs[curRegion]
         }
 
-        if (scfOutput.LastVersion) {
-          outputs[curRegion].lastVersion = scfOutput.LastVersion
-          this.state.lastVersion = scfOutput.LastVersion
+        // default version is $LATEST
+        outputs[curRegion].lastVersion = scfOutput.LastVersion
+          ? scfOutput.LastVersion
+          : this.state.lastVersion || '$LATEST'
+
+        // default traffic is 1.0, it can also be 0, so we should compare to undefined
+        outputs[curRegion].traffic = scfOutput.Traffic
+          ? scfOutput.Traffic
+          : this.state.traffic !== undefined
+          ? this.state.traffic
+          : 1
+
+        if (outputs[curRegion].traffic !== 1 && scfOutput.ConfigTrafficVersion) {
+          outputs[curRegion].configTrafficVersion = scfOutput.ConfigTrafficVersion
+          this.state.configTrafficVersion = scfOutput.ConfigTrafficVersion
         }
 
-        if (scfOutput.Traffic) {
-          outputs[curRegion].traffic = scfOutput.Traffic
-          this.state.functionTraffic = scfOutput.Traffic
-        }
+        this.state.lastVersion = outputs[curRegion].lastVersion
+        this.state.traffic = outputs[curRegion].traffic
       }
       uploadCodeHandler.push(funcDeployer())
     }
