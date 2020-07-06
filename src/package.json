@@ -1,18 +1,7 @@
 {
-  "name": "@serverless/express",
-  "main": "./serverless.js",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --fix --cache"
-  },
-  "author": "Tencent Cloud, Inc.",
-  "license": "MIT",
   "dependencies": {
     "download": "^8.0.0",
-    "tencent-component-toolkit": "^1.12.7",
+    "tencent-component-toolkit": "^1.12.9",
     "type": "^2.0.0"
   }
 }

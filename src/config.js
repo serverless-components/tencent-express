@@ -9,7 +9,7 @@ const CONFIGS = {
   timeout: 3,
   memorySize: 128,
   namespace: 'default',
-  description: 'This is a function created by serverless component'
+  description: 'Created by Serverless Component'
 }
 
 module.exports = CONFIGS
