@@ -6,7 +6,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "npm run lint && npm run prettier",
+    "int-test": "jest ./tests/integration.test.js --testEnvironment node",
+    "test": "npm run lint && npm run prettier && npm run int-test",
     "commitlint": "commitlint -f HEAD@{15}",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx .",
@@ -44,6 +45,8 @@
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/npm": "^7.0.4",
     "@semantic-release/release-notes-generator": "^9.0.1",
+    "@serverless/platform-client-china": "^1.0.19",
+    "axios": "^0.19.2",
     "babel-eslint": "^10.1.0",
     "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
@@ -51,6 +54,7 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.3",
+    "jest": "^25.0.1",
     "lint-staged": "^10.0.8",
     "prettier": "^1.19.1",
     "semantic-release": "^17.0.4"
