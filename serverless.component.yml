@@ -4,7 +4,7 @@ author: Tencent Cloud, Inc.
 org: Tencent Cloud, Inc.
 description: Deploys a serverless Express.js application onto Tencent SCF and Tencent APIGateway.
 keywords: tencent, serverless, express
-repo: https://github.com/serverless-components/tencent-express/tree/v2
-readme: https://github.com/serverless-components/tencent-express/tree/v2/README.md
+repo: https://github.com/serverless-components/tencent-express
+readme: https://github.com/serverless-components/tencent-express/tree/master/README.md
 license: MIT
 main: ./src
