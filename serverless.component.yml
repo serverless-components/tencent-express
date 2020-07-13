@@ -8,3 +8,4 @@ repo: https://github.com/serverless-components/tencent-express
 readme: https://github.com/serverless-components/tencent-express/tree/master/README.md
 license: MIT
 main: ./src
+webDeployable: true
