@@ -30,7 +30,6 @@ inputs:
   layers:
     - name: layerName #  layer名称
       version: 1 #  版本
-  traffic: 0.9 # 配置默认流量中 $LATEST 版本比重：0 - 1
   functionConf: # 函数配置相关
     timeout: 10 # 超时时间，单位秒
     memorySize: 128 # 内存大小，单位MB
@@ -73,20 +72,19 @@ inputs:
 
 主要的参数
 
-| 参数名称                             | 是否必选 |     默认值      | 描述                                                                                                                                                                                                     |
-| ------------------------------------ | :------: | :-------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| runtime                              |    否    |   Nodejs10.15   | 执行环境, 目前支持: Nodejs6.10, Nodejs8.9, Nodejs10.15, Nodejs12.16                                                                                                                                      |
-| region                               |    否    |  ap-guangzhou   | 项目部署所在区域，默认广州区                                                                                                                                                                             |
-| functionName                         |    否    |                 | 云函数名称                                                                                                                                                                                               |
-| serviceName                          |    否    |                 | API 网关服务名称, 默认创建一个新的服务名称                                                                                                                                                               |
-| serviceId                            |    否    |                 | API 网关服务 ID,如果存在将使用这个 API 网关服务                                                                                                                                                          |
-| src                                  |    否    | `process.cwd()` | 默认为当前目录, 如果是对象, 配置参数参考 [执行目录](#执行目录)                                                                                                                                           |
-| layers                               |    否    |                 | 云函数绑定的 layer, 配置参数参考 [层配置](#层配置)                                                                                                                                                       |
-| traffic                              |    否    |        1        | 配置默认流量中 `$LATEST` 版本比重，取值范围：0 ~ 1，比如 80%，可配置成 0.8。注意如果配置灰度流量，需要配置对应的 API 网关触发器的 endpoints 的 `function.functionQualifier` 参数为 `$DEFAULT` (默认流量) |
-| [functionConf](#函数配置)            |    否    |                 | 函数配置                                                                                                                                                                                                 |
-| [apigatewayConf](#API-网关配置)      |    否    |                 | API 网关配置                                                                                                                                                                                             |
-| [cloudDNSConf](#DNS-配置)            |    否    |                 | DNS 配置                                                                                                                                                                                                 |
-| [Region special config](#指定区配置) |    否    |                 | 指定区配置                                                                                                                                                                                               |
+| 参数名称                             | 是否必选 |     默认值      | 描述                                                                |
+| ------------------------------------ | :------: | :-------------: | :------------------------------------------------------------------ |
+| runtime                              |    否    |   Nodejs10.15   | 执行环境, 目前支持: Nodejs6.10, Nodejs8.9, Nodejs10.15, Nodejs12.16 |
+| region                               |    否    |  ap-guangzhou   | 项目部署所在区域，默认广州区                                        |
+| functionName                         |    否    |                 | 云函数名称                                                          |
+| serviceName                          |    否    |                 | API 网关服务名称, 默认创建一个新的服务名称                          |
+| serviceId                            |    否    |                 | API 网关服务 ID,如果存在将使用这个 API 网关服务                     |
+| src                                  |    否    | `process.cwd()` | 默认为当前目录, 如果是对象, 配置参数参考 [执行目录](#执行目录)      |
+| layers                               |    否    |                 | 云函数绑定的 layer, 配置参数参考 [层配置](#层配置)                  |
+| [functionConf](#函数配置)            |    否    |                 | 函数配置                                                            |
+| [apigatewayConf](#API-网关配置)      |    否    |                 | API 网关配置                                                        |
+| [cloudDNSConf](#DNS-配置)            |    否    |                 | DNS 配置                                                            |
+| [Region special config](#指定区配置) |    否    |                 | 指定区配置                                                          |
 
 ## 执行目录
 
