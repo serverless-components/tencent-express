@@ -304,6 +304,10 @@ class ServerlessComponent extends Component {
       'Function name not define'
     )
   }
+
+  async test() {
+    return { ok: 1 }
+  }
 }
 
 module.exports = ServerlessComponent

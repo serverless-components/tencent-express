@@ -1,5 +1,5 @@
-name: express
-version: 0.0.19
+name: express-ke
+version: 0.0.0-dev
 author: Tencent Cloud, Inc.
 org: Tencent Cloud, Inc.
 description: Deploy a serverless Express.js application on Tencent SCF and API Gateway.
@@ -9,3 +9,23 @@ readme: https://github.com/serverless-components/tencent-express/tree/master/REA
 license: MIT
 main: ./src
 webDeployable: true
+
+actions:
+  # deploy action
+  deploy:
+    definition: Deploy your Express.js application to Tencent SCF
+    inputs:
+      testParam:
+        type: array # The type
+        required: true # Defaults to required: false
+        items:
+          - type: number
+      scf:
+        type: object
+        description: The SCF related configuration
+        keys:
+          functionName:
+            type: string
+            regex: ^[a-z0-9-]+$
+          handler:
+            type: string
