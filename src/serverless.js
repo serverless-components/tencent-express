@@ -290,6 +290,12 @@ class ServerlessComponent extends Component {
         region,
         timezone: inputs.tz
       }
+
+      const curState = this.state[region]
+      if (curState.serviceId) {
+        options.apigwServiceId = curState.serviceId
+        options.apigwEnvironment = curState.environment || 'release'
+      }
       const credentials = this.getCredentials()
       const mertics = new Metrics(credentials, options)
       const metricResults = await mertics.getDatas(
