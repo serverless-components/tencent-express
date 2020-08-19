@@ -70,11 +70,12 @@ class ServerlessComponent extends Component {
           : this.state.lastVersion || '$LATEST'
 
         // default traffic is 1.0, it can also be 0, so we should compare to undefined
-        outputs[curRegion].traffic = scfOutput.Traffic
-          ? scfOutput.Traffic
-          : this.state.traffic !== undefined
-          ? this.state.traffic
-          : 1
+        outputs[curRegion].traffic =
+          scfOutput.Traffic !== undefined
+            ? scfOutput.Traffic
+            : this.state.traffic !== undefined
+            ? this.state.traffic
+            : 1
 
         if (outputs[curRegion].traffic !== 1 && scfOutput.ConfigTrafficVersion) {
           outputs[curRegion].configTrafficVersion = scfOutput.ConfigTrafficVersion
