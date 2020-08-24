@@ -161,6 +161,9 @@ const capitalString = (str) => {
 }
 
 const getDefaultProtocol = (protocols) => {
+  if (!protocols || protocols.length < 1) {
+    return 'http'
+  }
   if (protocols.map((i) => i.toLowerCase()).includes('https')) {
     return 'https'
   }
@@ -277,13 +280,8 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
   apigatewayConf.isDisabled = apigatewayConf.isDisabled === true
   apigatewayConf.fromClientRemark = fromClientRemark
   apigatewayConf.serviceName = inputs.serviceName
-  apigatewayConf.description = `Serverless Framework Tencent-${capitalString(
-    CONFIGS.compName
-  )} Component`
   apigatewayConf.serviceId = inputs.serviceId || stateServiceId
   apigatewayConf.region = functionConf.region
-  apigatewayConf.protocols = apigatewayConf.protocols || ['http']
-  apigatewayConf.environment = apigatewayConf.environment ? apigatewayConf.environment : 'release'
   apigatewayConf.endpoints = [
     {
       path: '/',
