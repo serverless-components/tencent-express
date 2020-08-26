@@ -11,8 +11,7 @@ module.exports = {
         preset: 'angular',
         parserOpts: {
           noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING']
-        },
-        releaseRules: [{ type: 'feat', release: 'patch' }]
+        }
       }
     ],
     [
