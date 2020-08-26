@@ -1,7 +1,6 @@
 module.exports = {
   verifyConditions: [
     '@semantic-release/changelog',
-    '@semantic-release/npm',
     '@semantic-release/git',
     '@semantic-release/github'
   ],
@@ -12,7 +11,8 @@ module.exports = {
         preset: 'angular',
         parserOpts: {
           noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING']
-        }
+        },
+        releaseRules: [{ type: 'feat', release: 'patch' }]
       }
     ],
     [
@@ -31,14 +31,6 @@ module.exports = {
       '@semantic-release/changelog',
       {
         changelogFile: 'CHANGELOG.md'
-      }
-    ],
-    [
-      '@semantic-release/npm',
-      {
-        pkgRoot: '.',
-        npmPublish: false,
-        tarballDir: false
       }
     ],
     [
