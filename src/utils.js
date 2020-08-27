@@ -243,6 +243,9 @@ const prepareInputs = async (instance, credentials, inputs = {}) => {
     layers: ensureIterable(tempFunctionConf.layers ? tempFunctionConf.layers : inputs.layers, {
       default: []
     }),
+    cfs: ensureIterable(tempFunctionConf.cfs ? tempFunctionConf.cfs : inputs.cfs, {
+      default: []
+    }),
     publish: inputs.publish,
     traffic: inputs.traffic,
     lastVersion: instance.state.lastVersion,
