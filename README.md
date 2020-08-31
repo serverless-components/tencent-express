@@ -89,12 +89,13 @@ app: appDemo # (optional) serverless dashboard app. default is the same as the n
 stage: dev # (optional) serverless dashboard stage. default is dev.
 
 inputs:
-  src: ./ # (optional) path to the source folder. default is a hello world app.
+  src:
+    src: ./ # (optional) path to the source folder. default is a hello world app.
+    exclude:
+      - .env
   functionName: expressDemo
   region: ap-guangzhou
   runtime: Nodejs10.15
-  exclude:
-    - .env
   apigatewayConf:
     protocols:
       - http
@@ -102,7 +103,7 @@ inputs:
     environment: release
 ```
 
-点此查看[全量配置及配置说明](https://github.com/serverless-components/tencent-express/blob/v2/docs/configure.md)
+点此查看[全量配置及配置说明](https://github.com/serverless-components/tencent-express/tree/master/docs/configure.md)
 
 当你根据该配置文件更新配置字段后，再次运行 `serverless deploy` 或者 `serverless` 就可以更新配置到云端。
 
