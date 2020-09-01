@@ -84,9 +84,7 @@ Express 组件支持 0 配置部署，也就是可以直接通过配置文件中
 
 component: express # (required) name of the component. In that case, it's express.
 name: expressDemo # (required) name of your express component instance.
-org: orgDemo # (optional) serverless dashboard org. default is the first org you created during signup.
 app: appDemo # (optional) serverless dashboard app. default is the same as the name property.
-stage: dev # (optional) serverless dashboard stage. default is dev.
 
 inputs:
   src:
