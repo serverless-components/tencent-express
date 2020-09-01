@@ -1,3 +1,11 @@
+## [0.1.3](https://github.com/serverless-components/tencent-express/compare/v0.1.2...v0.1.3) (2020-09-01)
+
+
+### Bug Fixes
+
+* support cfs ([9d1a1e1](https://github.com/serverless-components/tencent-express/commit/9d1a1e1793d866f5fbe5bdce61090db8381bb103))
+* update deps for error message ([f0a8f89](https://github.com/serverless-components/tencent-express/commit/f0a8f892f469efcda67070ff940421aa83a100c0))
+
 ## [0.1.2](https://github.com/serverless-components/tencent-express/compare/v0.1.1...v0.1.2) (2020-08-26)
 
 
