@@ -1,3 +1,10 @@
+## [0.1.4](https://github.com/serverless-components/tencent-express/compare/v0.1.3...v0.1.4) (2020-09-02)
+
+
+### Bug Fixes
+
+* update tencnet-component-toolkit for api mark ([7e25e8a](https://github.com/serverless-components/tencent-express/commit/7e25e8a86f539b2db449caf969cbbd58c5af4d1b))
+
 ## [0.1.3](https://github.com/serverless-components/tencent-express/compare/v0.1.2...v0.1.3) (2020-09-01)
 
 
