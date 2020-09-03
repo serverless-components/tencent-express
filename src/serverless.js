@@ -1,7 +1,7 @@
 const { Component } = require('@serverless/core')
-const { MultiApigw, Scf, Apigw, Cns, Cam, Metrics } = require('tencent-component-toolkit')
+const { Scf, Apigw, Cns, Cam, Metrics } = require('tencent-component-toolkit')
 const { TypeError } = require('tencent-component-toolkit/src/utils/error')
-const { uploadCodeToCos, getDefaultProtocol, deleteRecord, prepareInputs } = require('./utils')
+const { uploadCodeToCos, getDefaultProtocol, prepareInputs, deepClone } = require('./utils')
 const CONFIGS = require('./config')
 
 class ServerlessComponent extends Component {
@@ -39,135 +39,141 @@ class ServerlessComponent extends Component {
       }
     }
 
-    const uploadCodeHandler = []
     const outputs = {}
     const appId = this.getAppId()
 
-    for (let eveRegionIndex = 0; eveRegionIndex < regionList.length; eveRegionIndex++) {
-      const curRegion = regionList[eveRegionIndex]
-      const funcDeployer = async () => {
-        const code = await uploadCodeToCos(this, appId, credentials, inputs, curRegion)
-        const scf = new Scf(credentials, curRegion)
-        const tempInputs = {
-          ...inputs,
-          code
-        }
-        const scfOutput = await scf.deploy(tempInputs)
-        outputs[curRegion] = {
-          functionName: scfOutput.FunctionName,
-          runtime: scfOutput.Runtime,
-          namespace: scfOutput.Namespace
-        }
-
-        this.state[curRegion] = {
-          ...(this.state[curRegion] ? this.state[curRegion] : {}),
-          ...outputs[curRegion]
-        }
-
-        // default version is $LATEST
-        outputs[curRegion].lastVersion = scfOutput.LastVersion
-          ? scfOutput.LastVersion
-          : this.state.lastVersion || '$LATEST'
-
-        // default traffic is 1.0, it can also be 0, so we should compare to undefined
-        outputs[curRegion].traffic =
-          scfOutput.Traffic !== undefined
-            ? scfOutput.Traffic
-            : this.state.traffic !== undefined
-            ? this.state.traffic
-            : 1
-
-        if (outputs[curRegion].traffic !== 1 && scfOutput.ConfigTrafficVersion) {
-          outputs[curRegion].configTrafficVersion = scfOutput.ConfigTrafficVersion
-          this.state.configTrafficVersion = scfOutput.ConfigTrafficVersion
-        }
-
-        this.state.lastVersion = outputs[curRegion].lastVersion
-        this.state.traffic = outputs[curRegion].traffic
+    const funcDeployer = async (curRegion) => {
+      const code = await uploadCodeToCos(this, appId, credentials, inputs, curRegion)
+      const scf = new Scf(credentials, curRegion)
+      const tempInputs = {
+        ...inputs,
+        code
       }
-      uploadCodeHandler.push(funcDeployer())
+      const scfOutput = await scf.deploy(deepClone(tempInputs))
+      outputs[curRegion] = {
+        functionName: scfOutput.FunctionName,
+        runtime: scfOutput.Runtime,
+        namespace: scfOutput.Namespace
+      }
+
+      this.state[curRegion] = {
+        ...(this.state[curRegion] ? this.state[curRegion] : {}),
+        ...outputs[curRegion]
+      }
+
+      // default version is $LATEST
+      outputs[curRegion].lastVersion = scfOutput.LastVersion
+        ? scfOutput.LastVersion
+        : this.state.lastVersion || '$LATEST'
+
+      // default traffic is 1.0, it can also be 0, so we should compare to undefined
+      outputs[curRegion].traffic =
+        scfOutput.Traffic !== undefined
+          ? scfOutput.Traffic
+          : this.state.traffic !== undefined
+          ? this.state.traffic
+          : 1
+
+      if (outputs[curRegion].traffic !== 1 && scfOutput.ConfigTrafficVersion) {
+        outputs[curRegion].configTrafficVersion = scfOutput.ConfigTrafficVersion
+        this.state.configTrafficVersion = scfOutput.ConfigTrafficVersion
+      }
+
+      this.state.lastVersion = outputs[curRegion].lastVersion
+      this.state.traffic = outputs[curRegion].traffic
     }
-    await Promise.all(uploadCodeHandler)
+
+    for (let i = 0; i < regionList.length; i++) {
+      const curRegion = regionList[i]
+      await funcDeployer(curRegion)
+    }
     this.save()
     return outputs
+  }
+
+  // try to add dns record
+  async tryToAddDnsRecord(credentials, customDomains) {
+    try {
+      const cns = new Cns(credentials)
+      for (let i = 0; i < customDomains.length; i++) {
+        const item = customDomains[i]
+        if (item.domainPrefix) {
+          await cns.deploy({
+            domain: item.subDomain.replace(`${item.domainPrefix}.`, ''),
+            records: [
+              {
+                subDomain: item.domainPrefix,
+                recordType: 'CNAME',
+                recordLine: '默认',
+                value: item.cname,
+                ttl: 600,
+                mx: 10,
+                status: 'enable'
+              }
+            ]
+          })
+        }
+      }
+    } catch (e) {
+      console.log('METHOD_tryToAddDnsRecord', e.message)
+    }
   }
 
   async deployApigateway(credentials, inputs, regionList) {
     if (inputs.isDisabled) {
       return {}
     }
-    const apigw = new MultiApigw(credentials, regionList)
-    const oldState = this.state[regionList[0]] || {}
-    inputs.oldState = {
-      apiList: oldState.apiList || [],
-      customDomains: oldState.customDomains || []
-    }
-    const apigwOutputs = await apigw.deploy(inputs)
-    const outputs = {}
-    Object.keys(apigwOutputs).forEach((curRegion) => {
-      const curOutput = apigwOutputs[curRegion]
-      outputs[curRegion] = {
-        serviceId: curOutput.serviceId,
-        subDomain: curOutput.subDomain,
-        environment: curOutput.environment,
-        url: `${getDefaultProtocol(inputs.protocols)}://${curOutput.subDomain}/${
-          curOutput.environment
-        }/`
-      }
-      if (curOutput.customDomains) {
-        outputs[curRegion].customDomains = curOutput.customDomains
-      }
-      this.state[curRegion] = {
-        created: curOutput.created,
-        ...(this.state[curRegion] ? this.state[curRegion] : {}),
-        ...outputs[curRegion],
-        apiList: curOutput.apiList
-      }
-    })
-    this.save()
-    return outputs
-  }
 
-  async deployCns(credentials, inputs, regionList, apigwOutputs) {
-    const cns = new Cns(credentials)
-    const cnsRegion = {}
+    const getServiceId = (instance, region) => {
+      const regionState = instance.state[region]
+      return inputs.serviceId || (regionState && regionState.serviceId)
+    }
+
+    const deployTasks = []
+    const outputs = {}
     regionList.forEach((curRegion) => {
-      const curApigwOutput = apigwOutputs[curRegion]
-      cnsRegion[curRegion] = curApigwOutput.subDomain
-    })
+      const apigwDeployer = async () => {
+        const apigw = new Apigw(credentials, curRegion)
 
-    const state = []
-    const outputs = {}
-    const tempJson = {}
-    for (let i = 0; i < inputs.length; i++) {
-      const curCns = inputs[i]
-      for (let j = 0; j < curCns.records.length; j++) {
-        curCns.records[j].value =
-          cnsRegion[curCns.records[j].value.replace('temp_value_about_', '')]
-      }
-      const tencentCnsOutputs = await cns.deploy(curCns)
-      outputs[curCns.domain] = tencentCnsOutputs.DNS
-        ? tencentCnsOutputs.DNS
-        : 'The domain name has already been added.'
-      tencentCnsOutputs.domain = curCns.domain
-      state.push(tencentCnsOutputs)
-    }
+        const oldState = this.state[curRegion] || {}
+        const apigwInputs = {
+          ...inputs,
+          oldState: {
+            apiList: oldState.apiList || [],
+            customDomains: oldState.customDomains || []
+          }
+        }
+        // different region deployment has different service id
+        apigwInputs.serviceId = getServiceId(this, curRegion)
+        const apigwOutput = await apigw.deploy(deepClone(apigwInputs))
+        outputs[curRegion] = {
+          serviceId: apigwOutput.serviceId,
+          subDomain: apigwOutput.subDomain,
+          environment: apigwOutput.environment,
+          url: `${getDefaultProtocol(inputs.protocols)}://${apigwOutput.subDomain}/${
+            apigwOutput.environment
+          }/`
+        }
 
-    // 删除serverless创建的但是不在本次列表中
-    try {
-      for (let i = 0; i < state.length; i++) {
-        tempJson[state[i].domain] = state[i].records
-      }
-      const recordHistory = this.state.cns || []
-      for (let i = 0; i < recordHistory.length; i++) {
-        const delList = deleteRecord(tempJson[recordHistory[i].domain], recordHistory[i].records)
-        if (delList && delList.length > 0) {
-          await cns.remove({ deleteList: delList })
+        if (apigwOutput.customDomains) {
+          // TODO: need confirm add cns authentication
+          if (inputs.autoAddDnsRecord === true) {
+            // await this.tryToAddDnsRecord(credentials, apigwOutput.customDomains)
+          }
+          outputs[curRegion].customDomains = apigwOutput.customDomains
+        }
+        this.state[curRegion] = {
+          created: true,
+          ...(this.state[curRegion] ? this.state[curRegion] : {}),
+          ...outputs[curRegion],
+          apiList: apigwOutput.apiList
         }
       }
-    } catch (e) {}
+      deployTasks.push(apigwDeployer())
+    })
 
-    this.state['cns'] = state
+    await Promise.all(deployTasks)
+
     this.save()
     return outputs
   }
@@ -178,7 +184,7 @@ class ServerlessComponent extends Component {
     const credentials = this.getCredentials()
 
     // 对Inputs内容进行标准化
-    const { regionList, functionConf, apigatewayConf, cnsConf } = await prepareInputs(
+    const { regionList, functionConf, apigatewayConf } = await prepareInputs(
       this,
       credentials,
       inputs
@@ -208,11 +214,6 @@ class ServerlessComponent extends Component {
     } else {
       outputs['apigw'] = apigwOutputs
       outputs['scf'] = functionOutputs
-    }
-
-    // cns depends on apigw, so if disabled apigw, just ignore it.
-    if (cnsConf.length > 0 && apigatewayConf.isDisabled !== true) {
-      outputs['cns'] = await this.deployCns(credentials, cnsConf, regionList, apigwOutputs)
     }
 
     this.state.region = regionList[0]
