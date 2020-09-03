@@ -1,3 +1,10 @@
+## [0.1.5](https://github.com/serverless-components/tencent-express/compare/v0.1.4...v0.1.5) (2020-09-03)
+
+
+### Bug Fixes
+
+* update deploy flow for multi region ([33ae212](https://github.com/serverless-components/tencent-express/commit/33ae21248a7c191e3ceea2371fd2e69a6b1ebf67))
+
 ## [0.1.4](https://github.com/serverless-components/tencent-express/compare/v0.1.3...v0.1.4) (2020-09-02)
 
 
