@@ -4,15 +4,15 @@ const path = require('path')
 const { createServer, proxy } = require('tencent-serverless-http')
 
 let server
+let app
 
 exports.handler = async (event, context) => {
-  const userSls = path.join(__dirname, '..', 'sls.js')
-  let app
+  const userSls = path.join(__dirname, '..', process.env.SLS_ENTRY_FILE)
   if (fs.existsSync(userSls)) {
-    // load the user provided app
+    // eslint-disable-next-line
+    console.log(`Using user custom entry file ${process.env.SLS_ENTRY_FILE}`)
     app = require(userSls)
   } else {
-    // load the built-in default app
     app = require('./sls.js')
   }
 

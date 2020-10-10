@@ -5,8 +5,7 @@
     "access": "public"
   },
   "scripts": {
-    "int-test": "jest ./tests/integration.test.js --testEnvironment node",
-    "test": "npm run lint && npm run prettier && npm run int-test",
+    "test": "jest ./tests/integration.test.js --testEnvironment node",
     "commitlint": "commitlint -f HEAD@{15}",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx .",
@@ -58,5 +57,27 @@
     "lint-staged": "^10.0.8",
     "prettier": "^1.19.1",
     "semantic-release": "^17.0.4"
-  }
+  },
+  "description": "Easily deploy serverless Express.js applications to Tencent Cloud with the Serverless Framework",
+  "directories": {
+    "doc": "docs",
+    "example": "example",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/serverless-components/tencent-express.git"
+  },
+  "keywords": [
+    "serverless-express",
+    "serverless",
+    "express",
+    "serverless-framework",
+    "serverless-components",
+    "tencent-cloud"
+  ],
+  "bugs": {
+    "url": "https://github.com/serverless-components/tencent-express/issues"
+  },
+  "homepage": "https://github.com/serverless-components/tencent-express#readme"
 }
