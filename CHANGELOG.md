@@ -1,3 +1,15 @@
+# [0.2.0](https://github.com/serverless-components/tencent-express/compare/v0.1.5...v0.2.0) (2020-10-12)
+
+
+### Bug Fixes
+
+* support all parameters for apigw ([ec3ffc7](https://github.com/serverless-components/tencent-express/commit/ec3ffc7fb6a6959dbdb734b8a2137f5ac777d05c))
+
+
+### Features
+
+* support custom entry file and all scf config ([80e2890](https://github.com/serverless-components/tencent-express/commit/80e28903422c5710a56a8267f64ffe47398ddcf8))
+
 ## [0.1.5](https://github.com/serverless-components/tencent-express/compare/v0.1.4...v0.1.5) (2020-09-03)
 
 
