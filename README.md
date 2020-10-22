@@ -49,35 +49,27 @@ $ npm install -g serverless
 通过如下命令和模板链接，快速创建一个 Express 应用：
 
 ```bash
-$ serverless create --template-url https://github.com/serverless-components/tencent-express/tree/master/example
+$ serverless init express-starter --name example
 $ cd example
-```
-
-执行如下命令，安装 Express 应用的对应依赖
-
-```
-$ npm install
 ```
 
 ### 3. 部署
 
-在 `serverless.yml` 文件下的目录中运行 `serverless deploy` 进行 Express 项目的部署。第一次部署可能耗时相对较久，但后续的二次部署会在几秒钟之内完成。部署完毕后，你可以在命令行的输出中查看到你 Express 应用的 URL 地址，点击地址即可访问你的 Express 项目。
+在 `serverless.yml` 文件所在的项目根目录，运行以下指令进行部署：
 
-**注意：**
+```bash
+$ serverless deploy
+```
 
-如您的账号未[登陆](https://cloud.tencent.com/login)或[注册](https://cloud.tencent.com/register)腾讯云，您可以直接通过`微信`扫描命令行中的二维码进行授权登陆和注册。
+部署时需要进行身份验证，如您的账号未 [登陆](https://cloud.tencent.com/login) 或 [注册](https://cloud.tencent.com/register) 腾讯云，您可以直接通过 `微信` 扫描命令行中的二维码进行授权登陆和注册。
 
-如果出现了 `internal server error` 的报错，请检查是否在创建模板后没有运行 `npm install`。
-
-如果希望查看更多部署过程的信息，可以通过`sls deploy --debug` 命令查看部署过程中的实时日志信息，`sls`是 `serverless` 命令的缩写。
-
-<br/>
+> 注意: 如果希望查看更多部署过程的信息，可以通过`serverless deploy --debug` 命令查看部署过程中的实时日志信息。
 
 ### 4. 配置
 
 Express 组件支持 0 配置部署，也就是可以直接通过配置文件中的默认值进行部署。但你依然可以修改更多可选配置来进一步开发该 Express 项目。
 
-以下是 Express 组件的 `serverless.yml`完整配置说明：
+以下是 Express 组件的 `serverless.yml`配置示例：
 
 ```yml
 # serverless.yml
@@ -133,7 +125,7 @@ $ serverless info
 $ serverless remove
 ```
 
-和部署类似，支持通过 `sls remove --debug` 命令查看移除过程中的实时日志信息，`sls`是 `serverless` 命令的缩写。
+和部署类似，支持通过 `serverless remove --debug` 命令查看移除过程中的实时日志信息。
 
 ## 架构说明
 
