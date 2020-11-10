@@ -17,8 +17,6 @@
 
 <br/>
 
-<img align="right" width="400" src="https://scf-dev-tools-1253665819.cos.ap-guangzhou.myqcloud.com/express_demo_light_sm_resize.gif" />
-
 快速开始：
 
 1. [**安装**](#1-安装)
