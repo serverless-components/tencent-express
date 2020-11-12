@@ -1,8 +1,15 @@
 const { Component } = require('@serverless/core')
-const { Scf, Apigw, Cns, Cam, Metrics } = require('tencent-component-toolkit')
+const { Scf, Apigw, Cns, Cam, Metrics, Cos, Cdn } = require('tencent-component-toolkit')
 const { TypeError } = require('tencent-component-toolkit/src/utils/error')
-const { uploadCodeToCos, getDefaultProtocol, prepareInputs, deepClone } = require('./utils')
-const CONFIGS = require('./config')
+const {
+  uploadCodeToCos,
+  getDefaultProtocol,
+  deepClone,
+  initializeInputs,
+  initializeStaticCosInputs,
+  initializeStaticCdnInputs
+} = require('./utils')
+const initConfigs = require('./config')
 
 class ServerlessComponent extends Component {
   getCredentials() {
@@ -26,11 +33,18 @@ class ServerlessComponent extends Component {
     return this.credentials.tencent.tmpSecrets.appId
   }
 
-  async deployFunction(credentials, inputs, regionList) {
+  initialize(framework = 'express') {
+    const CONFIGS = initConfigs(framework)
+    this.CONFIGS = CONFIGS
+    this.framework = framework
+    this.__TmpCredentials = this.getCredentials()
+  }
+
+  async deployFaas(credentials, inputs) {
     if (!inputs.role) {
       try {
-        const camClient = new Cam(credentials)
-        const roleExist = await camClient.CheckSCFExcuteRole()
+        const cam = new Cam(credentials)
+        const roleExist = await cam.CheckSCFExcuteRole()
         if (roleExist) {
           inputs.role = 'QCS_SCFExcuteRole'
         }
@@ -39,56 +53,58 @@ class ServerlessComponent extends Component {
       }
     }
 
-    const outputs = {}
     const appId = this.getAppId()
-
-    const funcDeployer = async (curRegion) => {
-      const code = await uploadCodeToCos(this, appId, credentials, inputs, curRegion)
-      const scf = new Scf(credentials, curRegion)
+    const { region } = inputs
+    const { state } = this
+    const instance = this
+    const funcDeployer = async () => {
+      const code = await uploadCodeToCos(instance, appId, credentials, inputs, region)
+      const scf = new Scf(credentials, region)
       const tempInputs = {
         ...inputs,
         code
       }
       const scfOutput = await scf.deploy(deepClone(tempInputs))
-      outputs[curRegion] = {
-        functionName: scfOutput.FunctionName,
+      const outputs = {
+        name: scfOutput.FunctionName,
         runtime: scfOutput.Runtime,
         namespace: scfOutput.Namespace
       }
 
-      this.state[curRegion] = {
-        ...(this.state[curRegion] ? this.state[curRegion] : {}),
-        ...outputs[curRegion]
+      if (scfOutput.Layers && scfOutput.Layers.length > 0) {
+        outputs.layers = scfOutput.Layers.map((item) => ({
+          name: item.LayerName,
+          version: item.LayerVersion
+        }))
       }
 
       // default version is $LATEST
-      outputs[curRegion].lastVersion = scfOutput.LastVersion
+      const faasState = state.faas || state.scf || {}
+      outputs.lastVersion = scfOutput.LastVersion
         ? scfOutput.LastVersion
-        : this.state.lastVersion || '$LATEST'
+        : faasState.lastVersion || '$LATEST'
 
       // default traffic is 1.0, it can also be 0, so we should compare to undefined
-      outputs[curRegion].traffic =
+      outputs.traffic =
         scfOutput.Traffic !== undefined
           ? scfOutput.Traffic
-          : this.state.traffic !== undefined
-          ? this.state.traffic
+          : faasState.traffic !== undefined
+          ? faasState.traffic
           : 1
 
-      if (outputs[curRegion].traffic !== 1 && scfOutput.ConfigTrafficVersion) {
-        outputs[curRegion].configTrafficVersion = scfOutput.ConfigTrafficVersion
-        this.state.configTrafficVersion = scfOutput.ConfigTrafficVersion
+      if (outputs.traffic !== 1 && scfOutput.ConfigTrafficVersion) {
+        outputs.configTrafficVersion = scfOutput.ConfigTrafficVersion
       }
 
-      this.state.lastVersion = outputs[curRegion].lastVersion
-      this.state.traffic = outputs[curRegion].traffic
+      return outputs
     }
 
-    for (let i = 0; i < regionList.length; i++) {
-      const curRegion = regionList[i]
-      await funcDeployer(curRegion)
-    }
-    this.save()
-    return outputs
+    const faasOutputs = await funcDeployer(region)
+
+    this.state.faas = faasOutputs
+    await this.save()
+
+    return faasOutputs
   }
 
   // try to add dns record
@@ -119,187 +135,262 @@ class ServerlessComponent extends Component {
     }
   }
 
-  async deployApigateway(credentials, inputs, regionList) {
+  async deployApigw(credentials, inputs) {
     if (inputs.isDisabled) {
       return {}
     }
 
-    const getServiceId = (instance, region) => {
-      const regionState = instance.state[region]
-      return inputs.serviceId || (regionState && regionState.serviceId)
-    }
+    const { region } = inputs
+    const { state } = this
 
-    const deployTasks = []
-    const outputs = {}
-    regionList.forEach((curRegion) => {
-      const apigwDeployer = async () => {
-        const apigw = new Apigw(credentials, curRegion)
+    const apigwDeployer = async () => {
+      const apigw = new Apigw(credentials, region)
 
-        const oldState = this.state[curRegion] || {}
-        const apigwInputs = {
-          ...inputs,
-          oldState: {
-            apiList: oldState.apiList || [],
-            customDomains: oldState.customDomains || []
-          }
-        }
-        // different region deployment has different service id
-        apigwInputs.serviceId = getServiceId(this, curRegion)
-        const apigwOutput = await apigw.deploy(deepClone(apigwInputs))
-        outputs[curRegion] = {
-          serviceId: apigwOutput.serviceId,
-          subDomain: apigwOutput.subDomain,
-          environment: apigwOutput.environment,
-          url: `${getDefaultProtocol(inputs.protocols)}://${apigwOutput.subDomain}/${
-            apigwOutput.environment
-          }${apigwInputs.endpoints[0].path}`
-        }
-
-        if (apigwOutput.customDomains) {
-          // TODO: need confirm add cns authentication
-          if (inputs.autoAddDnsRecord === true) {
-            // await this.tryToAddDnsRecord(credentials, apigwOutput.customDomains)
-          }
-          outputs[curRegion].customDomains = apigwOutput.customDomains
-        }
-        this.state[curRegion] = {
-          created: true,
-          ...(this.state[curRegion] ? this.state[curRegion] : {}),
-          ...outputs[curRegion],
-          apiList: apigwOutput.apiList
+      const oldState = state.apigw || {}
+      const apigwInputs = {
+        ...inputs,
+        oldState: {
+          apis: oldState.apis || [],
+          customDomains: oldState.customDomains || []
         }
       }
-      deployTasks.push(apigwDeployer())
-    })
+      // different region deployment has different service id
+      const apigwOutput = await apigw.deploy(deepClone(apigwInputs))
+      const outputs = {
+        created: true,
+        url: `${getDefaultProtocol(apigwInputs.protocols)}://${apigwOutput.subDomain}/${
+          apigwOutput.environment
+        }${apigwInputs.endpoints[0].path}`,
+        id: apigwOutput.serviceId,
+        domain: apigwOutput.subDomain,
+        environment: apigwOutput.environment,
+        apis: apigwOutput.apiList
+      }
 
-    await Promise.all(deployTasks)
+      if (apigwOutput.customDomains) {
+        // TODO: need confirm add cns authentication
+        if (inputs.autoAddDnsRecord === true) {
+          // await this.tryToAddDnsRecord(credentials, apigwOutput.customDomains)
+        }
+        outputs.customDomains = apigwOutput.customDomains
+      }
+      return outputs
+    }
 
-    this.save()
-    return outputs
+    const apigwOutputs = await apigwDeployer()
+
+    this.state.apigw = apigwOutputs
+    await this.save()
+
+    return apigwOutputs
+  }
+
+  // deploy static to cos, and setup cdn
+  async deployStatic(credentials, inputs, region) {
+    const { state, framework } = this
+    const { zipPath } = state
+    const appId = this.getAppId()
+    const deployStaticOutpus = {}
+
+    if (zipPath) {
+      console.log(`Deploy static for ${framework} application`)
+      // 1. deploy to cos
+      const { staticCosInputs, bucket } = await initializeStaticCosInputs(
+        this,
+        inputs,
+        appId,
+        zipPath
+      )
+
+      const cos = new Cos(credentials, region)
+      const cosOutput = {
+        region
+      }
+      // flush bucket
+      if (inputs.cos.replace) {
+        await cos.flushBucketFiles(bucket)
+      }
+      for (let i = 0; i < staticCosInputs.length; i++) {
+        const curInputs = staticCosInputs[i]
+        console.log(`Starting deploy directory ${curInputs.src} to cos bucket ${curInputs.bucket}`)
+        const deployRes = await cos.deploy(curInputs)
+        cosOutput.origin = `${curInputs.bucket}.cos.${region}.myqcloud.com`
+        cosOutput.bucket = deployRes.bucket
+        cosOutput.url = `https://${curInputs.bucket}.cos.${region}.myqcloud.com`
+        console.log(`Deploy directory ${curInputs.src} to cos bucket ${curInputs.bucket} success`)
+      }
+      deployStaticOutpus.cos = cosOutput
+
+      // 2. deploy cdn
+      if (inputs.cdn) {
+        const cdn = new Cdn(credentials)
+        const cdnInputs = await initializeStaticCdnInputs(this, inputs, cosOutput.cosOrigin)
+        console.log(`Starting deploy cdn ${cdnInputs.domain}`)
+        const cdnDeployRes = await cdn.deploy(cdnInputs)
+        const protocol = cdnInputs.https ? 'https' : 'http'
+        const cdnOutput = {
+          domain: cdnDeployRes.domain,
+          url: `${protocol}://${cdnDeployRes.domain}`,
+          cname: cdnDeployRes.cname
+        }
+        deployStaticOutpus.cdn = cdnOutput
+
+        console.log(`Deploy cdn ${cdnInputs.domain} success`)
+      }
+
+      console.log(`Deployed static for ${framework} application successfully`)
+
+      return deployStaticOutpus
+    }
+
+    return null
   }
 
   async deploy(inputs) {
-    console.log(`Deploying ${CONFIGS.compFullname} App...`)
+    this.initialize('express')
+    const { __TmpCredentials, CONFIGS, framework } = this
 
-    const credentials = this.getCredentials()
+    console.log(`Deploying ${framework} Application`)
 
-    // 对Inputs内容进行标准化
-    const { regionList, functionConf, apigatewayConf } = await prepareInputs(
-      this,
-      credentials,
-      inputs
-    )
+    const { region, faasConfig, apigwConfig } = await initializeInputs(this, inputs)
 
-    // 部署函数 + API网关
-    const outputs = {}
-    if (!functionConf.code.src) {
+    const outputs = {
+      region
+    }
+    if (!faasConfig.code.src) {
       outputs.templateUrl = CONFIGS.templateUrl
     }
 
-    const deployTasks = [this.deployFunction(credentials, functionConf, regionList, outputs)]
-    // support apigatewayConf.isDisabled
-    if (apigatewayConf.isDisabled !== true) {
-      deployTasks.push(this.deployApigateway(credentials, apigatewayConf, regionList, outputs))
+    const deployTasks = [this.deployFaas(__TmpCredentials, faasConfig)]
+    // support apigw.isDisabled
+    if (apigwConfig.isDisabled !== true) {
+      deployTasks.push(this.deployApigw(__TmpCredentials, apigwConfig))
     } else {
-      this.state.apigwDisabled = true
+      this.state.apigw.isDisabled = true
     }
-    const [functionOutputs, apigwOutputs = {}] = await Promise.all(deployTasks)
+    const [faasOutputs, apigwOutputs = {}] = await Promise.all(deployTasks)
 
-    // optimize outputs for one region
-    if (regionList.length === 1) {
-      const [oneRegion] = regionList
-      outputs.region = oneRegion
-      outputs['apigw'] = apigwOutputs[oneRegion]
-      outputs['scf'] = functionOutputs[oneRegion]
-    } else {
-      outputs['apigw'] = apigwOutputs
-      outputs['scf'] = functionOutputs
+    outputs['faas'] = faasOutputs
+    outputs['apigw'] = apigwOutputs
+
+    // start deploy static cdn
+    const staticConfig = inputs.static || inputs.staticConf
+    if (staticConfig) {
+      staticConfig.cos = staticConfig.cos || staticConfig.cosConf
+      staticConfig.cdn = staticConfig.cdn || staticConfig.cdnConf
+      outputs.static = await this.deployStatic(__TmpCredentials, staticConfig, region)
+      this.state.static = outputs.static
     }
 
-    this.state.region = regionList[0]
-    this.state.regionList = regionList
-    this.state.lambdaArn = functionConf.name
+    // this config for online debug
+    this.state.region = region
+    this.state.namespace = faasConfig.namespace
+    this.state.lambdaArn = faasConfig.name
 
     return outputs
   }
 
-  async remove() {
-    console.log(`Removing ${CONFIGS.compFullname} App...`)
-
-    const { state } = this
-    const { regionList = [] } = state
-
-    const credentials = this.getCredentials()
-
-    const removeHandlers = []
-    for (let i = 0; i < regionList.length; i++) {
-      const curRegion = regionList[i]
-      const curState = state[curRegion]
-      const scf = new Scf(credentials, curRegion)
-      const apigw = new Apigw(credentials, curRegion)
-      const handler = async () => {
-        await scf.remove({
-          functionName: curState.functionName,
-          namespace: curState.namespace
-        })
-        // if disable apigw, no need to remove
-        if (state.apigwDisabled !== true) {
-          await apigw.remove({
-            created: curState.created,
-            environment: curState.environment,
-            serviceId: curState.serviceId,
-            apiList: curState.apiList,
-            customDomains: curState.customDomains
-          })
+  async removeStatic(credentials) {
+    // remove static
+    const { region } = this.state
+    const staticState = this.state.static || this.state.staticConf
+    if (staticState) {
+      console.log(`Removing static config`)
+      // 1. remove cos
+      if (staticState.cos) {
+        const cos = new Cos(credentials, region)
+        await cos.remove(staticState.cos)
+      }
+      // 2. remove cdn
+      if (staticState.cdn) {
+        const cdn = new Cdn(credentials)
+        try {
+          await cdn.remove(staticState.cdn)
+        } catch (e) {
+          // no op
         }
       }
-      removeHandlers.push(handler())
+      console.log(`Remove static config success`)
+    }
+  }
+
+  async remove() {
+    this.initialize('express')
+    const { __TmpCredentials, framework, state } = this
+
+    console.log(`Removing ${framework} App`)
+
+    const { region } = state
+
+    const apigwState = state.apigw
+    const faasState = state.faas || state.scf
+    const scf = new Scf(__TmpCredentials, region)
+    const apigw = new Apigw(__TmpCredentials, region)
+    await scf.remove({
+      functionName: faasState.name || faasState.functionName,
+      namespace: faasState.namespace
+    })
+    // if disable apigw, no need to remove
+    if (apigwState.isDisabled !== true) {
+      const serviceId = apigwState.id || apigwState.serviceId
+      let apis = apigwState.apis || apigwState.apiList || []
+      apis = apis.map((item) => {
+        item.created = true
+        return item
+      })
+      await apigw.remove({
+        created: true,
+        serviceId: serviceId,
+        environment: apigwState.environment,
+        apiList: apis,
+        customDomains: apigwState.customDomains
+      })
     }
 
-    await Promise.all(removeHandlers)
-
-    if (this.state.cns) {
-      const cns = new Cns(credentials)
-      for (let i = 0; i < this.state.cns.length; i++) {
-        await cns.remove({ deleteList: this.state.cns[i].records })
-      }
-    }
+    // remove static
+    await this.removeStatic(__TmpCredentials)
 
     this.state = {}
+
+    return {}
   }
 
   async metrics(inputs = {}) {
-    console.log(`Get ${CONFIGS.compFullname} Metrics Datas...`)
+    this.initialize('express')
+    const { __TmpCredentials, state } = this
+
+    console.log(`Get framework metrics data`)
     if (!inputs.rangeStart || !inputs.rangeEnd) {
       throw new TypeError(
-        `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
+        `PARAMETER_FRAMEWORK_METRICS`,
         'rangeStart and rangeEnd are require inputs'
       )
     }
-    const { region } = this.state
+    const { region } = state
     if (!region) {
-      throw new TypeError(
-        `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
-        'No region property in state'
-      )
+      throw new TypeError(`PARAMETER_FRAMEWORK_METRICS`, 'No region property in state')
     }
-    const { functionName, namespace, functionVersion } = this.state[region] || {}
-    if (functionName) {
+
+    const faasState = state.faas || state.scf || {}
+    const { namespace, latestVersion } = faasState
+    const faasName = faasState.name || faasState.functionName
+    if (faasName) {
       const options = {
-        funcName: functionName,
+        funcName: faasName,
         namespace: namespace,
-        version: functionVersion,
+        version: latestVersion,
         region,
         timezone: inputs.tz
       }
 
-      const curState = this.state[region]
-      if (curState.serviceId) {
-        options.apigwServiceId = curState.serviceId
-        options.apigwEnvironment = curState.environment || 'release'
+      const apigwState = state.apigw
+      const serviceId = apigwState.id || apigwState.serviceId
+      if (serviceId) {
+        options.apigwServiceId = serviceId
+        options.apigwEnvironment = apigwState.environment || 'release'
       }
-      const credentials = this.getCredentials()
-      const mertics = new Metrics(credentials, options)
+
+      const mertics = new Metrics(__TmpCredentials, options)
       const metricResults = await mertics.getDatas(
         inputs.rangeStart,
         inputs.rangeEnd,
@@ -307,10 +398,7 @@ class ServerlessComponent extends Component {
       )
       return metricResults
     }
-    throw new TypeError(
-      `PARAMETER_${CONFIGS.compName.toUpperCase()}_METRICS`,
-      'Function name not define'
-    )
+    throw new TypeError(`PARAMETER_FRAMEWORK_METRICS`, 'Function name not define')
   }
 }
 

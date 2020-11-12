@@ -1,7 +1,7 @@
 org: orgDemo
 app: appDemo
 stage: dev
-component: express
+component: express@dev
 name: expressDemo
 
 inputs:
@@ -9,7 +9,19 @@ inputs:
     src: ./
     exclude:
       - .env
-  apigatewayConf:
+  faas:
+    name: ${name}
+    timeout: 10
+    memorySize: 128
+    # layers:
+    #   - name: test-layer
+    #     version: 1
+    environments:
+      - envKey: NODE_ENV
+        envVal: production
+  apigw:
+    name: express_demo
+    environment: release
     protocols:
       - http
       - https

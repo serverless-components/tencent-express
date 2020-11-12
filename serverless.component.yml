@@ -1,5 +1,5 @@
 name: express
-version: 0.2.0
+version: dev
 author: Tencent Cloud, Inc.
 org: Tencent Cloud, Inc.
 description: Deploy a serverless Express.js application on Tencent SCF and API Gateway.
@@ -9,3 +9,198 @@ readme: https://github.com/serverless-components/tencent-express/tree/master/REA
 license: MIT
 main: ./src
 webDeployable: true
+
+actions:
+  deploy:
+    definition: Deploy web framework application
+    inputs:
+      src:
+        type: src
+        required: true
+        description: The folder containing the source code of your framework application.
+      entryFile:
+        type: string
+      faas:
+        type: object
+        keys:
+          name:
+            type: string
+            description: The name of faas
+            regex: '^[A-Za-z][\w-_]{0,58}[A-Za-z0-9]$'
+          region:
+            type: string
+            default: ap-guangzhou
+            description: Region for faas
+            allow: # The values that are allowed for this
+              - ap-guangzhou
+              - ap-shanghai
+              - ap-hongkong
+              - ap-beijing
+              - ap-chengdu
+              - ap-tokyo
+              - ap-mumbai
+              - ap-singapore
+              - na-siliconvalley
+              - na-toronto
+          runtime:
+            type: string
+            description: faas runtime
+            default: Nodejs10.15
+            allow:
+              - Python2.7
+              - Python3.6
+              - Nodejs6.10
+              - Nodejs8.9
+              - Nodejs10.15
+              - Nodejs12.16
+              - Php5
+              - Php7
+              - Go1
+              - Java8
+              - CustomRuntime
+          layers:
+            type: array
+            items:
+              - type: object
+                keys:
+                  name:
+                    type: string
+                    required: true
+                  version:
+                    type: number
+                    required: true
+          handler:
+            type: string
+            default: 'index.main_handler'
+            description: The handler of faas
+          environment:
+            type: object
+            description: faas environment
+            keys:
+              variables:
+                type: object
+          vpc:
+            type: object
+            keys:
+              vpcId:
+                type: string
+              subnetId:
+                type: string
+          memorySize:
+            type: number
+            description: SCF memory size
+            default: 128 # The default value
+            min: 64 # Minimum number allowed
+            max: 3072 # Maximum number allowed
+            allow: # The values that are allowed for this
+              - 64
+              - 128
+              - 256
+              - 384
+              - 512
+              - 640
+              - 768
+              - 896
+              - 1024
+              - 1152
+              - 1280
+              - 1408
+              - 1536
+              - 1664
+              - 1792
+              - 1920
+              - 2048
+              - 2176
+              - 2304
+              - 2432
+              - 2560
+              - 2688
+              - 2816
+              - 2944
+              - 3072
+      apigw:
+        type: object
+        keys:
+          id:
+            type: string
+            regex: '^service-(\w){8,}$'
+          name:
+            type: string
+            description: Name of API Gateway
+            default: serverless
+            regex: '^[a-zA-Z][a-zA-Z0-9(_)]{0,48}[a-zA-Z0-9]?$'
+      static:
+        type: object
+        keys:
+          cos:
+            type: object
+            keys:
+              bucket:
+                type: string
+                description: The name of cos
+                regex: '^[a-z][a-z0-9-]{0,48}[a-z0-9]$'
+              acl:
+                type: object
+              sources:
+                type: array
+                items:
+                  - type: object
+                    keys:
+                      src:
+                        type: string
+                        required: true
+                      targetDir:
+                        type: string
+                        required: true
+          cdn:
+            type: object
+            keys:
+              area:
+                type: string
+                allow:
+                  - mainland
+                  - overseas
+                  - global
+              domain:
+                type: string
+                required: true
+              autoRefresh:
+                type: boolean
+              refreshType:
+                type: string
+                allow:
+                  - delete
+                  - flush
+              forceRedirect:
+                type: object
+                keys:
+                  switch:
+                    type: string
+                    allow:
+                      - on
+                      - off
+                  redirectType:
+                    type: string
+                    allow:
+                      - http
+                      - https
+                  redirectStatusCode:
+                    type: number
+                    allow:
+                      - 301
+                      - 302
+              https:
+                type: object
+                keys:
+                  http2:
+                    type: string
+                    allow:
+                      - on
+                      - off
+                  certId:
+                    type: string
+                    required: true
+  remove:
+    definition: Remove web framework application
+  metrics:
+    definition: Get metrics of web framework application

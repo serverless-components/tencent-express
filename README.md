@@ -83,10 +83,11 @@ inputs:
     src: ./ # (optional) path to the source folder. default is a hello world app.
     exclude:
       - .env
-  functionName: expressDemo
   region: ap-guangzhou
-  runtime: Nodejs10.15
-  apigatewayConf:
+  faas:
+    name: expressDemo
+    runtime: Nodejs10.15
+  apigw:
     protocols:
       - http
       - https
