@@ -322,29 +322,34 @@ class ServerlessComponent extends Component {
 
     const { region } = state
 
-    const apigwState = state.apigw
-    const faasState = state.faas || state.scf
+    const apigwState = state.apigw || {}
+    const faasState = state.faas || state.scf || {}
     const scf = new Scf(__TmpCredentials, region)
     const apigw = new Apigw(__TmpCredentials, region)
-    await scf.remove({
-      functionName: faasState.name || faasState.functionName,
-      namespace: faasState.namespace
-    })
+    const faasName = faasState.name || faasState.functionName
+    if (faasName) {
+      await scf.remove({
+        functionName: faasState.name || faasState.functionName,
+        namespace: faasState.namespace
+      })
+    }
     // if disable apigw, no need to remove
     if (apigwState.isDisabled !== true) {
       const serviceId = apigwState.id || apigwState.serviceId
-      let apis = apigwState.apis || apigwState.apiList || []
-      apis = apis.map((item) => {
-        item.created = true
-        return item
-      })
-      await apigw.remove({
-        created: true,
-        serviceId: serviceId,
-        environment: apigwState.environment,
-        apiList: apis,
-        customDomains: apigwState.customDomains
-      })
+      if (serviceId) {
+        let apis = apigwState.apis || apigwState.apiList || []
+        apis = apis.map((item) => {
+          item.created = true
+          return item
+        })
+        await apigw.remove({
+          created: true,
+          serviceId: serviceId,
+          environment: apigwState.environment,
+          apiList: apis,
+          customDomains: apigwState.customDomains
+        })
+      }
     }
 
     // remove static
