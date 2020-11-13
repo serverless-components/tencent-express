@@ -12,12 +12,12 @@ webDeployable: true
 
 actions:
   deploy:
-    definition: Deploy web framework application
+    definition: Deploy Express.js application
     inputs:
       src:
         type: src
         required: true
-        description: The folder containing the source code of your framework application.
+        description: The folder containing the source code of your Express.js application.
       entryFile:
         type: string
       faas:
@@ -201,6 +201,6 @@ actions:
                     type: string
                     required: true
   remove:
-    definition: Remove web framework application
+    definition: Remove express application
   metrics:
-    definition: Get metrics of web framework application
+    definition: Get metrics of express application

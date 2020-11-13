@@ -97,8 +97,6 @@ inputs:
 | [apigw](#API-网关配置)       |  否  |                | API 网关配置                                             |
 | [static](#静态资源-CDN-配置) |  否  |                | 静态资源 CDN 配置                                        |
 
-> 注意：目前 `express` 支持 Web 框架有 `express`、`koa`、`egg`、`next`、`nuxt`、`nest`、`laravel`、`thinkphp`、`flask`。
-
 ## 执行目录
 
 | 参数名称 | 必选 |   类型   | 默认值 | 描述                                                                      |
@@ -108,7 +106,7 @@ inputs:
 | bucket   |  否  |  string  |        | bucket 名称。                                                             |
 | obejct   |  否  |  string  |        | 部署的代码在存储桶中的路径。                                              |
 
-> **注意**：如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 bucket-appid 对应的存储桶中；如果配置了 obejct，表示获取 bucket-appid 对应存储桶中 obejct 对应的代码进行部署。
+> **注意**：如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 `<bucket>-<appid>` 对应的存储桶中；如果配置了 obejct，表示获取 bucket-appid 对应存储桶中 obejct 对应的代码进行部署。
 
 比如需要忽略项目的 `node_modules` 目录，可以配置如下：
 
