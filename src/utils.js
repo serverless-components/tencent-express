@@ -269,13 +269,17 @@ const initializeStaticCdnInputs = async (instance, inputs, origin) => {
     }
     if (cdnConfig.https) {
       // using these default configs, for making user's config more simple
-      cdnInputs.forceRedirect =
-        cdnConfig.https.forceRedirect || CONFIGS.defaultcdnConfig.forceRedirect
+      cdnInputs.forceRedirect = {
+        ...{
+          switch: 'on'
+        },
+        ...(cdnConfig.https.forceRedirect || CONFIGS.cdn.forceRedirect)
+      }
       if (!cdnConfig.https.certId) {
         throw new TypeError(`PARAMETER_${framework}_HTTPS`, 'https.certId is required')
       }
       cdnInputs.https = {
-        ...CONFIGS.defaultcdnConfig.https,
+        ...CONFIGS.cdn.https,
         ...{
           http2: cdnConfig.https.http2 || 'on',
           certInfo: {

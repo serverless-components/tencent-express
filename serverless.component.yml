@@ -171,24 +171,6 @@ actions:
                 allow:
                   - delete
                   - flush
-              forceRedirect:
-                type: object
-                keys:
-                  switch:
-                    type: string
-                    allow:
-                      - on
-                      - off
-                  redirectType:
-                    type: string
-                    allow:
-                      - http
-                      - https
-                  redirectStatusCode:
-                    type: number
-                    allow:
-                      - 301
-                      - 302
               https:
                 type: object
                 keys:
@@ -200,6 +182,24 @@ actions:
                   certId:
                     type: string
                     required: true
+                  forceRedirect:
+                    type: object
+                    keys:
+                      switch:
+                        type: string
+                        allow:
+                          - on
+                          - off
+                      redirectType:
+                        type: string
+                        allow:
+                          - http
+                          - https
+                      redirectStatusCode:
+                        type: number
+                        allow:
+                          - 301
+                          - 302
   remove:
     definition: Remove express application
   metrics:

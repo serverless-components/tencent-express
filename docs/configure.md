@@ -75,13 +75,13 @@ inputs:
       domain: abc.com
       autoRefresh: true
       refreshType: delete
-      forceRedirect:
-        switch: on
-        redirectType: https
-        redirectStatusCode: 301
       https:
         http2: on
         certId: 'abc'
+        forceRedirect:
+          switch: on
+          redirectType: https
+          redirectStatusCode: 301
 ```
 
 ## 配置描述
@@ -97,6 +97,8 @@ inputs:
 | [apigw](#API-网关配置)       |  否  |                | API 网关配置                                             |
 | [static](#静态资源-CDN-配置) |  否  |                | 静态资源 CDN 配置                                        |
 
+> 注意：目前 `express` 支持 Web 框架有 `express`、`express`、`egg`、`next`、`nuxt`、`nest`、`laravel`、`thinkphp`、`flask`。
+
 ## 执行目录
 
 | 参数名称 | 必选 |   类型   | 默认值 | 描述                                                                      |
@@ -106,7 +108,7 @@ inputs:
 | bucket   |  否  |  string  |        | bucket 名称。                                                             |
 | obejct   |  否  |  string  |        | 部署的代码在存储桶中的路径。                                              |
 
-> **注意**：如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 `<bucket>-<appid>` 对应的存储桶中；如果配置了 obejct，表示获取 bucket-appid 对应存储桶中 obejct 对应的代码进行部署。
+> **注意**：如果配置了 src，表示部署 src 的代码并压缩成 zip 后上传到 bucket-appid 对应的存储桶中；如果配置了 obejct，表示获取 bucket-appid 对应存储桶中 obejct 对应的代码进行部署。
 
 比如需要忽略项目的 `node_modules` 目录，可以配置如下：
 
@@ -224,14 +226,21 @@ Refer to: https://cloud.tencent.com/document/product/628/14906
 
 ##### CDN 配置
 
-| 参数名称      | 必选 |  类型   |   默认值   | 描述                                                       |
-| ------------- | :--: | :-----: | :--------: | :--------------------------------------------------------- |
-| domain        |  是  | string  |            | CDN 域名                                                   |
-| area          |  否  | string  | `mainland` | 加速区域，mainland: 大陆，overseas：海外，global：全球加速 |
-| autoRefresh   |  否  | boolean |   `true`   | 是否自动刷新 CDN                                           |
-| refreshType   |  否  | boolean |  `delete`  | CDN 刷新类型，delete：刷新全部资源，flush：刷新变更资源    |
-| forceRedirect |  否  | obejct  |            | 访问协议强制跳转配置，参考 [forceRedirect](#forceRedirect) |
-| https         |  否  | obejct  |            | https 配置，参考 [https](#https)                           |
+| 参数名称    | 必选 |  类型   |   默认值   | 描述                                                       |
+| ----------- | :--: | :-----: | :--------: | :--------------------------------------------------------- |
+| domain      |  是  | string  |            | CDN 域名                                                   |
+| area        |  否  | string  | `mainland` | 加速区域，mainland: 大陆，overseas：海外，global：全球加速 |
+| autoRefresh |  否  | boolean |   `true`   | 是否自动刷新 CDN                                           |
+| refreshType |  否  | boolean |  `delete`  | CDN 刷新类型，delete：刷新全部资源，flush：刷新变更资源    |
+| https       |  否  | obejct  |            | https 配置，参考 [https](#https)                           |
+
+###### https
+
+| 参数名称      | 必选 |  类型  | 默认值 | 描述                                                       |
+| ------------- | :--: | :----: | :----: | :--------------------------------------------------------- |
+| certId        |  是  | string |        | 腾讯云托管域名证书 ID                                      |
+| http2         |  是  | string |        | 是否开启 HTTP2，on： 开启，off： 关闭                      |
+| forceRedirect |  否  | obejct |        | 访问协议强制跳转配置，参考 [forceRedirect](#forceRedirect) |
 
 ###### forceRedirect
 
@@ -240,10 +249,3 @@ Refer to: https://cloud.tencent.com/document/product/628/14906
 | switch             |  是  | string |  `on`  | 访问强制跳转配置开关, on：开启，off：关闭                      |
 | redirectType       |  是  | string | `http` | 访问强制跳转类型，http：强制 http 跳转，https：强制 https 跳转 |
 | redirectStatusCode |  是  | number | `301`  | 强制跳转时返回状态码，支持 301、302                            |
-
-###### https
-
-| 参数名称 | 必选 |  类型  | 默认值 | 描述                                  |
-| -------- | :--: | :----: | :----: | :------------------------------------ |
-| certId   |  是  | string |        | 腾讯云托管域名证书 ID                 |
-| http2    |  是  | string |        | 是否开启 HTTP2，on： 开启，off： 关闭 |

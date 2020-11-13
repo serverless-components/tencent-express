@@ -28,6 +28,18 @@ const CONFIGS = {
         abortIncompleteMultipartUpload: { daysAfterInitiation: '10' }
       }
     ]
+  },
+  cdn: {
+    autoRefresh: true,
+    forceRedirect: {
+      switch: 'on',
+      redirectType: 'https',
+      redirectStatusCode: 301
+    },
+    https: {
+      switch: 'on',
+      http2: 'on'
+    }
   }
 }
 
