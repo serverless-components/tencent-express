@@ -196,24 +196,33 @@ class ServerlessComponent extends Component {
       outputs.templateUrl = CONFIGS.templateUrl
     }
 
-    const deployTasks = [this.deployFunction(credentials, functionConf, regionList, outputs)]
+    let apigwOutputs
+    const functionOutputs = await this.deployFunction(
+      credentials,
+      functionConf,
+      regionList,
+      outputs
+    )
     // support apigatewayConf.isDisabled
     if (apigatewayConf.isDisabled !== true) {
-      deployTasks.push(this.deployApigateway(credentials, apigatewayConf, regionList, outputs))
+      apigwOutputs = await this.deployApigateway(credentials, apigatewayConf, regionList, outputs)
     } else {
       this.state.apigwDisabled = true
     }
-    const [functionOutputs, apigwOutputs = {}] = await Promise.all(deployTasks)
 
     // optimize outputs for one region
     if (regionList.length === 1) {
       const [oneRegion] = regionList
       outputs.region = oneRegion
-      outputs['apigw'] = apigwOutputs[oneRegion]
       outputs['scf'] = functionOutputs[oneRegion]
+      if (apigwOutputs) {
+        outputs['apigw'] = apigwOutputs[oneRegion]
+      }
     } else {
-      outputs['apigw'] = apigwOutputs
       outputs['scf'] = functionOutputs
+      if (apigwOutputs) {
+        outputs['apigw'] = apigwOutputs
+      }
     }
 
     this.state.region = regionList[0]
