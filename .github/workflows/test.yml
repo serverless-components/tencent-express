@@ -41,5 +41,7 @@ jobs:
       - name: Running tests
         run: npm run test
         env:
+          SERVERLESS_PLATFORM_VENDOR: tencent
+          GLOBAL_ACCELERATOR_NA: true
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
