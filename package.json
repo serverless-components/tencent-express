@@ -5,7 +5,7 @@
     "access": "public"
   },
   "scripts": {
-    "test": "jest ./tests/integration.test.js --testEnvironment node",
+    "test": "jest",
     "commitlint": "commitlint -f HEAD@{15}",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "lint:fix": "eslint --fix --ext .js,.ts,.tsx .",

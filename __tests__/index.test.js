@@ -1,17 +1,15 @@
-require('dotenv').config()
-const { generateId, getServerlessSdk } = require('./utils')
+const { join } = require('path');
+require('dotenv').config({ path: join(__dirname, '.env.test') });
+
+const { generateId, getServerlessSdk } = require('./lib/utils')
 const execSync = require('child_process').execSync
 const path = require('path')
 const axios = require('axios')
 
-// set enough timeout for deployment to finish
-jest.setTimeout(300000)
-
-// the yaml file we're testing against
 const instanceYaml = {
   org: 'orgDemo',
   app: 'appDemo',
-  component: 'express',
+  component: 'express@dev',
   name: `express-integration-tests-${generateId()}`,
   stage: 'dev',
   inputs: {
@@ -28,7 +26,6 @@ const credentials = {
   }
 }
 
-// get serverless construct sdk
 const sdk = getServerlessSdk(instanceYaml.org)
 
 it('should successfully deploy express app', async () => {
@@ -36,7 +33,6 @@ it('should successfully deploy express app', async () => {
 
   expect(instance).toBeDefined()
   expect(instance.instanceName).toEqual(instanceYaml.name)
-  // get src from template by default
   expect(instance.outputs.templateUrl).toBeDefined()
   expect(instance.outputs.region).toEqual(instanceYaml.inputs.region)
   expect(instance.outputs.apigw).toBeDefined()
@@ -47,14 +43,14 @@ it('should successfully deploy express app', async () => {
 
 it('should successfully update source code', async () => {
   // change source to own source './src' and need to install packages before deploy
-  const srcPath = path.join(__dirname, 'src')
+  const srcPath = path.join(__dirname, '..', 'example')
   execSync('npm install', { cwd: srcPath })
   instanceYaml.inputs.src = srcPath
 
   const instance = await sdk.deploy(instanceYaml, credentials)
   const response = await axios.get(instance.outputs.apigw.url)
 
-  expect(response.data).toEqual('hello world')
+  expect(response.data.includes('Serverless Framework')).toBeTruthy()
   expect(instance.outputs.templateUrl).not.toBeDefined()
 })
 
