@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/serverless-components/tencent-express/compare/v0.2.1...v0.2.2) (2020-12-15)
+
+
+### Bug Fixes
+
+* update remove flow ([f766ee6](https://github.com/serverless-components/tencent-express/commit/f766ee69cf39cf410df0203fc71644297ef70693))
+
 ## [0.2.1](https://github.com/serverless-components/tencent-express/compare/v0.2.0...v0.2.1) (2020-12-15)
 
 
