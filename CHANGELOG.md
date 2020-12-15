@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/serverless-components/tencent-express/compare/v0.2.0...v0.2.1) (2020-12-15)
+
+
+### Bug Fixes
+
+* update to deployment to serial flow ([a76fe58](https://github.com/serverless-components/tencent-express/commit/a76fe586846269132f3a9b9141302050b02a13c3))
+
 # [0.2.0](https://github.com/serverless-components/tencent-express/compare/v0.1.5...v0.2.0) (2020-10-12)
 
 
