@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "download": "^8.0.0",
-    "tencent-component-toolkit": "^1.19.8",
+    "tencent-component-toolkit": "^1.20.6",
     "type": "^2.0.0"
   }
 }
