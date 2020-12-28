@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/serverless-components/tencent-express/compare/v0.2.2...v0.2.3) (2020-12-28)
+
+
+### Bug Fixes
+
+* add sls initialize before creating server ([7f18f2c](https://github.com/serverless-components/tencent-express/commit/7f18f2c5e8e86cc0a9252e5bd036742251964e4d))
+
 ## [0.2.2](https://github.com/serverless-components/tencent-express/compare/v0.2.1...v0.2.2) (2020-12-15)
 
 
