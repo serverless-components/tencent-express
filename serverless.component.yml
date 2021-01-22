@@ -1,5 +1,5 @@
 name: express
-version: 0.2.3
+version: 0.3.0
 author: Tencent Cloud, Inc.
 org: Tencent Cloud, Inc.
 description: Deploy a serverless Express.js application on Tencent SCF and API Gateway.
