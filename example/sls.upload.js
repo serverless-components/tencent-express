@@ -1,9 +1,19 @@
+const multer = require('multer')
 const express = require('express')
 const path = require('path')
+
 const app = express()
 const isServerless = process.env.SERVERLESS
+const upload = multer({ dest: isServerless ? '/tmp/upload' : './upload' })
 
 // Routes
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.send({
+    success: true,
+    data: req.file
+  })
+})
+
 app.get(`/`, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'))
 })
