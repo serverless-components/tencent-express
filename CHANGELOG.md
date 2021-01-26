@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/serverless-components/tencent-express/compare/v0.2.3...v0.3.0) (2021-01-26)
+
+
+### Features
+
+* support apigw base64 encode ([78ca266](https://github.com/serverless-components/tencent-express/commit/78ca26613eec65558852ff1b6a130a841b0178f3))
+
 ## [0.2.3](https://github.com/serverless-components/tencent-express/compare/v0.2.2...v0.2.3) (2020-12-28)
 
 
