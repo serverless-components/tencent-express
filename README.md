@@ -1,3 +1,5 @@
+⚠️⚠️⚠️ 所有框架组件项目迁移到 [tencent-framework-components](https://github.com/serverless-components/tencent-framework-components).
+
 [![Serverless Components](https://img.serverlesscloud.cn/2020210/1581352135771-express.png)](http://serverless.com)
 
 <br/>
